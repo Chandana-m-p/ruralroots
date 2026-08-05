@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RuralRoots — Support Local, Buy Handmade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">🌱</div>
+      <div class="logo-text">
+        <h1>RuralRoots</h1>
+        <span>Support Local, Buy Handmade</span>
+      </div>
+    </a>
+
+    <form class="search-bar" role="search">
+      <input type="text" placeholder="Search handmade products..." aria-label="Search" />
+      <button type="submit" aria-label="Search">🔍</button>
+    </form>
+
+    <div class="topbar-actions">
+      <div class="lang-select">English ▾</div>
+      <a href="wishlist.html" class="icon-btn" aria-label="Wishlist">♡</a>
+      <a href="cart.html" class="icon-btn" aria-label="Cart">
+        🛒<span class="badge" data-cart-count>2</span>
+      </a>
+      <a href="profile.html" class="user-chip">
+        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=faces" alt="Ananya" />
+        Hi, Ananya
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ NAV ============ -->
+<nav class="navbar">
+  <div class="container">
+    <div class="cat-dropdown">☰ Categories ▾</div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="artisans.html">Artisans</a></li>
+      <li><a href="about.html">Our Story</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-copy">
+      <h2>Bringing Rural<br/>Craftsmanship to<br/>Every Home.</h2>
+      <p>Discover unique handmade products crafted with love by rural artisans — delivered straight to your door.</p>
+      <div class="hero-actions">
+        <a href="shop.html" class="btn btn-primary">Shop Now</a>
+        <a href="artisans.html" class="btn btn-outline">Meet Artisans</a>
+      </div>
+    </div>
+    <div class="hero-img-wrap">
+      <img data-hero-slide class="is-active" src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=1000&h=600&fit=crop" alt="Handwoven baskets and terracotta pots" />
+      <button class="hero-nav-btn prev" aria-label="Previous">‹</button>
+      <button class="hero-nav-btn next" aria-label="Next">›</button>
+      <div class="hero-dots">
+        <span data-hero-dot class="active"></span>
+        <span data-hero-dot></span>
+        <span data-hero-dot></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST STRIP ============ -->
+<section class="trust-strip">
+  <div class="container">
+    <div class="trust-item"><span class="ic">🤝</span> Handmade with Love</div>
+    <div class="trust-item"><span class="ic">🧑‍🤝‍🧑</span> Support Local Artisans</div>
+    <div class="trust-item"><span class="ic">🍃</span> Eco-friendly Products</div>
+    <div class="trust-item"><span class="ic">✅</span> Secure Payment</div>
+    <div class="trust-item"><span class="ic">🔁</span> Easy Returns</div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:40px;">
+  <div class="container">
+    <div class="section-head">
+      <h2>Why shoppers choose RuralRoots</h2>
+    </div>
+    <div class="product-grid" style="grid-template-columns:repeat(3,1fr);">
+      <div class="product-card" style="padding:18px;">
+        <div class="info">
+          <h4>Craft with story</h4>
+          <div class="price" style="font-family:var(--font-body);font-size:0.9rem;">Every product is tied to a real artisan family and a meaningful origin story.</div>
+        </div>
+      </div>
+      <div class="product-card" style="padding:18px;">
+        <div class="info">
+          <h4>Better than mass-market</h4>
+          <div class="price" style="font-family:var(--font-body);font-size:0.9rem;">Hand-finished details, natural materials, and thoughtful gifting makes every order feel premium.</div>
+        </div>
+      </div>
+      <div class="product-card" style="padding:18px;">
+        <div class="info">
+          <h4>Trust-first checkout</h4>
+          <div class="price" style="font-family:var(--font-body);font-size:0.9rem;">Clear order summary, transparent shipping, and a smoother purchase journey for shoppers.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATEGORIES ============ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Shop by Categories</h2>
+      <a href="shop.html" class="view-all">View All →</a>
+    </div>
+    <div class="cat-scroll">
+      <a class="cat-card" href="shop.html?cat=baskets">
+        <img src="https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=300&h=300&fit=crop" alt="Handwoven Baskets" />
+        <div class="label">Handwoven Baskets</div>
+      </a>
+      <a class="cat-card" href="shop.html?cat=pottery">
+        <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=300&h=300&fit=crop" alt="Pottery" />
+        <div class="label">Pottery</div>
+      </a>
+      <a class="cat-card" href="shop.html?cat=wood">
+        <img src="https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=300&h=300&fit=crop" alt="Wooden Crafts" />
+        <div class="label">Wooden Crafts</div>
+      </a>
+      <a class="cat-card" href="shop.html?cat=bamboo">
+        <img src="https://images.unsplash.com/photo-1596496181848-3091d4878b24?w=300&h=300&fit=crop" alt="Bamboo Products" />
+        <div class="label">Bamboo Products</div>
+      </a>
+      <a class="cat-card" href="shop.html?cat=jewelry">
+        <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=300&h=300&fit=crop" alt="Handmade Jewelry" />
+        <div class="label">Handmade Jewelry</div>
+      </a>
+      <a class="cat-card" href="shop.html?cat=decor">
+        <img src="https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=300&h=300&fit=crop" alt="Home Decor" />
+        <div class="label">Home Decor</div>
+      </a>
+      <a class="cat-card" href="shop.html?cat=textiles">
+        <img src="https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=300&h=300&fit=crop" alt="Traditional Clothing" />
+        <div class="label">Traditional Clothing</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURED ARTISANS ============ -->
+<section class="section" style="background:var(--cream-2);">
+  <div class="container">
+    <div class="section-head">
+      <h2>Featured Artisans</h2>
+      <a href="artisans.html" class="view-all">View All →</a>
+    </div>
+    <div class="artisan-grid">
+      <div class="artisan-card">
+        <div class="photo">
+          <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=300&h=300&fit=crop&crop=faces" alt="Lalitha Devi" />
+          <button class="fav-btn" data-wishlist aria-label="Save">♡</button>
+        </div>
+        <div class="info">
+          <h4>Lalitha Devi</h4>
+          <p class="loc">Andhra Pradesh · Handwoven Baskets</p>
+          <div class="rating-row"><span class="stars">★ 4.8</span><span class="count">32 Products</span></div>
+        </div>
+      </div>
+      <div class="artisan-card">
+        <div class="photo">
+          <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=300&h=300&fit=crop&crop=faces" alt="Ramesh Kumar" />
+          <button class="fav-btn" data-wishlist aria-label="Save">♡</button>
+        </div>
+        <div class="info">
+          <h4>Ramesh Kumar</h4>
+          <p class="loc">Rajasthan · Pottery</p>
+          <div class="rating-row"><span class="stars">★ 4.7</span><span class="count">28 Products</span></div>
+        </div>
+      </div>
+      <div class="artisan-card">
+        <div class="photo">
+          <img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=300&h=300&fit=crop&crop=faces" alt="Meena Bai" />
+          <button class="fav-btn" data-wishlist aria-label="Save">♡</button>
+        </div>
+        <div class="info">
+          <h4>Meena Bai</h4>
+          <p class="loc">Madhya Pradesh · Bamboo Crafts</p>
+          <div class="rating-row"><span class="stars">★ 4.9</span><span class="count">19 Products</span></div>
+        </div>
+      </div>
+      <div class="artisan-card">
+        <div class="photo">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=faces" alt="Suresh Patil" />
+          <button class="fav-btn" data-wishlist aria-label="Save">♡</button>
+        </div>
+        <div class="info">
+          <h4>Suresh Patil</h4>
+          <p class="loc">Maharashtra · Wooden Crafts</p>
+          <div class="rating-row"><span class="stars">★ 4.6</span><span class="count">21 Products</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BEST SELLING PRODUCTS ============ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Best Selling Products</h2>
+      <a href="shop.html" class="view-all">View All →</a>
+    </div>
+    <div class="product-grid">
+      <a class="product-card" href="product.html?id=basket-01">
+        <div class="thumb">
+          <span class="tag-bestseller">Bestseller</span>
+          <img src="https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=300&h=300&fit=crop" alt="Handwoven Basket" />
+        </div>
+        <div class="info"><h4>Handwoven Basket</h4><div class="price">₹699</div></div>
+      </a>
+      <a class="product-card" href="product.html?id=vase-01">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=300&h=300&fit=crop" alt="Terracotta Vase" /></div>
+        <div class="info"><h4>Terracotta Vase Set</h4><div class="price">₹899</div></div>
+      </a>
+      <a class="product-card" href="product.html?id=earrings-01">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=300&h=300&fit=crop" alt="Handmade Earrings" /></div>
+        <div class="info"><h4>Beaded Drop Earrings</h4><div class="price">₹450</div></div>
+      </a>
+      <a class="product-card" href="product.html?id=box-01">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=300&h=300&fit=crop" alt="Wooden Box" /></div>
+        <div class="info"><h4>Carved Wooden Box</h4><div class="price">₹1,150</div></div>
+      </a>
+      <a class="product-card" href="product.html?id=stole-01">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=300&h=300&fit=crop" alt="Handwoven Stole" /></div>
+        <div class="info"><h4>Handwoven Stole</h4><div class="price">₹1,299</div></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <h5>RuralRoots</h5>
+      <p>Connecting India's rural artisans to homes everywhere. Every purchase supports a family and keeps a craft tradition alive.</p>
+    </div>
+    <div>
+      <h5>Shop</h5>
+      <a href="shop.html">All Products</a><br/>
+      <a href="artisans.html">Artisans</a><br/>
+      <a href="shop.html">Categories</a><br/>
+      <a href="shop.html">Best Sellers</a>
+    </div>
+    <div>
+      <h5>Company</h5>
+      <a href="about.html">Our Story</a><br/>
+      <a href="blog.html">Blog</a><br/>
+      <a href="contact.html">Contact</a><br/>
+      <a href="#">Careers</a>
+    </div>
+    <div>
+      <h5>Stay Connected</h5>
+      <p>Get updates on new artisans and collections.</p>
+      <form class="search-bar" style="max-width:100%;margin-top:10px;">
+        <input type="email" placeholder="Your email" />
+        <button type="submit">→</button>
+      </form>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 RuralRoots. Made with care for rural communities across India.</div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>

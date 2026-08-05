@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Checkout — RuralRoots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500,600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">🌱</div>
+      <div class="logo-text"><h1>RuralRoots</h1><span>Support Local, Buy Handmade</span></div>
+    </a>
+    <div class="topbar-actions">
+      <a href="wishlist.html" class="icon-btn" aria-label="Wishlist">♡</a>
+      <a href="cart.html" class="icon-btn" aria-label="Cart">🛒<span class="badge" data-cart-count>0</span></a>
+    </div>
+  </div>
+</header>
+<nav class="navbar">
+  <div class="container">
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="artisans.html">Artisans</a></li>
+      <li><a href="about.html">Our Story</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="container" style="padding:40px 0;">
+  <div class="breadcrumb"><a href="index.html">Home</a><span class="sep">›</span><span class="current">Checkout</span></div>
+  <div class="checkout-shell">
+    <section class="checkout-card">
+      <h2>Checkout</h2>
+      <form class="checkout-form" data-checkout-form>
+        <div class="field-grid">
+          <label>
+            Full Name
+            <input type="text" name="name" placeholder="Enter your name" required />
+          </label>
+          <label>
+            Email
+            <input type="email" name="email" placeholder="name@example.com" required />
+          </label>
+        </div>
+        <label>
+          Delivery Address
+          <textarea name="address" rows="4" placeholder="Street, city, state, PIN" required></textarea>
+        </label>
+        <label>
+          Payment Method
+          <select name="payment">
+            <option>Cash on Delivery</option>
+            <option>UPI</option>
+            <option>Card</option>
+          </select>
+        </label>
+        <button class="btn btn-primary btn-block" type="submit">Place Order</button>
+      </form>
+      <div class="success-box is-hidden" data-order-success></div>
+    </section>
+
+    <aside class="checkout-summary">
+      <h3>Order Summary</h3>
+      <div class="checkout-items" data-checkout-items></div>
+      <div class="summary-row"><span>Subtotal</span><span data-checkout-subtotal>₹0</span></div>
+      <div class="summary-row"><span>Shipping</span><span data-checkout-shipping>₹0</span></div>
+      <div class="summary-row total-row"><span>Total</span><span data-checkout-total>₹0</span></div>
+    </aside>
+  </div>
+</div>
+<script src="js/script.js"></script>
+</body>
+</html>

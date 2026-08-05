@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Handpainted Terracotta Vase — RuralRoots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">🌱</div>
+      <div class="logo-text"><h1>RuralRoots</h1><span>Support Local, Buy Handmade</span></div>
+    </a>
+    <form class="search-bar" role="search">
+      <input type="text" placeholder="Search handmade products..." aria-label="Search" />
+      <button type="submit" aria-label="Search">🔍</button>
+    </form>
+    <div class="topbar-actions">
+      <div class="lang-select">English ▾</div>
+      <a href="wishlist.html" class="icon-btn" aria-label="Wishlist">♡</a>
+      <a href="cart.html" class="icon-btn" aria-label="Cart">🛒<span class="badge" data-cart-count>2</span></a>
+      <a href="profile.html" class="user-chip">
+        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=faces" alt="Ananya" />
+        Hi, Ananya
+      </a>
+    </div>
+  </div>
+</header>
+
+<nav class="navbar">
+  <div class="container">
+    <div class="cat-dropdown">☰ Categories ▾</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
+      <li><a href="artisans.html">Artisans</a></li>
+      <li><a href="about.html">Our Story</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="breadcrumb">
+    <a href="index.html">Home</a><span class="sep">›</span>
+    <a href="shop.html?cat=pottery">Pottery</a><span class="sep">›</span>
+    <span class="current">Handpainted Terracotta Vase</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="product-detail">
+
+    <!-- Thumbnails -->
+    <div class="thumb-col">
+      <img data-thumb class="active" src="https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=200&h=200&fit=crop" alt="Vase view 1" />
+      <img data-thumb src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=200&h=200&fit=crop" alt="Vase detail" />
+      <img data-thumb src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=200&h=200&fit=crop" alt="Vase view 2" />
+    </div>
+
+    <!-- Main image -->
+    <div class="main-image">
+      <img data-main-image src="https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&h=800&fit=crop" alt="Handpainted Terracotta Vase" />
+    </div>
+
+    <!-- Info -->
+    <div class="pd-info">
+      <h1>Handpainted Terracotta Vase</h1>
+      <p class="by">by <a href="artisan.html?id=ramesh-kumar">Ramesh Kumar</a></p>
+      <div class="pd-rating"><span class="stars">★★★★★</span> 4.7 (24 reviews)</div>
+
+      <div class="pd-price">₹899<small>Inclusive of all taxes</small></div>
+
+      <p class="pd-desc">Beautiful handpainted terracotta vase, perfect for home decor and gifting. Handcrafted using traditional techniques passed down through generations.</p>
+
+      <div class="qty-row">
+        <label>Quantity</label>
+        <div class="qty-control">
+          <button data-qty-minus aria-label="Decrease">−</button>
+          <span data-qty-value>1</span>
+          <button data-qty-plus aria-label="Increase">+</button>
+        </div>
+      </div>
+
+      <div class="pd-actions">
+        <button class="btn btn-primary" data-add-to-cart>Add to Cart</button>
+        <button class="btn-icon" data-wishlist aria-label="Save to wishlist">♡</button>
+      </div>
+      <a href="checkout.html" class="btn btn-outline btn-block pd-buy">Buy Now</a>
+
+      <div class="badge-row">
+        <span>🤲 100% Handmade</span>
+        <span>🍃 Eco-friendly</span>
+        <span>🇮🇳 Made in India</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- About artisan + story -->
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:24px;padding-bottom:56px;">
+    <div>
+      <div class="artisan-panel">
+        <h3>About the Artisan</h3>
+        <div class="artisan-head">
+          <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=120&h=120&fit=crop&crop=faces" alt="Ramesh Kumar" />
+          <div>
+            <h4>Ramesh Kumar</h4>
+            <p class="loc" style="margin:0;">Rajasthan</p>
+          </div>
+        </div>
+        <p>Ramesh ji has been practicing pottery for over 20 years. His work reflects the rich heritage and culture of Rajasthan.</p>
+        <div class="stat-row">
+          <div class="stat">📅 <span><b>20+ Years</b>Experience</span></div>
+          <div class="stat">👥 <span><b>500+ Happy</b>Customers</span></div>
+          <div class="stat">⭐ <span><b>4.7 Rating</b>Overall</span></div>
+        </div>
+        <a href="artisan.html?id=ramesh-kumar" class="btn btn-outline">View Profile</a>
+      </div>
+
+      <div class="story-panel">
+        <h3>Product Story</h3>
+        <p>This vase is crafted and handpainted by skilled artisans using traditional techniques passed down through generations. Each piece is unique and may have slight variations.</p>
+        <div class="spec-row">
+          <div class="spec">🏺 <b>Material</b>Terracotta</div>
+          <div class="spec">🔨 <b>Craft</b>Handpainted</div>
+          <div class="spec">⏱ <b>Time Taken</b>3–4 Hours</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="story-panel">
+        <h3>You May Also Like</h3>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <a class="product-card" style="display:flex;flex-direction:row;" href="product.html?id=basket-01">
+            <div class="thumb" style="width:90px;height:90px;flex-shrink:0;"><img src="https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=200&h=200&fit=crop" alt="Handwoven Basket" /></div>
+            <div class="info"><h4>Handwoven Basket</h4><div class="price">₹699</div></div>
+          </a>
+          <a class="product-card" style="display:flex;flex-direction:row;" href="product.html?id=box-01">
+            <div class="thumb" style="width:90px;height:90px;flex-shrink:0;"><img src="https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=200&h=200&fit=crop" alt="Wooden Box" /></div>
+            <div class="info"><h4>Carved Wooden Box</h4><div class="price">₹1,150</div></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <h5>RuralRoots</h5>
+      <p>Connecting India's rural artisans to homes everywhere. Every purchase supports a family and keeps a craft tradition alive.</p>
+    </div>
+    <div><h5>Shop</h5><a href="shop.html">All Products</a><br/><a href="artisans.html">Artisans</a><br/><a href="shop.html">Categories</a><br/><a href="shop.html">Best Sellers</a></div>
+    <div><h5>Company</h5><a href="about.html">Our Story</a><br/><a href="blog.html">Blog</a><br/><a href="contact.html">Contact</a><br/><a href="#">Careers</a></div>
+    <div>
+      <h5>Stay Connected</h5>
+      <p>Get updates on new artisans and collections.</p>
+      <form class="search-bar" style="max-width:100%;margin-top:10px;"><input type="email" placeholder="Your email" /><button type="submit">→</button></form>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 RuralRoots. Made with care for rural communities across India.</div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
