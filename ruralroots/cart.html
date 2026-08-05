@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cart — RuralRoots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  .cart-shell{display:grid;grid-template-columns:1.3fr .7fr;gap:24px;padding:24px 0 56px;}
+  .cart-card, .summary-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+  .cart-list{display:flex;flex-direction:column;gap:14px;}
+  .cart-item{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px;border:1px solid var(--line);border-radius:12px;}
+  .cart-item h4{margin:0 0 6px;font-size:1rem;}
+  .cart-item .meta{color:var(--ink-soft);font-size:0.9rem;}
+  .summary-row{display:flex;justify-content:space-between;margin:10px 0;}
+  .empty-cart{padding:10px 0;color:var(--ink-soft);}
+  @media(max-width:900px){.cart-shell{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">🌱</div>
+      <div class="logo-text"><h1>RuralRoots</h1><span>Support Local, Buy Handmade</span></div>
+    </a>
+    <form class="search-bar" role="search">
+      <input type="text" placeholder="Search handmade products..." aria-label="Search" />
+      <button type="submit" aria-label="Search">🔍</button>
+    </form>
+    <div class="topbar-actions">
+      <div class="lang-select">English ▾</div>
+      <a href="wishlist.html" class="icon-btn" aria-label="Wishlist">♡</a>
+      <a href="cart.html" class="icon-btn" aria-label="Cart">🛒<span class="badge" data-cart-count>0</span></a>
+      <a href="profile.html" class="user-chip">
+        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=faces" alt="Ananya" />
+        Hi, Ananya
+      </a>
+    </div>
+  </div>
+</header>
+
+<nav class="navbar">
+  <div class="container">
+    <div class="cat-dropdown">☰ Categories ▾</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="artisans.html">Artisans</a></li>
+      <li><a href="about.html">Our Story</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="breadcrumb"><a href="index.html">Home</a><span class="sep">›</span><span class="current">Cart</span></div>
+  <div class="cart-shell">
+    <section class="cart-card">
+      <h2>Your Cart</h2>
+      <div class="cart-list" data-cart-items></div>
+    </section>
+    <aside class="summary-card">
+      <h3>Order Summary</h3>
+      <div class="summary-row"><span>Items</span><span data-cart-count-summary>0</span></div>
+      <div class="summary-row"><span>Subtotal</span><span data-cart-total>₹0</span></div>
+      <a href="checkout.html" class="btn btn-primary btn-block">Proceed to Checkout</a>
+    </aside>
+  </div>
+</div>
+
+<footer>
+  <div class="container footer-grid">
+    <div><h5>RuralRoots</h5><p>Connecting India's rural artisans to homes everywhere. Every purchase supports a family and keeps a craft tradition alive.</p></div>
+    <div><h5>Shop</h5><a href="shop.html">All Products</a><br/><a href="artisans.html">Artisans</a><br/><a href="shop.html">Categories</a><br/><a href="shop.html">Best Sellers</a></div>
+    <div><h5>Company</h5><a href="about.html">Our Story</a><br/><a href="blog.html">Blog</a><br/><a href="contact.html">Contact</a><br/><a href="#">Careers</a></div>
+    <div><h5>Stay Connected</h5><p>Get updates on new artisans and collections.</p>
+      <form class="search-bar" style="max-width:100%;margin-top:10px;"><input type="email" placeholder="Your email" /><button type="submit">→</button></form>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 RuralRoots. Made with care for rural communities across India.</div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
