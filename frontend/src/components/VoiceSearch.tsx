@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { Mic, MicOff, Search } from 'lucide-react';
+import { Mic, MicOff } from 'lucide-react';
 
 interface VoiceSearchProps {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
+  onResult?: (text: string) => void;
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
 }
 
-export const VoiceSearch: React.FC<VoiceSearchProps> = ({ searchQuery, setSearchQuery }) => {
-  const { t, lang } = useLanguage();
+export const VoiceSearch: React.FC<VoiceSearchProps> = ({ onResult, setSearchQuery }) => {
+  const { lang } = useLanguage();
   const [isListening, setIsListening] = useState(false);
 
-  const startVoiceSearch = () => {
+  const startVoiceSearch = (e: React.MouseEvent) => {
+    e.preventDefault();
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      alert('Voice recognition not supported in this browser. Please use Chrome on Mobile.');
+      alert('Voice recognition is not supported on this browser. Try Chrome or Edge.');
       return;
     }
 
@@ -29,31 +31,23 @@ export const VoiceSearch: React.FC<VoiceSearchProps> = ({ searchQuery, setSearch
 
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
-      setSearchQuery(transcript);
+      if (onResult) onResult(transcript);
+      if (setSearchQuery) setSearchQuery(transcript);
     };
 
     recognition.start();
   };
 
   return (
-    <div className="search-bar-container">
-      <div className="search-input-wrapper">
-        <Search className="search-icon" size={20} />
-        <input 
-          type="text" 
-          className="search-input"
-          placeholder={t('searchPlaceholder')}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <button 
-          className={`mic-btn ${isListening ? 'listening' : ''}`}
-          onClick={startVoiceSearch}
-          title={t('voiceSearch')}
-        >
-          {isListening ? <MicOff size={20} className="pulse" /> : <Mic size={20} />}
-        </button>
-      </div>
-    </div>
+    <button 
+      type="button"
+      className={`btn-icon ${isListening ? 'active' : ''}`}
+      style={{ width: '32px', height: '32px', border: 'none', background: 'transparent' }}
+      onClick={startVoiceSearch}
+      title="Voice Search"
+      aria-label="Voice Search"
+    >
+      {isListening ? <MicOff size={16} color="var(--clay)" /> : <Mic size={16} color="var(--ink-soft)" />}
+    </button>
   );
 };
