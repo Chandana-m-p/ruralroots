@@ -63,3 +63,26 @@ VALUES (8, 'ART-CUSHION-01',
   '{"en": "Hand Block-Printed Cotton Cushion Cover", "hi": "हाथ से ब्लॉक-प्रिंटेड कॉटन कुशन कवर", "mr": "हातने ब्लॉक-प्रिंट केलेले सुती उशीचे कव्हर", "gu": "હાથથી બ્લોક-પ્રિન્ટેડ કોટન કુશન કવર"}', 
   '{"en": "Pure cotton cushion cover block-printed by traditional master artisans using natural indigo.", "hi": "प्राकृतिक नील का उपयोग करके पारंपरिक कारीगरों द्वारा ब्लॉक-प्रिंट किया गया शुद्ध सूती कुशन कवर।"}', 
   399.00, 65, 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80', '["https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80"]', true, 0);
+
+-- Seed Orders with required Status Management States:
+-- 1. Delivered Successfully
+-- 2. Delivered Unsuccessfully
+-- 3. Cancelled
+
+INSERT INTO orders (id, order_number, idempotency_key, buyer_id, hub_id, order_status, payment_type, payment_status, total_amount, offline_created_at, synced_at, delivery_date)
+VALUES (1, 'RR-889101', 'a1111111-1111-1111-1111-111111111111', 1, 1, 'Delivered Successfully', 'UPI', 'PAID', 1150.00, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), DATEADD('DAY', -2, CURRENT_TIMESTAMP()));
+
+INSERT INTO order_items (id, order_id, product_id, quantity, unit_price)
+VALUES (1, 1, 4, 1, 1150.00);
+
+INSERT INTO orders (id, order_number, idempotency_key, buyer_id, hub_id, order_status, payment_type, payment_status, total_amount, offline_created_at, synced_at, delivery_date)
+VALUES (2, 'RR-889102', 'a2222222-2222-2222-2222-222222222222', 1, 1, 'Delivered Unsuccessfully', 'COD', 'UNPAID', 899.00, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), DATEADD('DAY', -1, CURRENT_TIMESTAMP()));
+
+INSERT INTO order_items (id, order_id, product_id, quantity, unit_price)
+VALUES (2, 2, 1, 1, 899.00);
+
+INSERT INTO orders (id, order_number, idempotency_key, buyer_id, hub_id, order_status, payment_type, payment_status, total_amount, offline_created_at, synced_at, delivery_date)
+VALUES (3, 'RR-889103', 'a3333333-3333-3333-3333-333333333333', 1, 2, 'Cancelled', 'CARD', 'REFUNDED', 699.00, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), DATEADD('DAY', 0, CURRENT_TIMESTAMP()));
+
+INSERT INTO order_items (id, order_id, product_id, quantity, unit_price)
+VALUES (3, 3, 2, 1, 699.00);

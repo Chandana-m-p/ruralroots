@@ -1,10 +1,12 @@
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\dto\OrderResponseDTO.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\dto\OtpVerifyDTO.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\controller\AuthController.java
+C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\controller\NotificationController.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\model\Role.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\service\OrderSyncService.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\controller\OrderController.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\service\ProductService.java
+C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\controller\HomeController.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\dto\AuthResponseDTO.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\dto\VillageHubDTO.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\security\JwtTokenProvider.java
@@ -29,5 +31,6 @@ C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\service\VillageHubService.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\repository\VillageHubRepository.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\model\User.java
+C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\controller\UserController.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\controller\ProductController.java
 C:\Users\chand\OneDrive\Desktop\ruralroots\backend\src\main\java\com\ruralroots\dto\OrderItemDTO.java

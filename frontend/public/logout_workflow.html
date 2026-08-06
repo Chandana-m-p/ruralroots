@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3-Stage Authentication & Logout Workflow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --success: #16a34a;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* Workflow Stage Badges */
+    .workflow-tracker {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .step-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #94a3b8;
+      font-size: 0.825rem;
+      font-weight: 700;
+    }
+
+    .step-badge.active {
+      background: rgba(37, 99, 235, 0.2);
+      border-color: #3b82f6;
+      color: #60a5fa;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.25);
+    }
+
+    /* Container Card */
+    .auth-card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .card-header h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .card-header p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: #f8fafc;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .pin-grid {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .pin-input {
+      width: 54px;
+      height: 56px;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: #ffffff;
+    }
+
+    .pin-input:focus {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+      outline: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger-hover);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 420px;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 32px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      transform: scale(0.95);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-overlay.open .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #fef2f2;
+      color: #dc2626;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .alert-box {
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .alert-danger {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #b91c1c;
+    }
+
+    .alert-success {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      color: #15803d;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Workflow Stage Tracker -->
+  <div class="workflow-tracker">
+    <div id="badge-stage1" class="step-badge active"><span>1</span> Login / Register</div>
+    <div id="badge-stage2" class="step-badge"><span>2</span> Logout Confirmation</div>
+    <div id="badge-stage3" class="step-badge"><span>3</span> Verification Page</div>
+  </div>
+
+  <!-- STAGE 1: LOGIN PAGE -->
+  <div id="stage1-view" class="auth-card">
+    <div class="card-header">
+      <h2>Stage 1: User Sign In</h2>
+      <p>Enter your unique primary account name to log in or register.</p>
+    </div>
+
+    <div id="login-alert" class="alert-box alert-danger hidden"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label for="account-name">Unique Account Name / Identifier</label>
+        <input type="text" id="account-name" class="input-field" placeholder="e.g. Alex_Chandana" required />
+      </div>
+
+      <div class="form-group">
+        <label for="account-role">Account Type</label>
+        <select id="account-role" class="input-field">
+          <option value="Standard User">Standard Account</option>
+          <option value="Administrator">Administrator</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Sign In to Account →</button>
+    </form>
+  </div>
+
+  <!-- AUTHENTICATED DASHBOARD VIEW -->
+  <div id="dashboard-view" class="auth-card hidden">
+    <div class="card-header">
+      <h2>Welcome, <span id="active-user-name">User</span>!</h2>
+      <p>You are successfully logged in. You can now initiate the multi-stage logout process.</p>
+    </div>
+
+    <div style="background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px; text-align: center;">
+      <p style="font-size: 0.85rem; color: #64748b;">Account Status: <strong style="color: #16a34a;">● Authenticated Session Active</strong></p>
+    </div>
+
+    <button id="trigger-logout-btn" class="btn btn-danger">Initiate Logout Procedure</button>
+  </div>
+
+  <!-- STAGE 2: LOGOUT CONFIRMATION MODAL -->
+  <div id="logout-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-icon">⚠️</div>
+      <h3 style="font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Logout Confirmation</h3>
+      <p style="font-size: 0.9rem; color: #64748b;">Are you sure you want to logout from your account?</p>
+
+      <div class="modal-actions">
+        <button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+        <button id="modal-logout-btn" class="btn btn-danger">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 3: LOGOUT VERIFICATION PAGE -->
+  <div id="stage3-view" class="auth-card hidden">
+    <div class="card-header">
+      <h2>Stage 3: Logout Verification</h2>
+      <p>Re-enter your account handle and 4-digit security PIN to finalize session destruction.</p>
+    </div>
+
+    <div id="verify-alert" class="alert-box alert-danger hidden"></div>
+
+    <form id="verification-form">
+      <div class="form-group">
+        <label for="verify-account-name">Confirm Account Name</label>
+        <input type="text" id="verify-account-name" class="input-field" placeholder="Enter account name to verify" required />
+      </div>
+
+      <div class="form-group">
+        <label>4-Digit Verification Security PIN</label>
+        <div class="pin-grid">
+          <input type="password" class="pin-input" maxlength="1" id="pin-1" required />
+          <input type="password" class="pin-input" maxlength="1" id="pin-2" required />
+          <input type="password" class="pin-input" maxlength="1" id="pin-3" required />
+          <input type="password" class="pin-input" maxlength="1" id="pin-4" required />
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-danger">Verify & Complete Logout</button>
+    </form>
+  </div>
+
+  <script>
+    // App State Management
+    let currentAccountName = '';
+
+    // Elements
+    const stage1View = document.getElementById('stage1-view');
+    const dashboardView = document.getElementById('dashboard-view');
+    const stage3View = document.getElementById('stage3-view');
+    const logoutModal = document.getElementById('logout-modal');
+    
+    const badgeStage1 = document.getElementById('badge-stage1');
+    const badgeStage2 = document.getElementById('badge-stage2');
+    const badgeStage3 = document.getElementById('badge-stage3');
+
+    const loginForm = document.getElementById('login-form');
+    const accountNameInput = document.getElementById('account-name');
+    const activeUserName = document.getElementById('active-user-name');
+    const loginAlert = document.getElementById('login-alert');
+
+    const triggerLogoutBtn = document.getElementById('trigger-logout-btn');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalLogoutBtn = document.getElementById('modal-logout-btn');
+
+    const verificationForm = document.getElementById('verification-form');
+    const verifyAccountName = document.getElementById('verify-account-name');
+    const verifyAlert = document.getElementById('verify-alert');
+
+    // Stage 1: Login Submit
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = accountNameInput.value.trim();
+      if (!val) {
+        showLoginAlert('Please enter a valid unique account name.');
+        return;
+      }
+
+      currentAccountName = val;
+      activeUserName.textContent = currentAccountName;
+
+      // Transition to Dashboard
+      stage1View.classList.add('hidden');
+      dashboardView.classList.remove('hidden');
+
+      badgeStage1.classList.remove('active');
+    });
+
+    // Stage 2: Trigger Logout Modal
+    triggerLogoutBtn.addEventListener('click', () => {
+      logoutModal.classList.add('open');
+      badgeStage2.classList.add('active');
+    });
+
+    modalCancelBtn.addEventListener('click', () => {
+      logoutModal.classList.remove('open');
+      badgeStage2.classList.remove('active');
+    });
+
+    // Stage 2 Logout Confirmation -> Redirect to Stage 3 Verification Page
+    modalLogoutBtn.addEventListener('click', () => {
+      logoutModal.classList.remove('open');
+      dashboardView.classList.add('hidden');
+      stage3View.classList.remove('hidden');
+
+      badgeStage2.classList.remove('active');
+      badgeStage3.classList.add('active');
+
+      verifyAccountName.placeholder = `Confirm name (${currentAccountName})`;
+    });
+
+    // Stage 3: Auto-focus PIN Inputs
+    const pinInputs = document.querySelectorAll('.pin-input');
+    pinInputs.forEach((input, idx) => {
+      input.addEventListener('input', (e) => {
+        if (e.target.value.length === 1 && idx < 3) {
+          pinInputs[idx + 1].focus();
+        }
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+          pinInputs[idx - 1].focus();
+        }
+      });
+    });
+
+    // Stage 3: Verification Submit
+    verificationForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      hideVerifyAlert();
+
+      const enteredName = verifyAccountName.value.trim();
+      let pinCode = '';
+      pinInputs.forEach(inp => pinCode += inp.value);
+
+      if (enteredName.toLowerCase() !== currentAccountName.toLowerCase()) {
+        showVerifyAlert(`Account name mismatch! Entered "${enteredName}", expected "${currentAccountName}".`);
+        return;
+      }
+
+      if (pinCode.length < 4) {
+        showVerifyAlert('Please enter your complete 4-digit security PIN.');
+        return;
+      }
+
+      // Successful Logout Verification
+      showVerifySuccess('✅ Verification successful! Clearing session and logging out...');
+
+      setTimeout(() => {
+        // Reset state & Return to Stage 1
+        currentAccountName = '';
+        accountNameInput.value = '';
+        verifyAccountName.value = '';
+        pinInputs.forEach(inp => inp.value = '');
+
+        stage3View.classList.add('hidden');
+        stage1View.classList.remove('hidden');
+
+        badgeStage3.classList.remove('active');
+        badgeStage1.classList.add('active');
+
+        showLoginSuccess('You have been securely logged out.');
+      }, 1500);
+    });
+
+    function showLoginAlert(msg) {
+      loginAlert.textContent = msg;
+      loginAlert.className = 'alert-box alert-danger';
+      loginAlert.classList.remove('hidden');
+    }
+
+    function showLoginSuccess(msg) {
+      loginAlert.textContent = msg;
+      loginAlert.className = 'alert-box alert-success';
+      loginAlert.classList.remove('hidden');
+    }
+
+    function showVerifyAlert(msg) {
+      verifyAlert.textContent = msg;
+      verifyAlert.className = 'alert-box alert-danger';
+      verifyAlert.classList.remove('hidden');
+    }
+
+    function showVerifySuccess(msg) {
+      verifyAlert.textContent = msg;
+      verifyAlert.className = 'alert-box alert-success';
+      verifyAlert.classList.remove('hidden');
+    }
+
+    function hideVerifyAlert() {
+      verifyAlert.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

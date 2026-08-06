@@ -120,6 +120,8 @@ export const Navbar: React.FC = () => {
           <ul className="nav-links">
             <li><Link to="/" className={isActive('/') ? 'active' : ''}>Home</Link></li>
             <li><Link to="/shop" className={isActive('/shop') ? 'active' : ''}>Shop</Link></li>
+            <li><Link to="/my-orders" className={isActive('/my-orders') ? 'active' : ''}>My Orders</Link></li>
+            <li><Link to="/admin" className={isActive('/admin') ? 'active' : ''}>Admin Portal</Link></li>
             <li><Link to="/artisans" className={isActive('/artisans') ? 'active' : ''}>Artisans</Link></li>
             <li><Link to="/about" className={isActive('/about') ? 'active' : ''}>Our Story</Link></li>
             <li><Link to="/blog" className={isActive('/blog') ? 'active' : ''}>Blog</Link></li>

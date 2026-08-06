@@ -21,11 +21,12 @@ public class OrderResponseDTO {
     private BigDecimal totalAmount;
     private ZonedDateTime offlineCreatedAt;
     private ZonedDateTime syncedAt;
+    private ZonedDateTime deliveryDate;
     private List<OrderItemDTO> items;
 
     public OrderResponseDTO() {}
 
-    public OrderResponseDTO(Long id, String orderNumber, UUID idempotencyKey, Long buyerId, String buyerPhone, String buyerName, Long hubId, String hubName, String hubLandmark, String orderStatus, String paymentType, String paymentStatus, BigDecimal totalAmount, ZonedDateTime offlineCreatedAt, ZonedDateTime syncedAt, List<OrderItemDTO> items) {
+    public OrderResponseDTO(Long id, String orderNumber, UUID idempotencyKey, Long buyerId, String buyerPhone, String buyerName, Long hubId, String hubName, String hubLandmark, String orderStatus, String paymentType, String paymentStatus, BigDecimal totalAmount, ZonedDateTime offlineCreatedAt, ZonedDateTime syncedAt, ZonedDateTime deliveryDate, List<OrderItemDTO> items) {
         this.id = id;
         this.orderNumber = orderNumber;
         this.idempotencyKey = idempotencyKey;
@@ -41,6 +42,7 @@ public class OrderResponseDTO {
         this.totalAmount = totalAmount;
         this.offlineCreatedAt = offlineCreatedAt;
         this.syncedAt = syncedAt;
+        this.deliveryDate = deliveryDate;
         this.items = items;
     }
 
@@ -64,6 +66,7 @@ public class OrderResponseDTO {
         private BigDecimal totalAmount;
         private ZonedDateTime offlineCreatedAt;
         private ZonedDateTime syncedAt;
+        private ZonedDateTime deliveryDate;
         private List<OrderItemDTO> items;
 
         public OrderResponseDTOBuilder id(Long id) { this.id = id; return this; }
@@ -81,10 +84,11 @@ public class OrderResponseDTO {
         public OrderResponseDTOBuilder totalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; return this; }
         public OrderResponseDTOBuilder offlineCreatedAt(ZonedDateTime offlineCreatedAt) { this.offlineCreatedAt = offlineCreatedAt; return this; }
         public OrderResponseDTOBuilder syncedAt(ZonedDateTime syncedAt) { this.syncedAt = syncedAt; return this; }
+        public OrderResponseDTOBuilder deliveryDate(ZonedDateTime deliveryDate) { this.deliveryDate = deliveryDate; return this; }
         public OrderResponseDTOBuilder items(List<OrderItemDTO> items) { this.items = items; return this; }
 
         public OrderResponseDTO build() {
-            return new OrderResponseDTO(id, orderNumber, idempotencyKey, buyerId, buyerPhone, buyerName, hubId, hubName, hubLandmark, orderStatus, paymentType, paymentStatus, totalAmount, offlineCreatedAt, syncedAt, items);
+            return new OrderResponseDTO(id, orderNumber, idempotencyKey, buyerId, buyerPhone, buyerName, hubId, hubName, hubLandmark, orderStatus, paymentType, paymentStatus, totalAmount, offlineCreatedAt, syncedAt, deliveryDate, items);
         }
     }
 
@@ -118,6 +122,8 @@ public class OrderResponseDTO {
     public void setOfflineCreatedAt(ZonedDateTime offlineCreatedAt) { this.offlineCreatedAt = offlineCreatedAt; }
     public ZonedDateTime getSyncedAt() { return syncedAt; }
     public void setSyncedAt(ZonedDateTime syncedAt) { this.syncedAt = syncedAt; }
+    public ZonedDateTime getDeliveryDate() { return deliveryDate; }
+    public void setDeliveryDate(ZonedDateTime deliveryDate) { this.deliveryDate = deliveryDate; }
     public List<OrderItemDTO> getItems() { return items; }
     public void setItems(List<OrderItemDTO> items) { this.items = items; }
 }

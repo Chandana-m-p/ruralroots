@@ -20,6 +20,10 @@ import { Checkout } from './pages/Checkout';
 import { OrderSuccess } from './pages/OrderSuccess';
 import { HubDashboard } from './pages/HubDashboard';
 import { Login } from './pages/Login';
+import { MyOrders } from './pages/MyOrders';
+import { AdminDashboard } from './pages/AdminDashboard';
+import { AuthWorkflow } from './pages/AuthWorkflow';
+import { LogoutVerification } from './pages/LogoutVerification';
 
 export const App: React.FC = () => {
   return (
@@ -46,7 +50,11 @@ export const App: React.FC = () => {
                       <Route path="/checkout" element={<Checkout />} />
                       <Route path="/order-success" element={<OrderSuccess />} />
                       <Route path="/hub-dashboard" element={<HubDashboard />} />
+                      <Route path="/my-orders" element={<MyOrders />} />
+                      <Route path="/admin" element={<AdminDashboard />} />
                       <Route path="/login" element={<Login />} />
+                      <Route path="/auth-flow" element={<AuthWorkflow />} />
+                      <Route path="/logout-verify" element={<LogoutVerification />} />
                     </Routes>
                   </main>
                 </div>
