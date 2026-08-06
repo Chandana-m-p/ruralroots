@@ -18,7 +18,7 @@ export const Footer: React.FC = () => {
         </div>
         <div>
           <h5>Company</h5>
-          <Link to="/about">Our Story</Link><br/>
+          <Link to="/our-story">Our Story</Link><br/>
           <Link to="/blog">Blog</Link><br/>
           <Link to="/contact">Contact</Link><br/>
           <Link to="/hub-dashboard">Village Hub Portal</Link>

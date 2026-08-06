@@ -6,6 +6,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import { VoiceSearch } from './VoiceSearch';
 import { Heart, ShoppingBag, User, LogOut, ChevronDown, Layers, ArrowRight } from 'lucide-react';
+import { SignOutModal } from './SignOutModal';
 
 const CATEGORIES_LIST = [
   { id: 'pottery', name: 'Pottery & Terracotta', icon: '🏺', desc: 'Handpainted Vases, Bowls & Clayware' },
@@ -26,9 +27,17 @@ export const Navbar: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const totalCartCount = items.reduce((sum, i) => sum + i.quantity, 0);
+
+  // Keep search bar in sync with URL parameter
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const s = params.get('search') || '';
+    setSearchQuery(s);
+  }, [location.search]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -120,11 +129,11 @@ export const Navbar: React.FC = () => {
             {/* User Login/Profile */}
             {user ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Link to={user.role === 'ROLE_HUB_MANAGER' ? '/hub-dashboard' : '/cart'} className="user-chip">
+                <Link to="/profile" className="user-chip" title="View My Account Profile">
                   <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=faces" alt={user.fullName} />
                   <span>Hi, {user.fullName.split(' ')[0]}</span>
                 </Link>
-                <button onClick={() => { logout(); navigate('/'); }} className="icon-btn" title="Logout" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <button onClick={() => setShowSignOutModal(true)} className="icon-btn" title="Sign Out" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
                   <LogOut size={16} />
                 </button>
               </div>
@@ -253,13 +262,25 @@ export const Navbar: React.FC = () => {
             <li><Link to="/" className={isActive('/') ? 'active' : ''}>Home</Link></li>
             <li><Link to="/shop" className={isActive('/shop') ? 'active' : ''}>Shop</Link></li>
             <li><Link to="/artisans" className={isActive('/artisans') ? 'active' : ''}>Artisans</Link></li>
-            <li><Link to="/about" className={isActive('/about') ? 'active' : ''}>Our Story</Link></li>
-            <li><Link to="/blog" className={isActive('/blog') ? 'active' : ''}>Blog</Link></li>
+            <li><Link to="/track-order" className={isActive('/track-order') ? 'active' : ''}>Track Order</Link></li>
+            {user && <li><Link to="/profile" className={isActive('/profile') ? 'active' : ''}>My Profile</Link></li>}
+            <li><Link to="/our-story" className={isActive('/our-story') ? 'active' : ''}>{t('ourStory')}</Link></li>
+            <li><Link to="/blog" className={isActive('/blog') ? 'active' : ''}>{t('blog')}</Link></li>
             <li><Link to="/contact" className={isActive('/contact') ? 'active' : ''}>Contact</Link></li>
           </ul>
         </div>
       </nav>
+
+      {/* SIGN OUT CONFIRMATION MODAL */}
+      <SignOutModal
+        isOpen={showSignOutModal}
+        onClose={() => setShowSignOutModal(false)}
+        onConfirmSignOut={() => {
+          setShowSignOutModal(false);
+          logout();
+          navigate('/');
+        }}
+      />
     </>
   );
 };
-

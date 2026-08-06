@@ -30,7 +30,16 @@ export const translations = {
     voiceSearch: "वॉयस सर्च",
     codNotice: "भुगतान ग्राम केंद्र पर डिलीवरी के समय नकद (Cash) में करें।",
     statusConfirmed: "पुष्टि की गई",
-    statusDelivered: "डिलीवर हो गया"
+    statusDelivered: "डिलीवर हो गया",
+    buyerRole: "ग्रामीण ग्राहक (Buyer)",
+    hubManagerRole: "ग्राम केंद्र प्रबंधक (Hub Manager)",
+    accountSignIn: "खाता साइन इन",
+    signInSubtitle: "ऑर्डर और ग्राम केंद्र पिकअप प्रबंधित करने के लिए लॉगिन करें",
+    ourStory: "हमारी कहानी",
+    blog: "ब्लॉग और समाचार",
+    orderDetails: "ऑर्डर का विवरण",
+    cancelOrder: "ऑर्डर रद्द करें",
+    viewDetails: "विवरण देखें"
   },
   en: {
     appName: "RuralRoots",
@@ -61,7 +70,16 @@ export const translations = {
     voiceSearch: "Voice Search",
     codNotice: "Pay Cash on Delivery when picking up at your Village Hub.",
     statusConfirmed: "Confirmed",
-    statusDelivered: "Delivered"
+    statusDelivered: "Delivered",
+    buyerRole: "Rural Buyer",
+    hubManagerRole: "Village Hub Manager",
+    accountSignIn: "Account Sign In",
+    signInSubtitle: "Log in to RuralRoots to manage orders and local Village Hub pickups",
+    ourStory: "Our Story",
+    blog: "Blog & Insights",
+    orderDetails: "Order Details",
+    cancelOrder: "Cancel Order",
+    viewDetails: "View Details"
   },
   mr: {
     appName: "रुरल रूट्स",
@@ -92,7 +110,16 @@ export const translations = {
     voiceSearch: "व्हॉइस शोध",
     codNotice: "ग्राम केंद्रावर वस्तू घेताना रोखीने (Cash) पैसे द्या.",
     statusConfirmed: "निश्चित केले",
-    statusDelivered: "डिलिव्हर झाले"
+    statusDelivered: "डिलिव्हर झाले",
+    buyerRole: "ग्रामीण ग्राहक (Buyer)",
+    hubManagerRole: "ग्राम केंद्र व्यवस्थापक (Hub Manager)",
+    accountSignIn: "खाते साइन इन",
+    signInSubtitle: "ऑर्डर्स आणि ग्राम केंद्र पिकअप व्यवस्थापित करण्यासाठी लॉगिन करा",
+    ourStory: "आमची कथा",
+    blog: "ब्लॉग आणि बातम्या",
+    orderDetails: "ऑर्डरचे तपशील",
+    cancelOrder: "ऑर्डर रद्द करा",
+    viewDetails: "तपशील पहा"
   },
   gu: {
     appName: "રૂરલ રૂટ્સ",
@@ -123,6 +150,15 @@ export const translations = {
     voiceSearch: "વોઇસ સર્ચ",
     codNotice: "ગ્રામ કેન્દ્ર પરથી માલ મેળવતી વખતે રોકડ ચૂકવો.",
     statusConfirmed: "મંજૂર",
-    statusDelivered: "ડિલિવર થયું"
+    statusDelivered: "ડિલિવર થયું",
+    buyerRole: "ગ્રામીણ ગ્રાહક (Buyer)",
+    hubManagerRole: "ગ્રામ કેન્દ્ર મેનેજર (Hub Manager)",
+    accountSignIn: "એકાઉન્ટ સાઇન ઇન",
+    signInSubtitle: "ઓર્ડર અને ગ્રામ કેન્દ્ર પિકઅપ સંચાલિત કરવા માટે લોગિન કરો",
+    ourStory: "અમારી વાર્તા",
+    blog: "બ્લોગ અને અહેવાલો",
+    orderDetails: "ઓર્ડર વિગત",
+    cancelOrder: "ઓર્ડર રદ કરો",
+    viewDetails: "વિગત જુઓ"
   }
 };

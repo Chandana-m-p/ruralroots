@@ -27,6 +27,7 @@ com\ruralroots\repository\ProductRepository.class
 com\ruralroots\service\VillageHubService.class
 com\ruralroots\repository\OrderRepository.class
 com\ruralroots\security\JwtTokenProvider.class
+com\ruralroots\dto\OrderCancelRequestDTO.class
 com\ruralroots\controller\VillageHubController.class
 com\ruralroots\model\Order.class
 com\ruralroots\model\User.class

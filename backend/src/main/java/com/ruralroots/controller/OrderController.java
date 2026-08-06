@@ -1,5 +1,6 @@
 package com.ruralroots.controller;
 
+import com.ruralroots.dto.OrderCancelRequestDTO;
 import com.ruralroots.dto.OrderResponseDTO;
 import com.ruralroots.dto.OrderSyncRequestDTO;
 import com.ruralroots.service.OrderSyncService;
@@ -30,5 +31,16 @@ public class OrderController {
     public ResponseEntity<List<OrderResponseDTO>> getMyOrders(Authentication authentication) {
         String phone = authentication.getName();
         return ResponseEntity.ok(orderSyncService.getOrdersForBuyer(phone));
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<OrderResponseDTO> cancelOrder(
+            @PathVariable Long orderId,
+            @RequestBody OrderCancelRequestDTO request,
+            Authentication authentication) {
+        String phone = authentication.getName();
+        String reason = request != null ? request.getReason() : "Cancelled by user";
+        OrderResponseDTO response = orderSyncService.cancelOrder(orderId, reason, phone);
+        return ResponseEntity.ok(response);
     }
 }

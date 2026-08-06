@@ -128,6 +128,38 @@ public class OrderSyncService {
         return mapToDTO(updated);
     }
 
+    @Transactional
+    public OrderResponseDTO cancelOrder(Long orderId, String reason, String buyerPhoneNumber) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
+
+        if ("CANCELLED".equals(order.getOrderStatus())) {
+            throw new IllegalStateException("Order is already cancelled.");
+        }
+
+        if ("DELIVERED".equals(order.getOrderStatus())) {
+            throw new IllegalStateException("Delivered orders cannot be cancelled.");
+        }
+
+        order.setOrderStatus("CANCELLED");
+        order.setCancellationReason(reason != null ? reason : "Cancelled by user");
+        order.setCancelledAt(ZonedDateTime.now());
+
+        // Restore product stock quantity
+        if (order.getItems() != null) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                if (product != null) {
+                    product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                    productRepository.save(product);
+                }
+            }
+        }
+
+        Order updated = orderRepository.save(order);
+        return mapToDTO(updated);
+    }
+
     private OrderResponseDTO mapToDTO(Order o) {
         List<OrderItemDTO> itemDtos = o.getItems().stream().map(item -> OrderItemDTO.builder()
                 .productId(item.getProduct().getId())
@@ -152,6 +184,8 @@ public class OrderSyncService {
                 .totalAmount(o.getTotalAmount())
                 .offlineCreatedAt(o.getOfflineCreatedAt())
                 .syncedAt(o.getSyncedAt())
+                .cancellationReason(o.getCancellationReason())
+                .cancelledAt(o.getCancelledAt())
                 .items(itemDtos)
                 .build();
     }

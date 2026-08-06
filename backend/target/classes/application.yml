@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8085
   compression:
     enabled: true
     mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json
@@ -13,6 +13,21 @@ spring:
     driverClassName: org.h2.Driver
     username: sa
     password: 
+    hikari:
+      pool-name: RuralRootsHikariCPPool
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      max-lifetime: 1200000
+      leak-detection-threshold: 15000
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+  sql:
+    init:
+      mode: never
   h2:
     console:
       enabled: true
@@ -20,16 +35,11 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update
-    defer-datasource-initialization: true
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
         format_sql: true
-  sql:
-    init:
-      mode: always
-      data-locations: classpath:data.sql
 
 jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
