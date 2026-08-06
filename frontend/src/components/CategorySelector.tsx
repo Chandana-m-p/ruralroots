@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export interface CategoryOption {
   id: string;
@@ -18,17 +19,30 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   selectedCategory,
   onSelectCategory,
 }) => {
+  const { t } = useLanguage();
+
+  const getCategoryTranslation = (id: string, fallbackName: string) => {
+    if (id === 'all') return t('allCategories');
+    if (id === 'pottery') return t('potteryCategory');
+    if (id === 'baskets') return t('basketsCategory');
+    if (id === 'wood') return t('woodCategory');
+    if (id === 'bamboo') return t('bambooCategory');
+    if (id === 'jewelry') return t('jewelryCategory');
+    if (id === 'decor') return t('decorCategory');
+    return fallbackName;
+  };
+
   return (
     <div className="filter-box category-selector-container">
       <div className="category-header">
-        <h5 style={{ margin: 0 }}>Category Filter</h5>
+        <h5 style={{ margin: 0 }}>{t('categoryFilter')}</h5>
         {selectedCategory !== 'all' && (
           <button
             type="button"
             className="btn-clear-category"
             onClick={() => onSelectCategory('all')}
           >
-            Clear (Show All)
+            Clear ({t('allCategories')})
           </button>
         )}
       </div>
@@ -36,6 +50,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
       <div className="category-radio-group" role="radiogroup" aria-label="Category Selection">
         {categories.map((cat) => {
           const isSelected = selectedCategory === cat.id;
+          const localizedCatName = getCategoryTranslation(cat.id, cat.name);
           return (
             <label
               key={cat.id}
@@ -51,10 +66,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 className="category-radio-input"
               />
               <span className="category-radio-custom" />
-              <span className="category-name">{cat.name}</span>
-              {typeof cat.count === 'number' && (
-                <span className="category-badge">{cat.count}</span>
-              )}
+              <span className="category-name">{localizedCatName}</span>
             </label>
           );
         })}

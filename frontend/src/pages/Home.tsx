@@ -5,6 +5,7 @@ import { LocalProduct } from '../db';
 import { ProductCard } from '../components/ProductCard';
 import { ArtisanCard, Artisan } from '../components/ArtisanCard';
 import { Footer } from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 const mockArtisans: Artisan[] = [
   {
@@ -52,6 +53,7 @@ const heroSlides = [
 ];
 
 export const Home: React.FC = () => {
+  const { t } = useLanguage();
   const [products, setProducts] = useState<LocalProduct[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -72,11 +74,11 @@ export const Home: React.FC = () => {
       <section className="hero">
         <div className="container">
           <div className="hero-copy">
-            <h2>Bringing Rural<br/>Craftsmanship to<br/>Every Home.</h2>
-            <p>Discover unique handmade products crafted with love by rural artisans — delivered straight to your door.</p>
+            <h2>{t('heroTitleLine1')}<br/>{t('heroTitleLine2')}</h2>
+            <p>{t('heroSubtitle')}</p>
             <div className="hero-actions">
-              <Link to="/shop" className="btn btn-primary">Shop Now</Link>
-              <Link to="/artisans" className="btn btn-outline">Meet Artisans</Link>
+              <Link to="/shop" className="btn btn-primary">{t('shopNow')}</Link>
+              <Link to="/artisans" className="btn btn-outline">{t('meetArtisans')}</Link>
             </div>
           </div>
           <div className="hero-img-wrap">
@@ -115,11 +117,11 @@ export const Home: React.FC = () => {
       {/* Trust Strip */}
       <section className="trust-strip">
         <div className="container">
-          <div className="trust-item"><span className="ic">🤝</span> Handmade with Love</div>
-          <div className="trust-item"><span className="ic">🧑‍🤝‍🧑</span> Support Local Artisans</div>
-          <div className="trust-item"><span className="ic">🍃</span> Eco-friendly Products</div>
-          <div className="trust-item"><span className="ic">✅</span> Secure Payment</div>
-          <div className="trust-item"><span className="ic">🔁</span> Easy Returns</div>
+          <div className="trust-item"><span className="ic">🤝</span> {t('handmadeWithLove')}</div>
+          <div className="trust-item"><span className="ic">🧑‍🤝‍🧑</span> {t('supportLocalArtisans')}</div>
+          <div className="trust-item"><span className="ic">🍃</span> {t('ecoFriendlyProducts')}</div>
+          <div className="trust-item"><span className="ic">✅</span> {t('securePayment')}</div>
+          <div className="trust-item"><span className="ic">🔁</span> {t('easyReturns')}</div>
         </div>
       </section>
 
@@ -127,30 +129,30 @@ export const Home: React.FC = () => {
       <section className="section" style={{ paddingTop: '40px' }}>
         <div className="container">
           <div className="section-head">
-            <h2>Why shoppers choose RuralRoots</h2>
+            <h2>{t('whyChooseTitle')}</h2>
           </div>
           <div className="product-grid" style={{ gridTemplateColumns: 'repeat(3,1fr)' }}>
             <div className="product-card" style={{ padding: '18px' }}>
               <div className="info">
-                <h4>Craft with story</h4>
+                <h4>{t('craftWithStory')}</h4>
                 <div className="price" style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', color: 'var(--ink-soft)' }}>
-                  Every product is tied to a real artisan family and a meaningful origin story.
+                  {t('craftWithStoryDesc')}
                 </div>
               </div>
             </div>
             <div className="product-card" style={{ padding: '18px' }}>
               <div className="info">
-                <h4>Better than mass-market</h4>
+                <h4>{t('betterThanMassMarket')}</h4>
                 <div className="price" style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', color: 'var(--ink-soft)' }}>
-                  Hand-finished details, natural materials, and thoughtful gifting makes every order feel premium.
+                  {t('betterThanMassMarketDesc')}
                 </div>
               </div>
             </div>
             <div className="product-card" style={{ padding: '18px' }}>
               <div className="info">
-                <h4>Trust-first checkout</h4>
+                <h4>{t('trustFirstCheckout')}</h4>
                 <div className="price" style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', color: 'var(--ink-soft)' }}>
-                  Clear order summary, transparent hub shipping, and a smoother purchase journey for shoppers.
+                  {t('trustFirstCheckoutDesc')}
                 </div>
               </div>
             </div>
@@ -162,8 +164,8 @@ export const Home: React.FC = () => {
       <section className="section">
         <div className="container">
           <div className="section-head">
-            <h2>Shop by Categories</h2>
-            <Link to="/shop" className="view-all">View All →</Link>
+            <h2>{t('shopByCategories')}</h2>
+            <Link to="/shop" className="view-all">{t('viewAll')}</Link>
           </div>
           <div className="cat-scroll">
             <Link className="cat-card" to="/shop?cat=baskets">
@@ -198,8 +200,8 @@ export const Home: React.FC = () => {
       <section className="section" style={{ background: 'var(--cream-2)' }}>
         <div className="container">
           <div className="section-head">
-            <h2>Featured Artisans</h2>
-            <Link to="/artisans" className="view-all">View All →</Link>
+            <h2>{t('featuredArtisans')}</h2>
+            <Link to="/artisans" className="view-all">{t('viewAll')}</Link>
           </div>
           <div className="artisan-grid">
             {mockArtisans.map((artisan) => (
@@ -213,8 +215,8 @@ export const Home: React.FC = () => {
       <section className="section">
         <div className="container">
           <div className="section-head">
-            <h2>Trending Handmade Products</h2>
-            <Link to="/shop" className="view-all">View All →</Link>
+            <h2>{t('trendingProducts')}</h2>
+            <Link to="/shop" className="view-all">{t('viewAll')}</Link>
           </div>
           <div className="product-grid">
             {products.map((product) => (

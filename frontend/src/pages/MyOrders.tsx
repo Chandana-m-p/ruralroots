@@ -64,7 +64,7 @@ const FALLBACK_DEMO_ORDERS: OrderEntry[] = [
     items: [
       {
         productId: 4,
-        productTitle: '{"en": "Carved Sheesham Wooden Jewelry Box", "hi": "नक्काशीदार शीशम की लकड़ी का आभूषण डिब्बा"}',
+        productTitle: '{"en": "Carved Sheesham Wooden Jewelry Box", "hi": "नक्काशीदार शीशम की लकड़ी का आभूषण डिब्बा", "kn": "ಕೆತ್ತಿದ ಶೀಶಮ್ ಮರದ ಆಭರಣ ಪೆಟ್ಟಿಗೆ"}',
         quantity: 1,
         unitPrice: 1150.00
       }
@@ -88,7 +88,7 @@ const FALLBACK_DEMO_ORDERS: OrderEntry[] = [
     items: [
       {
         productId: 1,
-        productTitle: '{"en": "Handpainted Terracotta Vase", "hi": "हाथ से चित्रित टेराकोटा फूलदान"}',
+        productTitle: '{"en": "Handpainted Terracotta Vase", "hi": "हाथ से चित्रित टेराकोटा फूलदान", "kn": "ಕೈಯಿಂದ ಬಣ್ಣ ಬಳಿದ ಟೆರಾಕೋಟಾ ಹೂದಾನಿ"}',
         quantity: 1,
         unitPrice: 899.00
       }
@@ -103,8 +103,8 @@ const FALLBACK_DEMO_ORDERS: OrderEntry[] = [
     hubName: 'Chandanpur Rural Hub (Gupta General)',
     hubLandmark: 'Opposite Bus Stand',
     orderStatus: 'Cancelled',
-    paymentType: 'CARD',
-    paymentStatus: 'REFUNDED',
+    paymentType: 'COD',
+    paymentStatus: 'UNPAID',
     totalAmount: 699.00,
     offlineCreatedAt: new Date(Date.now() - 7 * 86400000).toISOString(),
     syncedAt: new Date(Date.now() - 7 * 86400000).toISOString(),
@@ -112,7 +112,7 @@ const FALLBACK_DEMO_ORDERS: OrderEntry[] = [
     items: [
       {
         productId: 2,
-        productTitle: '{"en": "Handwoven Sabai Grass Basket", "hi": "हाथ से बुनी सबाई घास की टोकरी"}',
+        productTitle: '{"en": "Handwoven Sabai Grass Basket", "hi": "हाथ से बुनी सबाई घास की टोकरी", "kn": "ಕೈಯಿಂದ ನೇಯ್ದ ಸಬಾಯಿ ಹುಲ್ಲಿನ ಬುಟ್ಟಿ"}',
         quantity: 1,
         unitPrice: 699.00
       }
@@ -122,11 +122,11 @@ const FALLBACK_DEMO_ORDERS: OrderEntry[] = [
 
 export const MyOrders: React.FC = () => {
   const { user, token } = useAuth();
-  const { getLocalizedTitle } = useLanguage();
+  const { getLocalizedTitle, t } = useLanguage();
 
   const [orders, setOrders] = useState<OrderEntry[]>([]);
-  const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [updatingId, setUpdatingId] = useState<number | null>(null);
 
   const fetchUserOrders = async () => {
@@ -144,7 +144,7 @@ export const MyOrders: React.FC = () => {
         }
       }
     } catch {
-      // Offline fallback
+      // Fallback
     }
 
     setOrders(FALLBACK_DEMO_ORDERS);
@@ -183,21 +183,21 @@ export const MyOrders: React.FC = () => {
         return (
           <span className="order-status-pill status-success">
             <CheckCircle2 size={15} />
-            <span>Delivered Successfully</span>
+            <span>{t('deliveredSuccessFilter').replace(' ({{count}})', '')}</span>
           </span>
         );
       case 'Delivered Unsuccessfully':
         return (
           <span className="order-status-pill status-failed">
             <AlertTriangle size={15} />
-            <span>Delivered Unsuccessfully</span>
+            <span>{t('deliveredUnsuccessfulBadge')}</span>
           </span>
         );
       case 'Cancelled':
         return (
           <span className="order-status-pill status-cancelled">
             <XCircle size={15} />
-            <span>Cancelled</span>
+            <span>{t('cancelledBadge')}</span>
           </span>
         );
       default:
@@ -229,15 +229,15 @@ export const MyOrders: React.FC = () => {
       <div className="container" style={{ minHeight: '70vh', paddingBottom: '56px' }}>
         {/* Breadcrumb */}
         <div className="breadcrumb">
-          <Link to="/">Home</Link>
+          <Link to="/">{t('home')}</Link>
           <span className="sep">›</span>
-          <span className="current">My Orders</span>
+          <span className="current">{t('myOrders')}</span>
         </div>
 
         <div className="section-head" style={{ marginBottom: '24px' }}>
-          <h2>My Order History</h2>
+          <h2>{t('myOrderHistory')}</h2>
           <p style={{ color: 'var(--ink-soft)', fontSize: '0.95rem' }}>
-            Track product details, prices, delivery dates & status management for your RuralRoots orders.
+            {t('myOrderHistorySub')}
           </p>
         </div>
 
@@ -249,7 +249,7 @@ export const MyOrders: React.FC = () => {
             onClick={() => setFilterStatus('ALL')}
           >
             <ShoppingBag size={16} />
-            <span>All Orders ({orders.length})</span>
+            <span>{t('allOrdersFilter').replace('{{count}}', String(orders.length))}</span>
           </button>
 
           <button
@@ -258,7 +258,7 @@ export const MyOrders: React.FC = () => {
             onClick={() => setFilterStatus('Delivered Successfully')}
           >
             <CheckCircle2 size={16} style={{ color: '#22c55e' }} />
-            <span>Delivered Successfully ({orders.filter(o => o.orderStatus === 'Delivered Successfully').length})</span>
+            <span>{t('deliveredSuccessFilter').replace('{{count}}', String(orders.filter(o => o.orderStatus === 'Delivered Successfully').length))}</span>
           </button>
 
           <button
@@ -267,7 +267,7 @@ export const MyOrders: React.FC = () => {
             onClick={() => setFilterStatus('Delivered Unsuccessfully')}
           >
             <AlertTriangle size={16} style={{ color: '#ef4444' }} />
-            <span>Delivered Unsuccessfully ({orders.filter(o => o.orderStatus === 'Delivered Unsuccessfully').length})</span>
+            <span>{t('deliveredUnsuccessFilter').replace('{{count}}', String(orders.filter(o => o.orderStatus === 'Delivered Unsuccessfully').length))}</span>
           </button>
 
           <button
@@ -276,7 +276,7 @@ export const MyOrders: React.FC = () => {
             onClick={() => setFilterStatus('Cancelled')}
           >
             <XCircle size={16} style={{ color: '#f59e0b' }} />
-            <span>Cancelled ({orders.filter(o => o.orderStatus === 'Cancelled').length})</span>
+            <span>{t('cancelledFilter').replace('{{count}}', String(orders.filter(o => o.orderStatus === 'Cancelled').length))}</span>
           </button>
         </div>
 
@@ -304,12 +304,11 @@ export const MyOrders: React.FC = () => {
                 <div className="order-card-header">
                   <div className="order-header-main">
                     <div className="order-num-tag">
-                      <span>Order #</span>
-                      <strong>{order.orderNumber}</strong>
+                      <span>{t('orderHash').replace('{{id}}', order.orderNumber)}</span>
                     </div>
                     <div className="order-date-tag">
                       <Calendar size={14} />
-                      <span>Purchased: {formatDate(order.offlineCreatedAt)}</span>
+                      <span>{t('purchasedOn').replace('{{date}}', formatDate(order.offlineCreatedAt))}</span>
                     </div>
                   </div>
                   {getStatusBadge(order.orderStatus)}
@@ -320,7 +319,7 @@ export const MyOrders: React.FC = () => {
                   
                   {/* Left Column: Product Details List */}
                   <div className="order-products-section">
-                    <h4 className="section-subtitle">Product Details</h4>
+                    <h4 className="section-subtitle">{t('productDetailsLabel')}</h4>
                     <div className="order-items-list">
                       {order.items && order.items.map((item, idx) => {
                         const title = getLocalizedTitle(item.productTitle);
@@ -332,7 +331,7 @@ export const MyOrders: React.FC = () => {
                             <div className="order-product-info">
                               <div className="product-title-text">{title}</div>
                               <div className="product-qty-meta">
-                                Qty: <strong>{item.quantity}</strong> &bull; Unit Price: <strong>₹{itemPrice.toLocaleString('en-IN')}</strong>
+                                {t('qtyLabel').replace('{{qty}}', String(item.quantity)).replace('{{price}}', itemPrice.toLocaleString('en-IN'))}
                               </div>
                             </div>
                             <div className="product-item-total">
@@ -350,7 +349,7 @@ export const MyOrders: React.FC = () => {
                     <div className="meta-box">
                       <div className="meta-label">
                         <Calendar size={15} />
-                        <span>Delivery Date</span>
+                        <span>{t('deliveryDateLabel')}</span>
                       </div>
                       <div className="meta-value-bold">
                         {formatDate(order.deliveryDate)}
@@ -360,7 +359,7 @@ export const MyOrders: React.FC = () => {
                     <div className="meta-box">
                       <div className="meta-label">
                         <Store size={15} />
-                        <span>Village Hub Partner</span>
+                        <span>{t('villageHubPartnerLabel')}</span>
                       </div>
                       <div className="meta-value-sub">
                         {order.hubName}
@@ -369,7 +368,7 @@ export const MyOrders: React.FC = () => {
 
                     <div className="meta-box total-box">
                       <div className="meta-label">
-                        <span>Total Price</span>
+                        <span>{t('totalPriceLabel')}</span>
                       </div>
                       <div className="total-amount-display">
                         ₹{Number(order.totalAmount).toLocaleString('en-IN')}
@@ -378,16 +377,16 @@ export const MyOrders: React.FC = () => {
 
                     {/* Interactive Status Management Controls */}
                     <div className="status-management-box">
-                      <label className="status-control-label">Status Management</label>
+                      <label className="status-control-label">{t('statusManagementLabel')}</label>
                       <select
                         className="status-control-select"
                         value={order.orderStatus}
                         disabled={updatingId === order.id}
                         onChange={(e) => handleUpdateStatus(order.id, e.target.value as OrderStatusType)}
                       >
-                        <option value="Delivered Successfully">🟢 Delivered Successfully</option>
-                        <option value="Delivered Unsuccessfully">🔴 Delivered Unsuccessfully</option>
-                        <option value="Cancelled">🟡 Cancelled</option>
+                        <option value="Delivered Successfully">🟢 {t('deliveredSuccessFilter').replace(' ({{count}})', '')}</option>
+                        <option value="Delivered Unsuccessfully">🔴 {t('deliveredUnsuccessfulBadge')}</option>
+                        <option value="Cancelled">🟡 {t('cancelledBadge')}</option>
                       </select>
                     </div>
 

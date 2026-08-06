@@ -5,6 +5,7 @@ import { LocalProduct } from '../db';
 import { ProductCard } from '../components/ProductCard';
 import { Footer } from '../components/Footer';
 import { CategorySelector, CategoryOption } from '../components/CategorySelector';
+import { useLanguage } from '../context/LanguageContext';
 
 const CATEGORIES: Omit<CategoryOption, 'count'>[] = [
   { id: 'all', name: 'All Categories' },
@@ -17,6 +18,7 @@ const CATEGORIES: Omit<CategoryOption, 'count'>[] = [
 ];
 
 export const Shop: React.FC = () => {
+  const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
@@ -25,8 +27,6 @@ export const Shop: React.FC = () => {
 
   const [products, setProducts] = useState<LocalProduct[]>([]);
   const [search, setSearch] = useState(initialSearch);
-  
-  // Mutually Exclusive Category State: Only ONE string can be active at a time
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCat);
   const [priceFilter, setPriceFilter] = useState<string>('all');
   const [sortOption, setSortOption] = useState<string>('featured');
@@ -35,41 +35,37 @@ export const Shop: React.FC = () => {
     fetchProducts().then(setProducts);
   }, []);
 
-  // Update selectedCategory when URL query param changes
   useEffect(() => {
-    const cat = new URLSearchParams(location.search).get('cat');
-    if (cat) {
-      setSelectedCategory(cat);
-    }
+    const params = new URLSearchParams(location.search);
+    const cat = params.get('cat') || 'all';
+    const searchVal = params.get('search') || '';
+    setSelectedCategory(cat);
+    setSearch(searchVal);
   }, [location.search]);
 
-  // Mutually Exclusive Handler: Selecting a category replaces any previously selected category
   const handleSelectCategory = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    // Sync with URL query parameter
+    const params = new URLSearchParams(location.search);
     if (categoryId === 'all') {
-      navigate('/shop', { replace: true });
+      params.delete('cat');
     } else {
-      navigate(`/shop?cat=${categoryId}`, { replace: true });
+      params.set('cat', categoryId);
     }
+    navigate({ search: params.toString() }, { replace: true });
+  };
+
+  const handleClearAllFilters = () => {
+    setSelectedCategory('all');
+    setSearch('');
+    setPriceFilter('all');
+    navigate('/shop', { replace: true });
   };
 
   const matchCategory = (product: LocalProduct, catId: string): boolean => {
-    if (catId === 'all') return true;
-    const sku = product.sku.toUpperCase();
-    const title = product.titleI18n.toLowerCase();
-
-    if (catId === 'baskets') return sku.includes('BASKET') || title.includes('basket') || title.includes('टोकरी');
-    if (catId === 'pottery') return sku.includes('VASE') || sku.includes('BOWL') || title.includes('terracotta') || title.includes('clay') || title.includes('फूलदान') || title.includes('कटोरा');
-    if (catId === 'wood') return sku.includes('WOOD') || title.includes('wooden') || title.includes('शीशम');
-    if (catId === 'bamboo') return sku.includes('BAMBOO') || title.includes('bamboo') || title.includes('बांस');
-    if (catId === 'jewelry') return sku.includes('JEWELRY') || title.includes('jewelry') || title.includes('earring') || title.includes('झुमके');
-    if (catId === 'decor') return sku.includes('STOLE') || sku.includes('CUSHION') || title.includes('stole') || title.includes('cushion') || title.includes('स्टोल') || title.includes('कुशन');
-
-    return true;
+    if (!catId || catId === 'all') return true;
+    return (product.category || '').toLowerCase() === catId.toLowerCase();
   };
 
-  // Compute category counts dynamically
   const categoriesWithCounts: CategoryOption[] = CATEGORIES.map((cat) => {
     const count = products.filter((p) => matchCategory(p, cat.id)).length;
     return { ...cat, count };
@@ -79,7 +75,6 @@ export const Shop: React.FC = () => {
     const matchesSearch = !search || p.titleI18n.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = matchCategory(p, selectedCategory);
 
-    // Price range matching
     let matchesPrice = true;
     if (priceFilter === 'under500') matchesPrice = p.basePrice < 500;
     else if (priceFilter === '500-1000') matchesPrice = p.basePrice >= 500 && p.basePrice <= 1000;
@@ -100,9 +95,9 @@ export const Shop: React.FC = () => {
       <div className="container">
         {/* Breadcrumb */}
         <div className="breadcrumb">
-          <Link to="/">Home</Link>
+          <Link to="/">{t('home')}</Link>
           <span className="sep">›</span>
-          <Link to="/shop">Shop</Link>
+          <Link to="/shop">{t('shop')}</Link>
           {selectedCategory !== 'all' && (
             <>
               <span className="sep">›</span>
@@ -134,7 +129,6 @@ export const Shop: React.FC = () => {
         <div className="shop-layout">
           {/* Sidebar Filters */}
           <aside>
-            {/* Reusable Mutually Exclusive Category Selection Component */}
             <CategorySelector
               categories={categoriesWithCounts}
               selectedCategory={selectedCategory}
@@ -142,14 +136,14 @@ export const Shop: React.FC = () => {
             />
 
             <div className="filter-box">
-              <h5>Price Range</h5>
+              <h5>{t('priceRange')}</h5>
               <label>
                 <input 
                   type="radio" 
                   name="price" 
                   checked={priceFilter === 'all'}
                   onChange={() => setPriceFilter('all')}
-                /> All Prices
+                /> {t('allPrices')}
               </label>
               <label>
                 <input 
@@ -184,44 +178,104 @@ export const Shop: React.FC = () => {
                 /> Above ₹2,000
               </label>
             </div>
-
-            <div className="filter-box">
-              <h5>Region</h5>
-              <label><input type="checkbox" defaultChecked /> Rajasthan</label>
-              <label><input type="checkbox" defaultChecked /> Andhra Pradesh</label>
-              <label><input type="checkbox" defaultChecked /> Madhya Pradesh</label>
-              <label><input type="checkbox" defaultChecked /> Maharashtra</label>
-              <label><input type="checkbox" defaultChecked /> Assam</label>
-            </div>
           </aside>
 
           {/* Main Shop Catalog Grid */}
           <section>
             <div className="shop-toolbar">
               <span style={{ color: 'var(--ink-soft)', fontSize: '0.9rem' }}>
-                Showing {filteredProducts.length} of {products.length} products
+                {t('showingProducts').replace('{{count}}', String(filteredProducts.length)).replace('{{total}}', String(products.length))}
               </span>
               <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
-                <option value="featured">Sort: Featured</option>
-                <option value="low-high">Price: Low to High</option>
-                <option value="high-low">Price: High to Low</option>
-                <option value="newest">Newest First</option>
+                <option value="featured">{t('sortBy')} {t('sortFeatured')}</option>
+                <option value="low-high">{t('sortPriceLowHigh')}</option>
+                <option value="high-low">{t('sortPriceHighLow')}</option>
               </select>
             </div>
 
-            <div className="product-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            {/* Active Filter Pills */}
+            {(selectedCategory !== 'all' || search) && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '20px', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--ink-soft)', fontWeight: 600 }}>Active Filters:</span>
+                {selectedCategory !== 'all' && (
+                  <span 
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '4px 10px',
+                      background: 'var(--forest)',
+                      color: 'var(--white)',
+                      borderRadius: '20px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600
+                    }}
+                  >
+                    Category: {activeCategoryObj?.name}
+                    <button 
+                      onClick={() => handleSelectCategory('all')} 
+                      style={{ background: 'none', border: 'none', color: 'var(--white)', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                      ✕
+                    </button>
+                  </span>
+                )}
+                {search && (
+                  <span 
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '4px 10px',
+                      background: 'var(--clay)',
+                      color: 'var(--white)',
+                      borderRadius: '20px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600
+                    }}
+                  >
+                    Search: "{search}"
+                    <button 
+                      onClick={() => { setSearch(''); navigate('/shop', { replace: true }); }} 
+                      style={{ background: 'none', border: 'none', color: 'var(--white)', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                      ✕
+                    </button>
+                  </span>
+                )}
+                <button 
+                  onClick={handleClearAllFilters}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--forest)',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            )}
 
-            {filteredProducts.length === 0 && (
-              <div className="empty-cart" style={{ marginTop: '24px', textAlign: 'center', padding: '40px' }}>
-                <h4>No products found in "{activeCategoryObj?.name}"</h4>
-                <p style={{ color: 'var(--ink-soft)', margin: '12px 0 20px' }}>
-                  Try switching to another category or clearing your price filters.
-                </p>
-                <button className="btn btn-primary" onClick={() => handleSelectCategory('all')}>
+            {/* Product Grid or Empty State */}
+            {filteredProducts.length > 0 ? (
+              <div className="product-grid">
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '60px 20px', background: 'var(--white)', borderRadius: '12px', border: '1px dashed var(--line)' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>🔍</div>
+                <h3 style={{ margin: '0 0 8px 0', color: 'var(--ink)' }}>{t('noProductsFound')}</h3>
+                <button 
+                  onClick={handleClearAllFilters} 
+                  className="btn btn-primary"
+                  style={{ marginTop: '16px' }}
+                >
                   View All Products
                 </button>
               </div>

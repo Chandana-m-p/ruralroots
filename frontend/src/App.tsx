@@ -39,6 +39,7 @@ export const App: React.FC = () => {
                   <main style={{ flex: 1 }}>
                     <Routes>
                       <Route path="/" element={<Home />} />
+                      <Route path="/admin" element={<AdminDashboard />} />
                       <Route path="/shop" element={<Shop />} />
                       <Route path="/product/:id" element={<ProductDetail />} />
                       <Route path="/artisans" element={<Artisans />} />
@@ -48,10 +49,8 @@ export const App: React.FC = () => {
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/cart" element={<Cart />} />
                       <Route path="/checkout" element={<Checkout />} />
-                      <Route path="/order-success" element={<OrderSuccess />} />
                       <Route path="/hub-dashboard" element={<HubDashboard />} />
                       <Route path="/my-orders" element={<MyOrders />} />
-                      <Route path="/admin" element={<AdminDashboard />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/auth-flow" element={<AuthWorkflow />} />
                       <Route path="/logout-verify" element={<LogoutVerification />} />

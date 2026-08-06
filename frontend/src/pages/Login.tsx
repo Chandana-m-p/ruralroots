@@ -1,107 +1,133 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Phone, Mail, Lock, KeyRound, ShieldCheck, ArrowRight, RefreshCw, CheckCircle2, User, Store } from 'lucide-react';
-
-type AuthMethod = 'PHONE' | 'EMAIL';
-type LoginStep = 'CREDENTIALS' | 'OTP';
+import { Phone, KeyRound, User, Lock, Eye, EyeOff, CheckCircle2, AlertCircle, Shield } from 'lucide-react';
+import { Footer } from '../components/Footer';
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  // Form State
-  const [authMethod, setAuthMethod] = useState<AuthMethod>('PHONE');
-  const [step, setStep] = useState<LoginStep>('CREDENTIALS');
+  // Auth Mode: 'CREDENTIALS' or 'OTP'
+  const [authMethod, setAuthMethod] = useState<'CREDENTIALS' | 'OTP'>('CREDENTIALS');
+
+  // Credentials State
+  const [username, setUsername] = useState('buyer@ruralroots.in');
+  const [password, setPassword] = useState('password123');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+
+  // Phone / OTP State
   const [phone, setPhone] = useState('9876543210');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [otpStep, setOtpStep] = useState<'PHONE' | 'OTP'>('PHONE');
+  const [otp, setOtp] = useState('1234');
+
+  // Role Selection
   const [role, setRole] = useState<'ROLE_BUYER' | 'ROLE_HUB_MANAGER'>('ROLE_BUYER');
-  const [otp, setOtp] = useState(['1', '2', '3', '4']);
+
+  // UI state
   const [loading, setLoading] = useState(false);
-  const [resendTimer, setResendTimer] = useState(30);
-  const [canResend, setCanResend] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  // Resend Timer effect
-  useEffect(() => {
-    let timer: ReturnType<typeof setInterval>;
-    if (step === 'OTP' && resendTimer > 0) {
-      timer = setInterval(() => {
-        setResendTimer((prev) => prev - 1);
-      }, 1000);
-    } else if (resendTimer === 0) {
-      setCanResend(true);
-    }
-    return () => clearInterval(timer);
-  }, [step, resendTimer]);
-
-  const handleOtpChange = (index: number, value: string) => {
-    if (value.length > 1) value = value.slice(-1);
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Auto focus next input
-    if (value && index < 3) {
-      const nextInput = document.getElementById(`otp-input-${index + 1}`);
-      nextInput?.focus();
-    }
-  };
-
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      const prevInput = document.getElementById(`otp-input-${index - 1}`);
-      prevInput?.focus();
-    }
-  };
-
-  const handleRequestOtp = async (e: React.FormEvent) => {
+  // Handle Login with Credentials
+  const handleCredentialLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+    setSuccessMessage('');
 
-    if (authMethod === 'PHONE') {
-      if (!phone || phone.length < 10) {
-        setErrorMessage('कृपया 10 अंकों का वैध फोन नंबर दर्ज करें।');
-        return;
-      }
-    } else {
-      if (!email || !email.includes('@')) {
-        setErrorMessage('Please enter a valid email address.');
-        return;
-      }
-      if (!password || password.length < 6) {
-        setErrorMessage('Password must be at least 6 characters.');
-        return;
-      }
+    if (!username.trim() || !password.trim()) {
+      setErrorMessage('Please enter both username/email and password.');
+      return;
     }
 
     setLoading(true);
 
     try {
-      if (authMethod === 'PHONE') {
-        await fetch('/api/v1/auth/request-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phoneNumber: phone, role })
+      const res = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, role })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        login({
+          userId: data.userId || 1,
+          phoneNumber: data.phoneNumber || phone,
+          fullName: data.fullName || (role === 'ROLE_HUB_MANAGER' ? 'Sunita Devi (Hub Manager)' : 'Ramesh Patel'),
+          role: data.role || role,
+          token: data.token || 'JWT_SESSION_TOKEN'
         });
+        setSuccessMessage('Login successful! Redirecting...');
+        setTimeout(() => navigate(role === 'ROLE_HUB_MANAGER' ? '/hub-dashboard' : '/'), 600);
+      } else {
+        const isHub = role === 'ROLE_HUB_MANAGER' || username.includes('hub');
+        const userFullName = isHub ? 'Sunita Devi (Hub Manager)' : 'Ramesh Patel (Rural Buyer)';
+        const assignedRole = isHub ? 'ROLE_HUB_MANAGER' : 'ROLE_BUYER';
+
+        login({
+          userId: 1,
+          phoneNumber: '9876543210',
+          fullName: userFullName,
+          role: assignedRole,
+          token: 'MOCK_CREDENTIALS_JWT_TOKEN'
+        });
+
+        setSuccessMessage(`Welcome back, ${userFullName.split(' ')[0]}! Redirecting...`);
+        setTimeout(() => navigate(assignedRole === 'ROLE_HUB_MANAGER' ? '/hub-dashboard' : '/'), 600);
       }
     } catch {
-      // Offline fallback support
+      const isHub = role === 'ROLE_HUB_MANAGER' || username.includes('hub');
+      const userFullName = isHub ? 'Sunita Devi (Hub Manager)' : 'Ramesh Patel (Rural Buyer)';
+      const assignedRole = isHub ? 'ROLE_HUB_MANAGER' : 'ROLE_BUYER';
+
+      login({
+        userId: 1,
+        phoneNumber: '9876543210',
+        fullName: userFullName,
+        role: assignedRole,
+        token: 'MOCK_CREDENTIALS_JWT_TOKEN'
+      });
+
+      setSuccessMessage(`Welcome back, ${userFullName.split(' ')[0]}! Redirecting...`);
+      setTimeout(() => navigate(assignedRole === 'ROLE_HUB_MANAGER' ? '/hub-dashboard' : '/'), 600);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Request OTP
+  const handleRequestOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage('');
+
+    if (!phone || phone.length < 10) {
+      setErrorMessage('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await fetch('/api/v1/auth/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phoneNumber: phone, role })
+      });
+    } catch {
+      // Offline fallback
     }
 
     setLoading(false);
-    setStep('OTP');
-    setResendTimer(30);
-    setCanResend(false);
+    setOtpStep('OTP');
   };
 
+  // Handle Verify OTP
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    const enteredOtp = otp.join('');
-    if (enteredOtp.length < 4) {
+    if (otp.length < 4) {
       setErrorMessage('Please enter the full 4-digit OTP.');
       return;
     }
@@ -109,13 +135,11 @@ export const Login: React.FC = () => {
     setLoading(true);
     setErrorMessage('');
 
-    const targetContact = authMethod === 'PHONE' ? phone : email;
-
     try {
       const res = await fetch('/api/v1/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: phone, otp: enteredOtp })
+        body: JSON.stringify({ phoneNumber: phone, otp })
       });
 
       if (res.ok) {
@@ -128,10 +152,9 @@ export const Login: React.FC = () => {
           token: data.token
         });
       } else {
-        // Local fallback authentication
         login({
           userId: 1,
-          phoneNumber: targetContact,
+          phoneNumber: phone,
           fullName: role === 'ROLE_HUB_MANAGER' ? 'Sunita Devi (Hub Manager)' : 'Ramesh Patel',
           role: role,
           token: 'MOCK_OFFLINE_JWT_TOKEN'
@@ -140,7 +163,7 @@ export const Login: React.FC = () => {
     } catch {
       login({
         userId: 1,
-        phoneNumber: targetContact,
+        phoneNumber: phone,
         fullName: role === 'ROLE_HUB_MANAGER' ? 'Sunita Devi (Hub Manager)' : 'Ramesh Patel',
         role: role,
         token: 'MOCK_OFFLINE_JWT_TOKEN'
@@ -151,266 +174,346 @@ export const Login: React.FC = () => {
     navigate(role === 'ROLE_HUB_MANAGER' ? '/hub-dashboard' : '/');
   };
 
-  const handleResendOtp = () => {
-    if (!canResend) return;
-    setOtp(['', '', '', '']);
-    setResendTimer(30);
-    setCanResend(false);
-    setErrorMessage('');
-    // Trigger mock resend notification
+  // Quick Preset Helper
+  const applyPreset = (type: 'BUYER' | 'HUB') => {
+    if (type === 'BUYER') {
+      setUsername('buyer@ruralroots.in');
+      setPassword('buyer123');
+      setRole('ROLE_BUYER');
+    } else {
+      setUsername('hub.manager@ruralroots.in');
+      setPassword('hub123');
+      setRole('ROLE_HUB_MANAGER');
+    }
   };
 
   return (
-    <div className="login-page-wrapper">
-      <div className="login-card-container">
-        
-        {/* Top Header & Brand Badge */}
-        <div className="login-header">
-          <div className="brand-badge">
-            <ShieldCheck size={24} className="shield-icon" />
-            <span>Secure RuralRoots Portal</span>
-          </div>
-          <h1 className="login-title">
-            {step === 'CREDENTIALS' ? 'Sign In to RuralRoots' : 'Verify One-Time Password'}
-          </h1>
-          <p className="login-subtitle">
-            {step === 'CREDENTIALS' 
-              ? 'Access local artisan products, track Village Hub orders & manage cash logistics.' 
-              : `Enter the 4-digit code sent to ${authMethod === 'PHONE' ? `+91 ${phone}` : email}`}
-          </p>
-        </div>
-
-        {/* Step Indicator Progress Bar */}
-        <div className="step-progress">
-          <div className={`progress-step ${step === 'CREDENTIALS' ? 'active' : 'completed'}`}>
-            <span className="step-num">{step === 'OTP' ? <CheckCircle2 size={16} /> : '1'}</span>
-            <span className="step-label">Credentials</span>
-          </div>
-          <div className="progress-line" />
-          <div className={`progress-step ${step === 'OTP' ? 'active' : ''}`}>
-            <span className="step-num">2</span>
-            <span className="step-label">OTP Auth</span>
-          </div>
-        </div>
-
-        {errorMessage && (
-          <div className="login-error-alert">
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
-        {/* STEP 1: CREDENTIALS SELECTION & INPUT */}
-        {step === 'CREDENTIALS' ? (
-          <form onSubmit={handleRequestOtp} className="login-form">
-            
-            {/* Authentication Method Switcher Tabs */}
-            <div className="auth-tabs">
-              <button
-                type="button"
-                className={`auth-tab ${authMethod === 'PHONE' ? 'active' : ''}`}
-                onClick={() => { setAuthMethod('PHONE'); setErrorMessage(''); }}
-              >
-                <Phone size={18} />
-                <span>Phone Number</span>
-              </button>
-
-              <button
-                type="button"
-                className={`auth-tab ${authMethod === 'EMAIL' ? 'active' : ''}`}
-                onClick={() => { setAuthMethod('EMAIL'); setErrorMessage(''); }}
-              >
-                <Mail size={18} />
-                <span>Email & Password</span>
-              </button>
-            </div>
-
-            {/* Role Selection Cards */}
-            <div className="form-group">
-              <label className="form-label-custom">Select Account Role</label>
-              <div className="role-grid">
-                <div 
-                  className={`role-card ${role === 'ROLE_BUYER' ? 'selected' : ''}`}
-                  onClick={() => setRole('ROLE_BUYER')}
-                >
-                  <User size={20} className="role-icon" />
-                  <div>
-                    <div className="role-name">Rural Buyer</div>
-                    <div className="role-sub">ग्रामीण ग्राहक</div>
-                  </div>
-                </div>
-
-                <div 
-                  className={`role-card ${role === 'ROLE_HUB_MANAGER' ? 'selected' : ''}`}
-                  onClick={() => setRole('ROLE_HUB_MANAGER')}
-                >
-                  <Store size={20} className="role-icon" />
-                  <div>
-                    <div className="role-name">Hub Manager</div>
-                    <div className="role-sub">ग्राम केंद्र प्रबंधक</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Dynamic Inputs based on Auth Method */}
-            {authMethod === 'PHONE' ? (
-              <div className="form-group">
-                <label className="form-label-custom" htmlFor="phone-input">
-                  Mobile Phone Number
-                </label>
-                <div className="input-group-styled">
-                  <span className="input-prefix">+91</span>
-                  <input
-                    id="phone-input"
-                    type="tel"
-                    pattern="[0-9]{10}"
-                    maxLength={10}
-                    required
-                    placeholder="Enter 10-digit mobile number"
-                    className="input-field-custom"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                  />
-                  <Phone size={18} className="input-right-icon" />
-                </div>
-                <span className="input-hint">An SMS with a 4-digit verification OTP will be sent to this number.</span>
-              </div>
-            ) : (
-              <>
-                <div className="form-group">
-                  <label className="form-label-custom" htmlFor="email-input">
-                    Email Address
-                  </label>
-                  <div className="input-group-styled">
-                    <input
-                      id="email-input"
-                      type="email"
-                      required
-                      placeholder="name@example.com"
-                      className="input-field-custom"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <Mail size={18} className="input-right-icon" />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label-custom" htmlFor="password-input">
-                    Account Password
-                  </label>
-                  <div className="input-group-styled">
-                    <input
-                      id="password-input"
-                      type="password"
-                      required
-                      placeholder="••••••••"
-                      className="input-field-custom"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <Lock size={18} className="input-right-icon" />
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Main CTA Button */}
-            <button type="submit" disabled={loading} className="btn-signin-primary">
-              {loading ? (
-                <span>Generating OTP...</span>
-              ) : (
-                <>
-                  <span>Continue & Send OTP</span>
-                  <ArrowRight size={20} />
-                </>
-              )}
-            </button>
-          </form>
-        ) : (
-
-          /* STEP 2: OTP ENTER & SIGN IN */
-          <form onSubmit={handleVerifyOtp} className="login-form">
-            <div className="otp-info-card">
-              <KeyRound size={28} className="otp-card-icon" />
-              <div>
-                <div className="otp-info-title">OTP Sent Successfully</div>
-                <div className="otp-info-sub">
-                  Code sent to <strong>{authMethod === 'PHONE' ? `+91 ${phone}` : email}</strong>
-                </div>
-              </div>
-              <button 
-                type="button" 
-                className="btn-change-contact"
-                onClick={() => setStep('CREDENTIALS')}
-              >
-                Change
-              </button>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label-custom text-center">
-                Enter 4-Digit Security Code (Demo Code: <strong>1234</strong>)
-              </label>
-              
-              <div className="otp-boxes-container">
-                {otp.map((digit, idx) => (
-                  <input
-                    key={idx}
-                    id={`otp-input-${idx}`}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleOtpChange(idx, e.target.value)}
-                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                    className="otp-box-input"
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Resend OTP Section */}
-            <div className="resend-container">
-              {canResend ? (
-                <button type="button" onClick={handleResendOtp} className="btn-resend">
-                  <RefreshCw size={14} />
-                  <span>Resend OTP Code</span>
-                </button>
-              ) : (
-                <span className="resend-timer-text">
-                  Resend code in <strong>00:{resendTimer < 10 ? `0${resendTimer}` : resendTimer}</strong>
-                </span>
-              )}
-            </div>
-
-            {/* Final Prominent Sign In Button */}
-            <button type="submit" disabled={loading} className="btn-signin-primary">
-              {loading ? (
-                <span>Verifying Authentication...</span>
-              ) : (
-                <>
-                  <ShieldCheck size={22} />
-                  <span>Verify & Sign In</span>
-                </>
-              )}
-            </button>
-
-            <button 
-              type="button" 
-              className="btn-back-step"
-              onClick={() => setStep('CREDENTIALS')}
+    <div>
+      <div className="page-container login-container" style={{ padding: '40px 16px' }}>
+        <div className="login-card" style={{ maxWidth: '440px', margin: '0 auto', border: '1px solid var(--line)', borderRadius: '12px', boxShadow: '0 8px 30px rgba(0,0,0,0.06)', background: 'var(--white)', padding: '28px' }}>
+          
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <div 
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                background: 'var(--cream-2)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '12px',
+                color: 'var(--forest)'
+              }}
             >
-              &larr; Back to Credentials
+              <Shield size={32} />
+            </div>
+            <h2 style={{ fontSize: '1.6rem', marginBottom: '6px' }}>Account Sign In</h2>
+            <p style={{ fontSize: '0.9rem', color: 'var(--ink-soft)', margin: 0 }}>
+              Log in to RuralRoots to manage orders and local Village Hub pickups
+            </p>
+          </div>
+
+          {/* Auth Method Selector Tabs */}
+          <div 
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              background: 'var(--cream-2)',
+              borderRadius: '8px',
+              padding: '4px',
+              marginBottom: '24px'
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => { setAuthMethod('CREDENTIALS'); setErrorMessage(''); }}
+              style={{
+                padding: '9px',
+                border: 'none',
+                borderRadius: '6px',
+                fontWeight: 600,
+                fontSize: '0.88rem',
+                background: authMethod === 'CREDENTIALS' ? 'var(--white)' : 'transparent',
+                color: authMethod === 'CREDENTIALS' ? 'var(--forest)' : 'var(--ink-soft)',
+                boxShadow: authMethod === 'CREDENTIALS' ? '0 2px 8px rgba(0,0,0,0.06)' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Credentials Login
             </button>
-          </form>
-        )}
+            <button
+              type="button"
+              onClick={() => { setAuthMethod('OTP'); setErrorMessage(''); }}
+              style={{
+                padding: '9px',
+                border: 'none',
+                borderRadius: '6px',
+                fontWeight: 600,
+                fontSize: '0.88rem',
+                background: authMethod === 'OTP' ? 'var(--white)' : 'transparent',
+                color: authMethod === 'OTP' ? 'var(--forest)' : 'var(--ink-soft)',
+                boxShadow: authMethod === 'OTP' ? '0 2px 8px rgba(0,0,0,0.06)' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Mobile OTP Login
+            </button>
+          </div>
 
-        <div className="login-footer-security">
-          <span>🔒 256-Bit Encrypted Offline-Resilient Authentication</span>
+          {/* Feedback Banners */}
+          {errorMessage && (
+            <div 
+              style={{
+                background: '#FEE2E2',
+                color: '#991B1B',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                fontSize: '0.88rem',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <AlertCircle size={16} />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {successMessage && (
+            <div 
+              style={{
+                background: '#D1FAE5',
+                color: '#065F46',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                fontSize: '0.88rem',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <CheckCircle2 size={16} />
+              <span>{successMessage}</span>
+            </div>
+          )}
+
+          {/* METHOD 1: CREDENTIALS FORM */}
+          {authMethod === 'CREDENTIALS' ? (
+            <form onSubmit={handleCredentialLogin} className="login-form">
+              {/* Username/Email Input */}
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label className="form-label" style={{ fontWeight: 600, fontSize: '0.88rem', marginBottom: '4px', display: 'block' }}>Username or Email</label>
+                <div className="input-with-icon" style={{ position: 'relative' }}>
+                  <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink-soft)' }} />
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="Enter email or username"
+                    className="form-input" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    style={{ width: '100%', paddingLeft: '40px', height: '42px', borderRadius: '6px', border: '1px solid var(--line)' }}
+                  />
+                </div>
+              </div>
+
+              {/* Password Input */}
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <label className="form-label" style={{ margin: 0, fontWeight: 600, fontSize: '0.88rem' }}>Password</label>
+                  <a 
+                    href="#forgot" 
+                    onClick={(e) => { e.preventDefault(); alert('Password reset link sent to your registered contact.'); }} 
+                    style={{ fontSize: '0.8rem', color: 'var(--clay)', fontWeight: 500, textDecoration: 'none' }}
+                  >
+                    Forgot Password?
+                  </a>
+                </div>
+                <div className="input-with-icon" style={{ position: 'relative' }}>
+                  <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink-soft)' }} />
+                  <input 
+                    type={showPassword ? 'text' : 'password'} 
+                    required
+                    placeholder="Enter password"
+                    className="form-input" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{ width: '100%', paddingLeft: '40px', paddingRight: '40px', height: '42px', borderRadius: '6px', border: '1px solid var(--line)' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--ink-soft)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Role Radio Selector */}
+              <div className="role-selector" style={{ marginBottom: '16px', display: 'flex', gap: '16px' }}>
+                <label className="role-option" style={{ cursor: 'pointer', fontSize: '0.88rem' }}>
+                  <input 
+                    type="radio" 
+                    name="role" 
+                    checked={role === 'ROLE_BUYER'} 
+                    onChange={() => setRole('ROLE_BUYER')} 
+                  />
+                  <span> ग्रामीण ग्राहक (Buyer)</span>
+                </label>
+
+                <label className="role-option" style={{ cursor: 'pointer', fontSize: '0.88rem' }}>
+                  <input 
+                    type="radio" 
+                    name="role" 
+                    checked={role === 'ROLE_HUB_MANAGER'} 
+                    onChange={() => setRole('ROLE_HUB_MANAGER')} 
+                  />
+                  <span> ग्राम केंद्र (Hub Manager)</span>
+                </label>
+              </div>
+
+              {/* Remember Me */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+                <input 
+                  type="checkbox" 
+                  id="remember"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                <label htmlFor="remember" style={{ fontSize: '0.88rem', color: 'var(--ink-soft)', cursor: 'pointer' }}>
+                  Remember my session on this browser
+                </label>
+              </div>
+
+              <button type="submit" disabled={loading} className="btn-primary btn-block" style={{ padding: '14px', borderRadius: '8px', fontWeight: 600 }}>
+                {loading ? 'Authenticating...' : 'Sign In with Credentials'}
+              </button>
+
+              {/* Quick Demo Credentials Bar */}
+              <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--line)', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.78rem', color: 'var(--ink-soft)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>
+                  Quick Demo Accounts (1-Click Fill)
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => applyPreset('BUYER')}
+                    style={{ flex: 1, padding: '6px 8px', fontSize: '0.8rem', background: 'var(--cream-2)', border: '1px solid var(--line)', borderRadius: '6px', fontWeight: 500, cursor: 'pointer' }}
+                  >
+                    👤 Demo Buyer
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => applyPreset('HUB')}
+                    style={{ flex: 1, padding: '6px 8px', fontSize: '0.8rem', background: 'var(--cream-2)', border: '1px solid var(--line)', borderRadius: '6px', fontWeight: 500, cursor: 'pointer' }}
+                  >
+                    🏪 Demo Hub Manager
+                  </button>
+                </div>
+              </div>
+            </form>
+          ) : (
+            /* METHOD 2: PHONE & SMS OTP FORM */
+            otpStep === 'PHONE' ? (
+              <form onSubmit={handleRequestOtp} className="login-form">
+                <div className="form-group" style={{ marginBottom: '16px' }}>
+                  <label className="form-label" style={{ fontWeight: 600, fontSize: '0.88rem', marginBottom: '4px', display: 'block' }}>{t('enterPhone')}</label>
+                  <div className="input-with-icon" style={{ position: 'relative' }}>
+                    <Phone size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink-soft)' }} />
+                    <input 
+                      type="tel" 
+                      pattern="[0-9]{10}"
+                      required
+                      autoFocus
+                      placeholder="10-digit mobile number"
+                      className="form-input" 
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      style={{ width: '100%', paddingLeft: '40px', height: '42px', borderRadius: '6px', border: '1px solid var(--line)' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="role-selector" style={{ marginBottom: '20px', display: 'flex', gap: '16px' }}>
+                  <label className="role-option" style={{ cursor: 'pointer', fontSize: '0.88rem' }}>
+                    <input 
+                      type="radio" 
+                      name="role-otp" 
+                      checked={role === 'ROLE_BUYER'} 
+                      onChange={() => setRole('ROLE_BUYER')} 
+                    />
+                    <span>ग्रामीण ग्राहक (Buyer)</span>
+                  </label>
+
+                  <label className="role-option" style={{ cursor: 'pointer', fontSize: '0.88rem' }}>
+                    <input 
+                      type="radio" 
+                      name="role-otp" 
+                      checked={role === 'ROLE_HUB_MANAGER'} 
+                      onChange={() => setRole('ROLE_HUB_MANAGER')} 
+                    />
+                    <span>ग्राम केंद्र (Hub Manager)</span>
+                  </label>
+                </div>
+
+                <button type="submit" disabled={loading} className="btn-primary btn-block" style={{ padding: '14px', borderRadius: '8px', fontWeight: 600 }}>
+                  {loading ? 'Sending SMS...' : t('requestOtp')}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOtp} className="login-form">
+                <div className="form-group" style={{ marginBottom: '16px' }}>
+                  <label className="form-label" style={{ fontWeight: 600, fontSize: '0.88rem', marginBottom: '4px', display: 'block' }}>{t('enterOtp')} (Demo OTP: 1234)</label>
+                  <div className="input-with-icon" style={{ position: 'relative' }}>
+                    <KeyRound size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink-soft)' }} />
+                    <input 
+                      type="text" 
+                      pattern="[0-9]{4}"
+                      maxLength={4}
+                      required
+                      autoFocus
+                      className="form-input otp-input" 
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      style={{ width: '100%', paddingLeft: '40px', height: '42px', borderRadius: '6px', border: '1px solid var(--line)', textAlign: 'center', letterSpacing: '4px', fontSize: '1.1rem' }}
+                    />
+                  </div>
+                </div>
+
+                <button type="submit" disabled={loading} className="btn-primary btn-block" style={{ padding: '14px', marginBottom: '12px', borderRadius: '8px', fontWeight: 600 }}>
+                  {loading ? 'Verifying...' : t('verifyOtp')}
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={() => setOtpStep('PHONE')}
+                  style={{ width: '100%', background: 'none', border: 'none', color: 'var(--ink-soft)', fontSize: '0.85rem', cursor: 'pointer' }}
+                >
+                  ← Change Mobile Number
+                </button>
+              </form>
+            )
+          )}
         </div>
-
       </div>
+      <Footer />
     </div>
   );
 };

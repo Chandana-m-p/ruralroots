@@ -10,7 +10,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { getLocalizedTitle } = useLanguage();
+  const { getLocalizedTitle, t } = useLanguage();
   const { addToCart, items } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
 
@@ -22,7 +22,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="product-card">
       <div className="thumb">
-        {isBestseller && <span className="tag-bestseller">Bestseller</span>}
+        {isBestseller && <span className="tag-bestseller">{t('bestsellerTag')}</span>}
         <button 
           className={`fav-btn ${isFav ? 'active' : ''}`}
           onClick={(e) => {
@@ -58,7 +58,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           style={{ marginTop: '10px', padding: '8px 12px', fontSize: '0.85rem' }}
           onClick={() => addToCart(product)}
         >
-          {inCart ? 'Added ✓' : 'Add to Cart'}
+          {inCart ? `${t('addedToCart')} ✓` : t('addToCart')}
         </button>
       </div>
     </div>

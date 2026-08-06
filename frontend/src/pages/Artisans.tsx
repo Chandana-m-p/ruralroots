@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArtisanCard, Artisan } from '../components/ArtisanCard';
 import { Footer } from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 const artisansList: Artisan[] = [
   {
@@ -61,6 +62,7 @@ const artisansList: Artisan[] = [
 ];
 
 export const Artisans: React.FC = () => {
+  const { t } = useLanguage();
   const [selectedRegion, setSelectedRegion] = useState('all');
 
   const filtered = artisansList.filter((a) => {
@@ -73,17 +75,17 @@ export const Artisans: React.FC = () => {
       <div className="container" style={{ paddingBottom: '48px' }}>
         {/* Breadcrumb */}
         <div className="breadcrumb">
-          <Link to="/">Home</Link>
+          <Link to="/">{t('home')}</Link>
           <span className="sep">›</span>
-          <span className="current">Artisans</span>
+          <span className="current">{t('artisans')}</span>
         </div>
 
         {/* Hero Spotlight */}
         <div className="hero" style={{ padding: '36px', borderRadius: 'var(--radius-lg)', marginBottom: '32px' }}>
           <div style={{ maxWidth: '640px' }}>
-            <h2 style={{ fontSize: '2.2rem', marginBottom: '12px' }}>Meet Our Rural Artisans</h2>
+            <h2 style={{ fontSize: '2.2rem', marginBottom: '12px' }}>{t('meetOurRuralArtisans')}</h2>
             <p style={{ color: 'var(--ink-soft)', fontSize: '1rem', lineHeight: '1.6' }}>
-              Every product on RuralRoots is hand-crafted by skilled master artisans across India's villages. By purchasing directly, 100% of fair income flows back into rural households.
+              {t('artisansHeroSub')}
             </p>
           </div>
         </div>
@@ -91,7 +93,7 @@ export const Artisans: React.FC = () => {
         {/* Region Filter Bar */}
         <div className="shop-toolbar" style={{ marginBottom: '24px' }}>
           <span style={{ color: 'var(--ink-soft)', fontSize: '0.92rem', fontWeight: 600 }}>
-            Filter Artisans by Region:
+            {t('filterArtisansByRegion')}
           </span>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {['all', 'Rajasthan', 'Andhra Pradesh', 'Madhya Pradesh', 'Assam', 'Gujarat'].map((reg) => (
@@ -101,12 +103,13 @@ export const Artisans: React.FC = () => {
                 style={{ padding: '6px 14px', fontSize: '0.85rem' }}
                 onClick={() => setSelectedRegion(reg)}
               >
-                {reg === 'all' ? 'All Regions' : reg}
+                {reg === 'all' ? t('allRegions') : reg}
               </button>
             ))}
           </div>
         </div>
 
+        {/* Artisan Grid */}
         <div className="artisan-grid">
           {filtered.map((artisan) => (
             <ArtisanCard key={artisan.id} artisan={artisan} />

@@ -9,7 +9,7 @@ import { Footer } from '../components/Footer';
 
 export const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { getLocalizedTitle } = useLanguage();
+  const { getLocalizedTitle, getLocalizedDesc, t } = useLanguage();
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export const ProductDetail: React.FC = () => {
   }
 
   const title = getLocalizedTitle(product.titleI18n);
-  const desc = getLocalizedTitle(product.descriptionI18n);
+  const desc = getLocalizedDesc(product.descriptionI18n);
   const isFav = isInWishlist(product.id);
 
   return (
@@ -44,9 +44,9 @@ export const ProductDetail: React.FC = () => {
       <div className="container">
         {/* Breadcrumb */}
         <div className="breadcrumb">
-          <Link to="/">Home</Link>
+          <Link to="/">{t('home')}</Link>
           <span className="sep">›</span>
-          <Link to="/shop">Shop</Link>
+          <Link to="/shop">{t('shop')}</Link>
           <span className="sep">›</span>
           <span className="current">{title}</span>
         </div>
@@ -61,12 +61,6 @@ export const ProductDetail: React.FC = () => {
               className={selectedImage === product.thumbnailUrl ? 'active' : ''}
               onClick={() => setSelectedImage(product.thumbnailUrl)}
             />
-            <img 
-              src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=300&h=300&fit=crop" 
-              alt="Alternate view" 
-              className={selectedImage.includes('1610701596007') ? 'active' : ''}
-              onClick={() => setSelectedImage('https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&h=800&fit=crop')}
-            />
           </div>
 
           {/* Main Image */}
@@ -78,7 +72,7 @@ export const ProductDetail: React.FC = () => {
           <div className="pd-info">
             <h1>{title}</h1>
             <div className="by">
-              Crafted by <Link to="/artisans">Ananya Sharma (Master Artisan)</Link>
+              Crafted by <Link to="/artisans">{product.artisanName || 'Master Artisan'} ({product.artisanRegion || 'Rural Village Cluster'})</Link>
             </div>
             
             <div className="pd-rating">
@@ -149,19 +143,19 @@ export const ProductDetail: React.FC = () => {
         <div className="artisan-panel">
           <h3>Meet the Artisan</h3>
           <div className="artisan-head">
-            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=faces" alt="Ananya Sharma" />
+            <img src={product.thumbnailUrl} alt={product.artisanName || 'Artisan'} style={{ borderRadius: '50%', width: '64px', height: '64px', objectFit: 'cover' }} />
             <div>
-              <h4>Ananya Sharma</h4>
-              <div className="loc">📍 Jaipur, Rajasthan · Terracotta & Pottery Master</div>
+              <h4>{product.artisanName || 'Master Artisan'}</h4>
+              <div className="loc">📍 {product.artisanRegion || 'Rural Village Cluster'}</div>
             </div>
           </div>
           <p>
-            Ananya has been practicing traditional terracotta pottery for over 18 years. She leads a self-help cluster of 20 rural artisan families, reviving age-old pottery techniques while utilizing eco-friendly natural pigments.
+            {product.artisanName || 'This master artisan'} has been practicing authentic traditional handcrafting for over 15 years. They lead a self-help cluster of rural artisan families, preserving age-old heritage techniques while using eco-friendly natural materials.
           </p>
           <div className="stat-row">
-            <div className="stat"><b>18+ Yrs</b> Experience</div>
-            <div className="stat"><b>2,400+</b> Pieces Crafted</div>
-            <div className="stat"><b>20</b> Families Empowered</div>
+            <div className="stat"><b>15+ Yrs</b> Experience</div>
+            <div className="stat"><b>1,800+</b> Pieces Crafted</div>
+            <div className="stat"><b>15</b> Families Empowered</div>
           </div>
         </div>
 

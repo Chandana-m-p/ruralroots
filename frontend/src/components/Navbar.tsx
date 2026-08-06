@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import { VoiceSearch } from './VoiceSearch';
-import { Heart, ShoppingBag, User, LogOut, ChevronDown } from 'lucide-react';
+import { Heart, ShoppingBag, User, LogOut, ChevronDown, Layers, ArrowRight } from 'lucide-react';
+
+const CATEGORIES_LIST = [
+  { id: 'pottery', name: 'Pottery & Terracotta', icon: '🏺', desc: 'Handpainted Vases, Bowls & Clayware' },
+  { id: 'baskets', name: 'Handwoven Baskets', icon: '🧺', desc: 'Natural Sabai Grass & Jute Fibers' },
+  { id: 'wood', name: 'Wooden Crafts', icon: '🪵', desc: 'Carved Sheesham & Teak Wood' },
+  { id: 'bamboo', name: 'Bamboo Products', icon: '🎋', desc: 'Handcrafted Trays, Baskets & Decor' },
+  { id: 'jewelry', name: 'Handmade Jewelry', icon: '💍', desc: 'Recycled Glass & Beaded Tribal Art' },
+  { id: 'decor', name: 'Home Decor & Textiles', icon: '🧵', desc: 'Indigo Block-Printed Cushion Covers' }
+];
 
 export const Navbar: React.FC = () => {
   const { lang, setLang, t } = useLanguage();
@@ -16,8 +25,21 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const totalCartCount = items.reduce((sum, i) => sum + i.quantity, 0);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowCategoryDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +51,11 @@ export const Navbar: React.FC = () => {
   const handleVoiceSearchResult = (text: string) => {
     setSearchQuery(text);
     navigate(`/shop?search=${encodeURIComponent(text)}`);
+  };
+
+  const handleCategorySelect = (catId: string) => {
+    setShowCategoryDropdown(false);
+    navigate(`/shop?cat=${catId}`);
   };
 
   const isActive = (path: string) => location.pathname === path;
@@ -75,6 +102,7 @@ export const Navbar: React.FC = () => {
                 <option value="hi">हिन्दी (Hindi) ▾</option>
                 <option value="mr">मराठी (Marathi) ▾</option>
                 <option value="gu">ગુજરાતી (Gujarati) ▾</option>
+                <option value="kn">ಕನ್ನಡ (Kannada) ▾</option>
               </select>
             </div>
 
@@ -104,7 +132,7 @@ export const Navbar: React.FC = () => {
             ) : (
               <Link to="/login" className="user-chip">
                 <User size={18} />
-                <span>Hi, Guest</span>
+                <span>{t('hiGuest')}</span>
               </Link>
             )}
           </div>
@@ -114,21 +142,127 @@ export const Navbar: React.FC = () => {
       {/* Nav */}
       <nav className="navbar">
         <div className="container">
-          <div className="cat-dropdown" onClick={() => navigate('/shop')}>
-            ☰ Categories ▾
+          {/* Interactive Category Dropdown Trigger */}
+          <div 
+            ref={dropdownRef}
+            style={{ position: 'relative' }}
+          >
+            <button 
+              className="cat-dropdown"
+              onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: showCategoryDropdown ? 'var(--forest)' : 'var(--cream)',
+                color: showCategoryDropdown ? 'var(--white)' : 'var(--ink)',
+                border: '1.5px solid var(--line)',
+                borderRadius: '8px',
+                padding: '9px 16px',
+                fontWeight: 600,
+                fontSize: '0.92rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <Layers size={16} />
+              <span>{t('categories')}</span>
+              <ChevronDown size={16} style={{ transform: showCategoryDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+            </button>
+
+            {/* Category Dropdown Menu */}
+            {showCategoryDropdown && (
+              <div 
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 8px)',
+                  left: 0,
+                  width: '320px',
+                  background: 'var(--white)',
+                  borderRadius: '12px',
+                  boxShadow: 'var(--shadow-lg)',
+                  border: '1px solid var(--line)',
+                  padding: '8px',
+                  zIndex: 999,
+                  animation: 'fadeIn 0.2s ease-out'
+                }}
+              >
+                <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--line)', marginBottom: '4px' }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--ink-soft)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {t('browseCategories')}
+                  </div>
+                </div>
+
+                {CATEGORIES_LIST.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => handleCategorySelect(cat.id)}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '10px 12px',
+                      border: 'none',
+                      background: 'transparent',
+                      borderRadius: '8px',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      transition: 'background 0.15s ease'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--cream)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <span style={{ fontSize: '1.4rem' }}>{cat.icon}</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--ink)' }}>{cat.name}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--ink-soft)' }}>{cat.desc}</div>
+                    </div>
+                  </button>
+                ))}
+
+                <div style={{ borderTop: '1px solid var(--line)', marginTop: '4px', paddingTop: '4px' }}>
+                  <button
+                    onClick={() => {
+                      setShowCategoryDropdown(false);
+                      navigate('/shop');
+                    }}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '10px 12px',
+                      border: 'none',
+                      background: 'var(--cream-2)',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontWeight: 600,
+                      fontSize: '0.85rem',
+                      color: 'var(--forest)'
+                    }}
+                  >
+                    <span>{t('viewAllProducts')}</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
+
           <ul className="nav-links">
-            <li><Link to="/" className={isActive('/') ? 'active' : ''}>Home</Link></li>
-            <li><Link to="/shop" className={isActive('/shop') ? 'active' : ''}>Shop</Link></li>
-            <li><Link to="/my-orders" className={isActive('/my-orders') ? 'active' : ''}>My Orders</Link></li>
-            <li><Link to="/admin" className={isActive('/admin') ? 'active' : ''}>Admin Portal</Link></li>
-            <li><Link to="/artisans" className={isActive('/artisans') ? 'active' : ''}>Artisans</Link></li>
-            <li><Link to="/about" className={isActive('/about') ? 'active' : ''}>Our Story</Link></li>
-            <li><Link to="/blog" className={isActive('/blog') ? 'active' : ''}>Blog</Link></li>
-            <li><Link to="/contact" className={isActive('/contact') ? 'active' : ''}>Contact</Link></li>
+            <li><Link to="/" className={isActive('/') ? 'active' : ''}>{t('home')}</Link></li>
+            <li><Link to="/admin" className={isActive('/admin') ? 'active' : ''}>{t('adminPortal')}</Link></li>
+            <li><Link to="/shop" className={isActive('/shop') ? 'active' : ''}>{t('shop')}</Link></li>
+            <li><Link to="/my-orders" className={isActive('/my-orders') ? 'active' : ''}>{t('myOrders')}</Link></li>
+            <li><Link to="/artisans" className={isActive('/artisans') ? 'active' : ''}>{t('artisans')}</Link></li>
+            <li><Link to="/about" className={isActive('/about') ? 'active' : ''}>{t('ourStory')}</Link></li>
+            <li><Link to="/blog" className={isActive('/blog') ? 'active' : ''}>{t('blog')}</Link></li>
+            <li><Link to="/contact" className={isActive('/contact') ? 'active' : ''}>{t('contact')}</Link></li>
           </ul>
         </div>
       </nav>
     </>
   );
 };
+

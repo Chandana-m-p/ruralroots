@@ -3,6 +3,7 @@ import Dexie, { Table } from 'dexie';
 export interface LocalProduct {
   id: number;
   sku: string;
+  category: string;
   titleI18n: string;
   descriptionI18n: string;
   basePrice: number;
@@ -10,6 +11,8 @@ export interface LocalProduct {
   thumbnailUrl: string;
   imagesJson: string;
   isActive: boolean;
+  artisanName?: string;
+  artisanRegion?: string;
 }
 
 export interface LocalPendingOrder {
