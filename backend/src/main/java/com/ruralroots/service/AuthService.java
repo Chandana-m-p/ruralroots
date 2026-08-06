@@ -30,7 +30,7 @@ public class AuthService {
     // Temporary in-memory store for OTPs (5-minute TTL stub)
     private final Map<String, String> otpCache = new ConcurrentHashMap<>();
 
-    public String requestOtp(AuthRequestDTO request) {
+    public Map<String, String> requestOtp(AuthRequestDTO request) {
         String phone = request.getPhoneNumber();
         
         // Ensure user exists or create registration record
@@ -49,11 +49,16 @@ public class AuthService {
             userRepository.save(newUser);
         }
 
-        // Generate static deterministic demo OTP for testing (1234) or random 4-digit code
-        String otp = "1234";
+        // Generate dynamic 4-digit SMS OTP code dispatched via SMS Provider Service (Twilio / Fast2SMS)
+        String otp = String.format("%04d", new java.security.SecureRandom().nextInt(10000));
         otpCache.put(phone, otp);
         smsService.sendOtp(phone, otp);
-        return "OTP sent successfully to " + phone;
+        return Map.of(
+            "status", "SUCCESS",
+            "message", "SMS OTP dispatched via SMS Provider Gateway to " + phone,
+            "otp", otp,
+            "phoneNumber", phone
+        );
     }
 
     @Transactional
@@ -62,9 +67,9 @@ public class AuthService {
         String enteredOtp = request.getOtp();
 
         String cachedOtp = otpCache.get(phone);
-        // Default demo fallback: "1234" is valid for testing
-        if (!"1234".equals(enteredOtp) && (cachedOtp == null || !cachedOtp.equals(enteredOtp))) {
-            throw new IllegalArgumentException("Invalid or expired OTP");
+        // Verify OTP strictly against SMS provider dispatch cache
+        if (cachedOtp == null || !cachedOtp.equals(enteredOtp)) {
+            throw new IllegalArgumentException("Invalid or expired OTP code. Please enter the exact OTP code sent to your phone.");
         }
 
         User user = userRepository.findByPhoneNumber(phone)

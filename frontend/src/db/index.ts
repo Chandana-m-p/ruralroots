@@ -28,7 +28,9 @@ export interface LocalPendingOrder {
     unitPrice: number;
   }>;
   offlineCreatedAt: string;
-  syncStatus: 'QUEUED' | 'SYNCED' | 'FAILED';
+  syncStatus: 'QUEUED' | 'SYNCED' | 'FAILED' | 'CANCELLED';
+  cancellationReason?: string;
+  cancelledAt?: string;
 }
 
 export interface LocalUserSession {
