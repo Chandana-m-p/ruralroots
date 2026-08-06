@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { fetchProducts } from '../services/api';
+import { fetchProducts, getProductCategory } from '../services/api';
 import { LocalProduct } from '../db';
 import { ProductCard } from '../components/ProductCard';
 import { Footer } from '../components/Footer';
@@ -72,8 +72,34 @@ export const Shop: React.FC = () => {
   });
 
   const filteredProducts = products.filter((p) => {
+<<<<<<< HEAD
     const matchesSearch = !search || p.titleI18n.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = matchCategory(p, selectedCategory);
+=======
+    // Multi-field & Multi-lingual Search
+    let matchesSearch = true;
+    if (search && search.trim() !== '') {
+      const searchClean = search.toLowerCase().trim();
+      const words = searchClean.split(/\s+/).filter(Boolean);
+
+      const titleRaw = typeof p.titleI18n === 'string' ? p.titleI18n : JSON.stringify(p.titleI18n || '');
+      const descRaw = typeof p.descriptionI18n === 'string' ? p.descriptionI18n : JSON.stringify(p.descriptionI18n || '');
+      const skuStr = (p.sku || '').toLowerCase();
+      const catStr = (p.category || getProductCategory(p) || '').toLowerCase();
+
+      // Full text buffer for keyword searching
+      const fullTextBuffer = `${titleRaw} ${descRaw} ${skuStr} ${catStr}`.toLowerCase();
+
+      // Check if at least one word from search query exists in the full text buffer
+      matchesSearch = words.some((word) => fullTextBuffer.includes(word));
+    }
+    
+    // Category matching using fallback deduction helper
+    const pCategory = (p.category || getProductCategory(p)).toLowerCase();
+    const matchesCategory =
+      selectedCategories.length === 0 ||
+      selectedCategories.some((c) => c.toLowerCase() === pCategory);
+>>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
 
     let matchesPrice = true;
     if (priceFilter === 'under500') matchesPrice = p.basePrice < 500;

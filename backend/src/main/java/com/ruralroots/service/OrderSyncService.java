@@ -148,8 +148,40 @@ public class OrderSyncService {
     }
 
     @Transactional
+<<<<<<< HEAD
     public OrderResponseDTO markOrderDelivered(Long orderId) {
         return updateOrderStatus(orderId, "Delivered Successfully");
+=======
+    public OrderResponseDTO cancelOrder(Long orderId, String reason, String buyerPhoneNumber) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
+
+        if ("CANCELLED".equals(order.getOrderStatus())) {
+            throw new IllegalStateException("Order is already cancelled.");
+        }
+
+        if ("DELIVERED".equals(order.getOrderStatus())) {
+            throw new IllegalStateException("Delivered orders cannot be cancelled.");
+        }
+
+        order.setOrderStatus("CANCELLED");
+        order.setCancellationReason(reason != null ? reason : "Cancelled by user");
+        order.setCancelledAt(ZonedDateTime.now());
+
+        // Restore product stock quantity
+        if (order.getItems() != null) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                if (product != null) {
+                    product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                    productRepository.save(product);
+                }
+            }
+        }
+
+        Order updated = orderRepository.save(order);
+        return mapToDTO(updated);
+>>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
     }
 
     private OrderResponseDTO mapToDTO(Order o) {
@@ -176,7 +208,12 @@ public class OrderSyncService {
                 .totalAmount(o.getTotalAmount())
                 .offlineCreatedAt(o.getOfflineCreatedAt())
                 .syncedAt(o.getSyncedAt())
+<<<<<<< HEAD
                 .deliveryDate(o.getDeliveryDate())
+=======
+                .cancellationReason(o.getCancellationReason())
+                .cancelledAt(o.getCancelledAt())
+>>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
                 .items(itemDtos)
                 .build();
     }
