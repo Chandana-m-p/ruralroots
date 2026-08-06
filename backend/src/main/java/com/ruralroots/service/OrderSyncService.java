@@ -111,7 +111,6 @@ public class OrderSyncService {
 
         List<Order> orders = orderRepository.findByBuyerIdOrderBySyncedAtDesc(buyer.getId());
         
-        // If DB is empty for user, return mapped seed orders for demo
         return orders.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
@@ -128,7 +127,6 @@ public class OrderSyncService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
 
-        // Enforce valid status states: 'Delivered Successfully', 'Delivered Unsuccessfully', 'Cancelled'
         String normalizedStatus;
         if ("DELIVERED_FAILED".equalsIgnoreCase(newStatus) || "Delivered Unsuccessfully".equalsIgnoreCase(newStatus)) {
             normalizedStatus = "Delivered Unsuccessfully";
@@ -148,23 +146,20 @@ public class OrderSyncService {
     }
 
     @Transactional
-<<<<<<< HEAD
     public OrderResponseDTO markOrderDelivered(Long orderId) {
         return updateOrderStatus(orderId, "Delivered Successfully");
-=======
+    }
+
+    @Transactional
     public OrderResponseDTO cancelOrder(Long orderId, String reason, String buyerPhoneNumber) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
 
-        if ("CANCELLED".equals(order.getOrderStatus())) {
+        if ("CANCELLED".equalsIgnoreCase(order.getOrderStatus()) || "Cancelled".equalsIgnoreCase(order.getOrderStatus())) {
             throw new IllegalStateException("Order is already cancelled.");
         }
 
-        if ("DELIVERED".equals(order.getOrderStatus())) {
-            throw new IllegalStateException("Delivered orders cannot be cancelled.");
-        }
-
-        order.setOrderStatus("CANCELLED");
+        order.setOrderStatus("Cancelled");
         order.setCancellationReason(reason != null ? reason : "Cancelled by user");
         order.setCancelledAt(ZonedDateTime.now());
 
@@ -181,7 +176,6 @@ public class OrderSyncService {
 
         Order updated = orderRepository.save(order);
         return mapToDTO(updated);
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
     }
 
     private OrderResponseDTO mapToDTO(Order o) {
@@ -208,12 +202,9 @@ public class OrderSyncService {
                 .totalAmount(o.getTotalAmount())
                 .offlineCreatedAt(o.getOfflineCreatedAt())
                 .syncedAt(o.getSyncedAt())
-<<<<<<< HEAD
                 .deliveryDate(o.getDeliveryDate())
-=======
                 .cancellationReason(o.getCancellationReason())
                 .cancelledAt(o.getCancelledAt())
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
                 .items(itemDtos)
                 .build();
     }

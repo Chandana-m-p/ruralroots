@@ -5,6 +5,7 @@ import { LocalProduct } from '../db';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { ProductReviewsSection } from '../components/ProductReviewsSection';
 import { Footer } from '../components/Footer';
 
 export const ProductDetail: React.FC = () => {
@@ -172,6 +173,9 @@ export const ProductDetail: React.FC = () => {
             <div className="spec"><b>Care</b> Clean with dry soft cloth</div>
           </div>
         </div>
+
+        {/* Product Reviews Section */}
+        <ProductReviewsSection productId={product.id} productTitle={title} />
       </div>
 
       <Footer />

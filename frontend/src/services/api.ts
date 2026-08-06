@@ -2,524 +2,509 @@ import { db, LocalProduct } from '../db';
 
 const API_BASE = '/api/v1';
 
-<<<<<<< HEAD
-const CATEGORY_NAMES: { [key: string]: { nameEn: string; nameHi: string; nameKn: string; prefix: string; img: string } } = {
-  pottery: { nameEn: 'Pottery & Terracotta', nameHi: 'टेराकोटा और मिट्टी के बर्तन', nameKn: 'ಮಣ್ಣಿನ ಪಾತ್ರೆಗಳು ಮತ್ತು ಟೆರಾಕೋಟಾ', prefix: 'ART-POTTERY', img: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=500&q=80' },
-  baskets: { nameEn: 'Handwoven Basket', nameHi: 'हाथ से बुनी टोकरी', nameKn: 'ಕೈಯಿಂದ ನೇಯ್ದ ಬುಟ್ಟಿ', prefix: 'ART-BASKET', img: 'https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=500&q=80' },
-  wood: { nameEn: 'Wooden Craft', nameHi: 'लकड़ी का शिल्प', nameKn: 'ಮರದ ಕೆತ್ತನೆ ಉತ್ಪನ್ನ', prefix: 'ART-WOOD', img: 'https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=500&q=80' },
-  bamboo: { nameEn: 'Bamboo Craft', nameHi: 'बांस का हस्तशिल्प', nameKn: 'ಬಿದಿರಿನ ಕರಕುಶಲ', prefix: 'ART-BAMBOO', img: 'https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=500&q=80' },
-  jewelry: { nameEn: 'Handmade Jewelry', nameHi: 'हस्तनिर्मित आभूषण', nameKn: 'ಹಸ್ತಾಲಂಕಾರ ಆಭರಣ', prefix: 'ART-JEWELRY', img: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=500&q=80' },
-  decor: { nameEn: 'Home Decor & Textile', nameHi: 'गृह सज्जा और वस्त्र', nameKn: 'ಮನೆ ಅಲಂकार और बटलियां', prefix: 'ART-DECOR', img: 'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=500&q=80' }
-};
+export interface VillageHubItem {
+  id: number;
+  hubCode: string;
+  hubName: string;
+  pincode: string;
+  villageName: string;
+  district: string;
+  state: string;
+  landmark?: string;
+  operatesCod: boolean;
+}
 
-const CATEGORY_ITEMS: { [key: string]: { title: string; img: string; descEn: string; descHi: string; descKn: string; artisan: string; region: string; rating: number; reviews: number }[] } = {
-  baskets: [
-    { title: 'Seagrass Belly Basket with Handles', img: 'https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=500&q=80', descEn: 'Flexible collapsible seagrass storage basket featuring sturdy woven carrying handles.', descHi: 'मजबूत हैंडल के साथ लचीली और मोड़ने योग्य प्राकृतिक सीग्रास की टोकरी।', descKn: 'ಹಿಡಿಕೆಗಳಿರುವ ಮಡಚಬಹುದಾದ ನೈಸರ್ಗಿಕ ಸಮುದ್ರ ಹುಲ್ಲಿನ ಬುಟ್ಟಿ.', artisan: 'Lalitha Devi', region: 'Narsapur, Andhra Pradesh', rating: 4.9, reviews: 54 },
-    { title: 'Rattan Nesting Storage Hampers', img: 'https://images.unsplash.com/photo-1590736704728-f4730bb30770?w=500&q=80', descEn: 'Set of multi-sized woven rattan hampers designed for efficient nesting storage.', descHi: 'घर की चीजों को व्यवस्थित रखने के लिए रतन से बनी 3 टोकरियों का सेट।', descKn: 'ಮನೆಯ ವಸ್ತುಗಳನ್ನು ಜೋಡಿಸಲು 3 ಬೆತ್ತದ ಬುಟ್ಟಿಗಳ ಸೆಟ್.', artisan: 'Harish Roy', region: 'Cooch Behar, West Bengal', rating: 4.8, reviews: 42 },
-    { title: 'Coiled Cotton Rope Laundry Bin', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&q=80', descEn: 'Soft textured coiled cotton cord hamper ideal for laundry and toy storage.', descHi: 'कपड़ों और खिलौनों के लिए सूती धागों से बनी मुलायम और टिकाऊ बास्केट।', descKn: 'ಉಡುಪುಗಳ ಸಂಗ್ರಹಣೆಗೆ ಹತ್ತಿ ದಾರದ ಮೃದುವಾದ ದೊಡ್ಡ ಬುಟ್ಟಿ.', artisan: 'Savitri Bai', region: 'Mayurbhanj, Odisha', rating: 4.9, reviews: 38 },
-    { title: 'Woven Jute Plant Pot Cover', img: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=500&q=80', descEn: 'Rustic natural jute planter basket adding boho charm to indoor greenery.', descHi: 'घर के पौधों के गमलों को सुंदर और प्राकृतिक रूप देने वाला जूट का कवर।', descKn: 'ಮನೆಯೊಳಗಿನ ಗಿಡಗಳಿಗೆ ನೈಸರ್ಗಿಕ ಶೃಂಗಾರ ನೀಡುವ ಸಣಬಿನ ಕುಂಡ ಕವರ್.', artisan: 'Bikash Chetri', region: 'Golaghat, Assam', rating: 4.7, reviews: 29 },
-    { title: 'Split-Willow Picnic Basket with Liner', img: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&q=80', descEn: 'Classic split-willow outdoor picnic basket fitted with a washable cotton lining.', descHi: 'पिकनिक के लिए सूती कपड़े के अस्तर वाली क्लासिक विलो लकड़ी की टोकरी।', descKn: 'ಉಪಹಾರ ವಿಹಾರಕ್ಕೆ ಅನುಕೂಲಕರವಾದ ಬಟ್ಟೆ ಲೈನಿಂಗ್ ಇರುವ ಪಿಕ್ನಿಕ್ ಬುಟ್ಟಿ.', artisan: 'Manjula Naidu', region: 'Chittoor, Andhra Pradesh', rating: 4.9, reviews: 61 },
-    { title: 'Boho Macrame Hanging Fruit Basket', img: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=500&q=80', descEn: 'Tiered hand-knotted macrame cotton fruit hammock for space-saving kitchen storage.', descHi: 'रसोई में फल और सब्जियां टांगने के लिए मैक्रम धागों की सजावटी टोकरी।', descKn: 'ಅಡುಗೆಮನೆಯಲ್ಲಿ ಹಣ್ಣುಗಳನ್ನು ತೂಗುಹಾಕಲು ಮ್ಯಾಕ್ರೇಮ್ ಹ್ಯಾಂಗಿಂಗ್ ಬುಟ್ಟಿ.', artisan: 'Abdul Karim', region: 'Murshidabad, West Bengal', rating: 4.8, reviews: 33 },
-    { title: 'Water Hyacinth Magazine Holder', img: 'https://images.unsplash.com/photo-1606744888344-49423b812d02?w=500&q=80', descEn: 'Sturdy water hyacinth fiber magazine basket with built-in dividing handles.', descHi: 'अखबार और पत्रिकाओं को व्यवस्थित रखने के लिए वाटर हायसिंथ की टोकरी।', descKn: 'ಪತ್ರಿಕೆಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲು ಜಲಸಸ್ಯದ ನಾರಿನ ಬಲವಾದ ಬುಟ್ಟಿ.', artisan: 'Gauri Shankar', region: 'Koraput, Odisha', rating: 4.6, reviews: 25 },
-    { title: 'Sweetgrass Decorative Wall Trays', img: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=500&q=80', descEn: 'Coiled sweetgrass wall trays handcrafted with geometric traditional patterns.', descHi: 'दीवार की सजावट के लिए पारंपरिक पैटर्न वाली स्वीटग्रास ट्रे।', descKn: 'ಗೋಡೆಯ ಸೌಂದರ್ಯಕ್ಕೆ ಜಾನಪದ ವಿನ್ಯಾಸದ ಸುಗಂಧ ಹುಲ್ಲಿನ ಪ್ಲೇಟ್.', artisan: 'Sita Mahato', region: 'Purulia, West Bengal', rating: 4.9, reviews: 47 },
-    { title: 'Sisal Fiber Colorful Storage Bowl', img: 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=500&q=80', descEn: 'Vibrant dyed sisal fiber serving bowl woven tightly by rural artisans.', descHi: 'मेज पर सजावट और फल रखने के लिए रंग-बिरंगी सिसल फाइबर की बास्केट।', descKn: 'ಡೈನಿಂಗ್ ಟೇಬಲ್‌ಗೆ ಬಣ್ಣ ಬಣ್ಣದ ಸಿಸಲ್ ನಾರಿನ ಬೌಲ್.', artisan: 'Narayanappa', region: 'Chikballapur, Karnataka', rating: 4.7, reviews: 31 },
-    { title: 'Bamboo Slat Wastepaper Basket', img: 'https://images.unsplash.com/photo-1596496181848-3091d4878b24?w=500&q=80', descEn: 'Natural bamboo strip waste bin suitable for home offices and bedrooms.', descHi: 'ऑफिस और अध्ययन कक्ष के लिए पर्यावरण-अनुकूल बांस का डस्टबिन।', descKn: 'ಆಫೀಸ್ ಮತ್ತು ಕೋಣೆಗಳಿಗೆ ನೈಸರ್ಗಿಕ ಬಿದಿರಿನ ಕಸದ ಬುಟ್ಟಿ.', artisan: 'Bina Hazarika', region: 'Jorhat, Assam', rating: 4.8, reviews: 52 },
-    { title: 'Toquilla Straw Beach Tote Basket', img: 'https://images.unsplash.com/photo-1590736704728-f4730bb30770?w=500&q=80', descEn: 'Handwoven Toquilla straw tote bag detailed with reinforced leather handles.', descHi: 'खरीदारी और पिकनिक के लिए चमड़े के हैंडल वाला मजबूत स्ट्रॉ बैग।', descKn: 'ಖರೀದಿಗೆ ಸೂಕ್ತವಾದ ಗಟ್ಟಿಮುಟ್ಟಾದ ಟೋಕಿಲಾ ಹುಲ್ಲಿನ ಹ್ಯಾಂಡ್‌ಬ್ಯಾಗ್.', artisan: 'Gopal Samant', region: 'Midnapore, West Bengal', rating: 4.9, reviews: 40 },
-    { title: 'Wicker Bicycle Front Basket', img: 'https://images.unsplash.com/photo-1590736935046-641573c713b1?w=500&q=80', descEn: 'Retro style wicker front handlebar bike basket with adjustable leather straps.', descHi: 'साइकिल के आगे बांधने के लिए चमड़े की बेल्ट वाली क्लासिक टोकरी।', descKn: 'ಸೈಕಲ್ ಮುಂಭಾಗಕ್ಕೆ ಕಟ್ಟಲು ಬೆತ್ತದ ರೇಟ್ರೋ ಶೈಲಿಯ ಬುಟ್ಟಿ.', artisan: 'Revathi Pillai', region: 'Thiruvananthapuram, Kerala', rating: 4.8, reviews: 36 },
-    { title: 'Pine Needle Embroidered Trinket Dish', img: 'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?w=500&q=80', descEn: 'Aromatic pine needle coiled tray accented with threadwork embroidery.', descHi: 'चाबियां और गहने रखने के लिए सुगंधित पाइन नीडल की छोटी ट्रे।', descKn: 'ಚಿಕ್ಕ ಆಭರಣಗಳನ್ನಿಡಲು ಪೈನ್ ಸೂಜಿಗಳ ಸುಗಂಧಿತ ಕರಕುಶಲ ಪ್ಲೇಟ್.', artisan: 'Taramani Sahu', region: 'Sambalpur, Odisha', rating: 4.9, reviews: 28 },
-    { title: 'Kuna Palm Leaf Gathering Basket', img: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=500&q=80', descEn: 'Deep palm leaf gathering basket built for garden harvesting and storage.', descHi: 'सब्जियों और फूलों की कटाई के लिए ताड़ के पत्तों की टिकाऊ टोकरी।', descKn: 'ತೋಟದ ಕಟಾವಿಗೆ ತಾಳೆ ಗರಿಯಿಂದ ನೇಯ್ದ ಆಳವಾದ ಬುಟ್ಟಿ.', artisan: 'Purna Chandra', region: 'Cuttack, Odisha', rating: 4.7, reviews: 33 },
-    { title: 'Banana Bark Square Organizer Cube', img: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=500&q=80', descEn: 'Eco-conscious banana tree fiber square storage box fitted for closet shelves.', descHi: 'अलमारी में कपड़े और जरूरी सामान रखने के लिए केले के छिलके का बॉक्स।', descKn: 'ವಾಕ್-ಇನ್ ಕ್ಲೋಸೆಟ್‌ಗಾಗಿ ಬಾಳೆ ನಾರಿನ ಚೌಕಾಕಾರದ ಶೇಖರಣಾ ಪೆಟ್ಟಿಗೆ.', artisan: 'Urmila Kanwar', region: 'Bikaner, Rajasthan', rating: 4.8, reviews: 45 },
-    { title: 'Handwoven Reed Firewood Holder', img: 'https://images.unsplash.com/photo-1590736704728-f4730bb30770?w=500&q=80', descEn: 'Heavy duty thick reed basket designed to carry and store hearth firewood.', descHi: 'लकड़ी और भारी सामान ले जाने के लिए सरकंडे की मजबूत टोकरी।', descKn: 'ಮರಗಳನ್ನು ಹೊರಲು ಗಟ್ಟಿಮುಟ್ಟಾದ ನೈಜ ನಳ್ಳಿಯ ದೊಡ್ಡ ಬುಟ್ಟಿ.', artisan: 'Deepa Sengupta', region: 'Nadia, West Bengal', rating: 4.9, reviews: 50 },
-    { title: 'Raffia Utility Basket with Lid', img: 'https://images.unsplash.com/photo-1596496181848-3091d4878b24?w=500&q=80', descEn: 'Natural raffia fiber round storage box complete with fitted lid.', descHi: 'कीमती सामान सुरक्षित रखने के लिए ढक्कन वाली राफिया फाइबर की टोकरी।', descKn: 'ವಸ್ತುಗಳನ್ನು ಗೌಪ್ಯವಾಗಿಡಲು ಮುಚ್ಚಳವಿರುವ ರ್ಯಾಫಿಯಾ ನಾರಿನ ಪೆಟ್ಟಿಗೆ.', artisan: 'Chhannulal Verma', region: 'Raigarh, Chhattisgarh', rating: 4.8, reviews: 39 },
-    { title: 'Abaca Fiber Nested Shelf Trays', img: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=500&q=80', descEn: 'Flat profile abaca rope vanity trays ideal for desk and bathroom organization.', descHi: 'ड्रेसिंग टेबल और बाथरूम के लिए अबाका फाइबर की फ्लैट ट्रे।', descKn: 'ಡ್ರೆಸ್ಸಿಂಗ್ ಟೇಬಲ್ ಮತ್ತು ಡೆಸ್ಕ್‌ಗಾಗಿ ಅಬಾಕಾ ನಾರಿನ ಫ್ಲಾಟ್ ಟ್ರೇಗಳು.', artisan: 'Padmavati Rao', region: 'Visakhapatnam, Andhra Pradesh', rating: 4.7, reviews: 27 },
-    { title: 'Cane Bread Proofing Banneton Basket', img: 'https://images.unsplash.com/photo-1590736935046-641573c713b1?w=500&q=80', descEn: 'Traditional unbleached natural cane round banneton basket for sourdough baking.', descHi: 'बेकिंग और ब्रेड बनाने के लिए प्राकृतिक बेत की राउंड प्रूफिंग बास्केट।', descKn: 'ಬ್ರೆಡ್ ತಯಾರಿಕೆಗೆ ಸಾಂಪ್ರದಾಯಿಕ ಬೆತ್ತದ ಪ್ರೂಫಿಂಗ್ ಬ್ಯಾನ್ನೇಟನ್ ಬೌಲ್.', artisan: 'Sanatan Behera', region: 'Balasore, Odisha', rating: 4.9, reviews: 58 },
-    { title: 'Rush Grass Stair Step Storage Basket', img: 'https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=500&q=80', descEn: 'Specially shaped rush grass basket molded to fit perfectly on staircase steps.', descHi: 'सीढ़ियों पर सामान रखने के लिए विशेष आकार में बुनी गई रश ग्रास की बास्केट।', descKn: 'ಮೆಟ್ಟಿಲುಗಳ ಮೇಲೆ ಇಡಲು ವಿಶೇಷ ವಿನ್ಯಾಸದ ರಷ್ ಹುಲ್ಲಿನ ಬುಟ್ಟಿ.', artisan: 'Rukmini Amma', region: 'Thrissur, Kerala', rating: 4.8, reviews: 44 }
-  ],
-  pottery: [
-    { title: 'Glazed Ceramic Succulent Planters', img: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=500&q=80', descEn: 'Set of 3 hand-glazed ceramic planters with drainage holes for indoor succulents.', descHi: 'इंडोर पौधों के लिए ड्रेनेज होल के साथ चिकनी मिट्टी के 3 गमलों का सेट।', descKn: 'ಇಂಡೋರ್ ಗಿಡಗಳಿಗೆ ಡ್ರೈನೇಜ್ ರಂಧ್ರವಿರುವ 3 ಸೆರಾಮಿಕ್ ಕುಂಡಗಳ ಸೆಟ್.', artisan: 'Ananya Sharma', region: 'Jaipur, Rajasthan', rating: 4.9, reviews: 64 },
-    { title: 'Terracotta Clay Water Pitcher', img: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=500&q=80', descEn: 'Evaporative cooling natural terracotta pitcher for fresh, alkaline drinking water.', descHi: 'प्राकृतिक रूप से पानी को ठंडा रखने वाला मिट्टी का पारंपरिक सुराहीदार जग।', descKn: 'ನೀರಿಗೆ ನೈಸರ್ಗಿಕ ತಂಪನ್ನು ನೀಡುವ ಸಾಂಪ್ರದಾಯಿಕ ಮಣ್ಣಿನ ಜಗ್.', artisan: 'Rameshwar Patel', region: 'Khurja, Uttar Pradesh', rating: 4.8, reviews: 52 },
-    { title: 'Hand-Thrown Stoneware Coffee Mugs', img: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=500&q=80', descEn: 'Durable pottery wheel-thrown stoneware mugs featuring speckled reactive glaze.', descHi: 'चाय और कॉफी के लिए कुम्हार के चाक पर बने टिकाऊ सेरामिक मग।', descKn: 'ಚಹಾ ಮತ್ತು ಕಾಫಿಗಾಗಿ ಚಕ್ರದ ಮೇಲೆ ನೆಯ್ದ ಗಟ್ಟಿಮುಟ್ಟಾದ ಸ್ಟೋನ್ವೇರ್ ಕಪ್.', artisan: 'Sunita Devi', region: 'Gorakhpur, Uttar Pradesh', rating: 4.9, reviews: 48 },
-    { title: 'Earthenware Decorative Urn Vase', img: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500&q=80', descEn: 'Rustic hand-molded earthenware urn vase finished with antiqued chalk patina.', descHi: 'ड्राइंग रूम की सजावट के लिए प्राचीन शैली का मिट्टी का कलश फूलदान।', descKn: 'ಲಿವಿಂಗ್ ರೂಮ್ ಶೃಂಗಾರಕ್ಕಾಗಿ ಆಂಟಿಕ್ ಶೈಲಿಯ ಮಣ್ಣಿನ ಕಳಸ ಹೂದಾನಿ.', artisan: 'Maheshwar Rao', region: 'Kondapalli, Andhra Pradesh', rating: 4.7, reviews: 31 },
-    { title: 'Porcelain Hand-Painted Teapot Set', img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&q=80', descEn: 'Fine porcelain teapot with matching cups painted in heritage botanical art.', descHi: 'वनस्पति चित्रकारी के साथ सुंदर चीनी मिट्टी का टीपॉट और कप सेट।', descKn: 'ಸಸ್ಯಶಾಸ್ತ್ರದ ಚಿತ್ರಕಲೆಯುಳ್ಳ ಪೋರ್ಸಿಲೇನ್ ಚಹಾ ಪಾತ್ರೆ ಸೆಟ್.', artisan: 'Radha Krishna', region: 'Channapatna, Karnataka', rating: 4.9, reviews: 59 },
-    { title: 'Raku-Fired Ceramic Accent Bowl', img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=500&q=80', descEn: 'One-of-a-kind raku kiln fired ceramic dish featuring metallic crackle glaze.', descHi: 'धात्विक फिनिश और अनूठी दरारों वाला जापानी राकू स्टाइल सेरामिक कटोरा।', descKn: 'ವಿಶಿಷ್ಟ ಮೆಟಾಲಿಕ್ ಕ್ರ್ಯಾಕಲ್ ಗ್ಲೇಜ್ ಹೊಂದಿರುವ ರಾಕು ಸೆರಾಮಿಕ್ ಬೌಲ್.', artisan: 'Balaram Das', region: 'Puri, Odisha', rating: 4.8, reviews: 27 },
-    { title: 'Rustic Terracotta Garden Pots', img: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=500&q=80', descEn: 'Porous high-temperature clay pots designed to nourish garden plants.', descHi: 'बगीचे के पौधों की बेहतर ग्रोथ के लिए हवादार मिट्टी के प्राकृतिक गमले।', descKn: 'ಸಸ್ಯಗಳ ಬೆಳವಣಿಗೆಗೆ ಅನುಕೂಲಕರವಾದ ಟೆರಾಕೋಟಾ ತೋಟದ ಕುಂಡಗಳು.', artisan: 'Fatima Begum', region: 'Srinagar, Jammu & Kashmir', rating: 4.9, reviews: 71 },
-    { title: 'Chupícuaro Style Clay Figurine', img: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=500&q=80', descEn: 'Heritage molded terracotta tribal statuette painted with mineral pigments.', descHi: 'प्राकृतिक रंगों से तराशी गई ऐतिहासिक मिट्टी की जनजातीय मूर्ति।', descKn: 'ನೈಸರ್ಗಿಕ ಬಣ್ಣಗಳಿಂದ ಕಲಾತ್ಮಕವಾಗಿ ಬಿಡಿಸಿದ ಸಾಂಪ್ರದಾಯಿಕ ಮಣ್ಣಿನ ವಿಗ್ರಹ.', artisan: 'Lakshmi Ammal', region: 'Tanjore, Tamil Nadu', rating: 4.6, reviews: 22 },
-    { title: 'Matte Black Stoneware Dinner Plates', img: 'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?w=500&q=80', descEn: 'Minimalist matte black ceramic dinner plates crafted for modern dining.', descHi: 'आधुनिक डाइनिंग के लिए मैट ब्लैक फिनिश वाली 4 सेरामिक प्लेटों का सेट।', descKn: 'ಆಧುನಿಕ ಊಟದ ಟೇಬಲ್‌ಗಾಗಿ ಮ್ಯಾಟ್ ಬ್ಲಾಕ್ ಸೆರಾಮಿಕ್ ಪ್ಲೇಟ್‌ಗಳು.', artisan: 'Devendra Pal', region: 'Alwar, Rajasthan', rating: 4.8, reviews: 46 },
-    { title: 'Sculpted Ceramic Soap Dish', img: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=500&q=80', descEn: 'Self-draining raised ridge pottery soap holder for sink countertops.', descHi: 'साबुन को सूखा रखने के लिए ड्रेनेज कट वाला सुंदर सेरामिक सोप डिश।', descKn: 'ಸಾಬೂನು ಒಣಗಲು ಅನುಕೂಲಕರವಾದ ಸೆರಾಮಿಕ್ ಸೋಪ್ ಡಿಶ್.', artisan: 'Kamala Soren', region: 'Bankura, West Bengal', rating: 4.7, reviews: 34 },
-    { title: 'Clay Diya Oil Lamps Set', img: 'https://images.unsplash.com/photo-1605371924599-2d0365da1ae0?w=500&q=80', descEn: 'Hand-molded unglazed terracotta oil lamps for festive illumination.', descHi: 'त्योहारों पर पूजा और रोशनी के लिए हस्तनिर्मित मिट्टी के दीयों का सेट।', descKn: 'ಹಬ್ಬಗಳ ಪೂಜೆ ಮತ್ತು ಬೆಳಕಿಗಾಗಿ ನೈಸರ್ಗಿಕ ಮಣ್ಣಿನ ದೀಪಗಳ ಸೆಟ್.', artisan: 'Suresh Vishwakarma', region: 'Bhopal, Madhya Pradesh', rating: 4.9, reviews: 85 },
-    { title: 'Majolica Floral Ceramic Pitcher', img: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=500&q=80', descEn: 'Classic tin-glazed Majolica pottery pitcher painted in vibrant floral scrollwork.', descHi: 'फूलदार चित्रकारी वाला क्लासिक इतालवी शैली का सेरामिक जग।', descKn: 'ಹೂವಿನ ಸುಂದರ ಚಿತ್ತಾರವುಳ್ಳ ಮೆಜೋಲಿಕಾ ಸೆರಾಮಿಕ್ ಜಗ್.', artisan: 'Meena Kumari', region: 'Kutch, Gujarat', rating: 4.8, reviews: 39 },
-    { title: 'Talavera Style Vibrant Plant Pot', img: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=500&q=80', descEn: 'Colorful hand-painted ceramic planter inspired by traditional Talavera pottery.', descHi: 'ब्राइट रंगों से रंगा हुआ सजावटी सेरामिक प्लान्टर पॉट।', descKn: 'ಅಲಂಕಾರಿಕ ಬಣ್ಣ ಬಣ್ಣದ ಕಲಾತ್ಮಕ ಸೆರಾಮಿಕ್ ಪ್ಲಾಂಟರ್ ಕುಂಡ.', artisan: 'Jayanta Borah', region: 'Majuli, Assam', rating: 4.9, reviews: 53 },
-    { title: 'Celadon Glazed Incense Burner', img: 'https://images.unsplash.com/photo-1602928321679-560b4139c901?w=500&q=80', descEn: 'Pale jade green celadon glazed stoneware bowl for incense cones and sticks.', descHi: 'धूप और अगरबत्ती जलाने के लिए सुकोमल जेड ग्रीन फिनिश वाला बर्नर।', descKn: 'ಧೂಪ ದೇವತಾರಾಧನೆಗೆ ಜೇಡ್ ಗ್ರೀನ್ ಗ್ಲೇಜ್ಡ್ ಧೂಪದ ಪಾತ್ರೆ.', artisan: 'Rekha Prasad', region: 'Madhubani, Bihar', rating: 4.7, reviews: 30 },
-    { title: 'Mudbrick Terracotta Wall Plaque', img: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=500&q=80', descEn: 'Sun-baked terracotta clay tile relief featuring hand-carved village motifs.', descHi: 'दीवार की सजावट के लिए मिट्टी का नक्काशीदार एंटीक प्लेक।', descKn: 'ಗೋಡೆ ಶೃಂಗಾರಕ್ಕಾಗಿ ಹಳ್ಳಿಯ ಕಲಾ ನಕ್ಷೆಯಿರುವ ಮಣ್ಣಿನ ಪ್ಲೇಟ್.', artisan: 'Mohanlal Kumhar', region: 'Molela, Rajasthan', rating: 4.8, reviews: 26 },
-    { title: 'Speckled Stoneware Mixing Bowls', img: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=500&q=80', descEn: 'Heavyweight nested ceramic mixing bowls with textured speckled finish.', descHi: 'रसोई में खाना पकाने और फेटने के लिए भारी सेरामिक मिक्सिंग बाउल सेट।', descKn: 'ಅಡುಗೆಮನೆಯಲ್ಲಿ ಮಿಶ್ರಣ ಮಾಡಲು ಗಟ್ಟಿಮುಟ್ಟಾದ ಸೆರಾಮಿಕ್ ಬೌಲ್‌ಗಳು.', artisan: 'Geeta Rani', region: 'Kundu, West Bengal', rating: 4.9, reviews: 44 },
-    { title: 'Anasazi Geometric Pattern Clay Pot', img: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=500&q=80', descEn: 'Tribal heritage black-on-white painted earthenware vessel.', descHi: 'ब्लैक और व्हाइट ज्यामितीय चित्रकारी वाला प्राचीन मिट्टी का मटका।', descKn: 'ಕಪ್ಪು-ಬಿಳುಪು ಜ್ಯಾಮಿತೀಯ ಚಿತ್ರಕಲೆಯುಳ್ಳ ಗಿರಿಜನ ಮಣ್ಣಿನ ಪಾತ್ರೆ.', artisan: 'Nagesh Gowda', region: 'Shivamogga, Karnataka', rating: 4.7, reviews: 32 },
-    { title: 'Porcelain Essential Oil Diffuser', img: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?w=500&q=80', descEn: 'Tea-light warm porcelain aroma oil burner casting delicate geometric light.', descHi: 'सुगंधित तेलों के लिए मोमबत्ती वाला चीनी मिट्टी का डिफ्यूज़र।', descKn: 'ಸುಗಂಧ ತೈಲಗಳಿಗೆ ಮೇಣದಬತ್ತಿ ಹಚ್ಚುವ ಪೋರ್ಸಿಲೇನ್ ಆಯಿಲ್ ಬರ್ನರ್.', artisan: 'Santosh Sutar', region: 'Sawantwadi, Maharashtra', rating: 4.9, reviews: 67 },
-    { title: 'Terracotta Herb Garden Markers', img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=500&q=80', descEn: 'Set of 6 stamped clay stakes to identify herbs in kitchen gardens.', descHi: 'बगीचे में जड़ी-बूटियों के नाम लिखने के लिए मिट्टी के 6 मार्कर।', descKn: 'ತೋಟದಲ್ಲಿ ಗಿಡಗಳ ಹೆಸರು ಗುರ್ತಿಸಲು ಮಣ್ಣಿನ 6 ಪ್ಲೇಟ್‌ಗಳು.', artisan: 'Bhaskar Acharya', region: 'Bhubaneswar, Odisha', rating: 4.8, reviews: 41 },
-    { title: 'Handmade Ceramic Spoon Rest', img: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&q=80', descEn: 'Contoured pottery dish keeping kitchen countertops clean while cooking.', descHi: 'खाना बनाते समय चम्मच रखने के लिए सेरामिक की स्पून रेस्ट प्लेट।', descKn: 'ಅಡುಗೆ ಮಾಡುವಾಗ ಸ್ಪೂನ್ ಇಡಲು ನಯವಾದ ಸೆರಾಮಿಕ್ ಪ್ಲೇಟ್.', artisan: 'Parvati Devi', region: 'Kangra, Himachal Pradesh', rating: 4.9, reviews: 55 }
-  ],
-  wood: [
-    { title: 'Engraved Sheesham Cooking Spoon Set', img: 'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?w=500&q=80', descEn: 'Non-stick friendly hand-carved Sheesham wooden cooking spatulas set.', descHi: 'नान-स्टिक बर्तनों के लिए सुरक्षित हस्तनिर्मित लकड़ी के चम्मचों का सेट।', descKn: 'ನಾನ್-ಸ್ಟಿಕ್ ಪಾತ್ರೆಗಳಿಗೆ ಸೂಕ್ತವಾದ ಕೈಯಿಂದ ಮಾಡಿದ ಮರದ ಸೌಟುಗಳ ಸೆಟ್.', artisan: 'Ramesh Kumar', region: 'Tikamgarh, Madhya Pradesh', rating: 4.9, reviews: 78 },
-    { title: 'Wooden Multipurpose Spice Storage Box', img: 'https://images.unsplash.com/photo-1590736935046-641573c713b1?w=500&q=80', descEn: 'Traditional 9-compartment solid wood spice container with glass lid.', descHi: 'मसालों की ताजगी बनाए रखने के लिए 9 खानों वाला लकड़ी का मसाला डिब्बा।', descKn: 'ಸಾಂಬಾರು ಪದಾರ್ಥಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲು 9 ವಿಭಾಗಗಳ ಮರದ ಸಾಂಬಾರು ಪೆಟ್ಟಿಗೆ.', artisan: 'Jagdish Mistry', region: 'Saran, Bihar', rating: 4.8, reviews: 63 },
-    { title: 'Sheesham Carved Decorative Tray', img: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=500&q=80', descEn: 'Hand-carved wooden serving tray featuring floral border relief work.', descHi: 'फूलों की नक्काशी वाली हस्तनिर्मित शीशम लकड़ी की सर्विंग ट्रे।', descKn: 'ಸುಂದರ ಹೂವಿನ ಕೆತ್ತನೆಯುಳ್ಳ ಶೀಶಮ್ ಮರದ ಬಡಿಸುವ ಟ್ರೇ.', artisan: 'Basavarajappa', region: 'Tumakuru, Karnataka', rating: 4.9, reviews: 57 },
-    { title: 'Handcrafted Wooden Wall Clock', img: 'https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=500&q=80', descEn: 'Vintage style handcrafted solid wood wall clock with quiet movement.', descHi: 'शांत मशीन और एंटीक डिजाइन वाली हस्तनिर्मित लकड़ी की दीवार घड़ी।', descKn: 'ವಿಂಟೇಜ್ ಶೈಲಿಯ ಕೈಯಿಂದ ಮಾಡಿದ ಮರದ ಸುಂದರ ಗೋಡೆ ಗಡಿಯಾರ.', artisan: 'Dattatray Patil', region: 'Kolhapur, Maharashtra', rating: 4.7, reviews: 41 },
-    { title: 'Solid Wood Mortar and Pestle Set', img: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=500&q=80', descEn: 'Heavy duty Sheesham wood mortar and pestle for crushing fresh spices.', descHi: 'ताजे मसालों को कूटने और पीसने के लिए मजबूत लकड़ी का ओखली-मूसल।', descKn: 'ತಾಜಾ ಮಸಾಲೆಗಳನ್ನು ಪುಡಿಮಾಡಲು ಗಟ್ಟಿಮುಟ್ಟಾದ ಮರದ ಕುಟ್ಟುವ ಕಲ್ಲು ಸೆಟ್.', artisan: 'Bhairav Sharma', region: 'Udaipur, Rajasthan', rating: 4.9, reviews: 72 },
-    { title: 'Handcarved Wooden Elephant Trio', img: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=500&q=80', descEn: 'Decorative set of 3 hand-carved wooden elephant figurines representing good fortune.', descHi: 'सौभाग्य और सजावट का प्रतीक हाथ से तराशी गई 3 लकड़ी की हाथियों की मूर्तियां।', descKn: 'ಮನೆಯ ಮಂಗಳಕರ ಅಲಂಕಾರಕ್ಕಾಗಿ ಕೈಯಿಂದ ಕೆತ್ತಲಾದ 3 ಮರದ ಆನೆಗಳ ಸೆಟ್.', artisan: 'Shivcharan Ram', region: 'Bastar, Chhattisgarh', rating: 4.8, reviews: 49 },
-    { title: 'Olive Wood Rustic Chopping Board', img: 'https://images.unsplash.com/photo-1590736704728-f4730bb30770?w=500&q=80', descEn: 'Live edge dense olive wood cutting board with rich natural grain patterning.', descHi: 'सब्जियों और पनीर काटने के लिए प्राकृतिक जैतून की लकड़ी का चॉपिंग बोर्ड।', descKn: 'ತರಕಾರಿಗಳನ್ನು ಹೆಚ್ಚಲು ಆಲೀವ್ ಮರದ ಗಟ್ಟಿಮುಟ್ಟಾದ ಚಾಪಿಂಗ್ ಬೋರ್ಡ್.', artisan: 'Ishwar Sahai', region: 'Saharanpur, Uttar Pradesh', rating: 4.9, reviews: 66 },
-    { title: 'Walnut Magnetic Knife Block Holder', img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&q=80', descEn: 'Freestanding solid walnut wood board equipped with concealed magnets.', descHi: 'चाकू सुरक्षित रूप से चिपकाकर रखने के लिए मैग्नेटिक लकड़ी का स्टैंड।', descKn: 'ಚಾಕುಗಳನ್ನು ಭದ್ರವಾಗಿಡಲು ಮ್ಯಾಗ್ನೆಟಿಕ್ ವಾಲ್ನಟ್ ಮರದ ನೈಫ್ ಬ್ಲಾಕ್.', artisan: 'Mangal Singh', region: 'Jodhpur, Rajasthan', rating: 4.8, reviews: 35 },
-    { title: 'Mango Wood Distressed Pillar Candlesticks', img: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?w=500&q=80', descEn: 'Set of 3 hand-turned mango wood candlesticks in whitewashed antique patina.', descHi: 'टेबल सजावट के लिए प्राचीन स्टाइल के 3 मैंगो वुड कैंडल होल्डर।', descKn: 'ಮೇಜಿನ ಬೆಳಕಿನ ಶೃಂಗಾರಕ್ಕೆ ಆಂಟಿಕ್ ಫಿನಿಶ್‌ನ 3 ಮರದ ಕ್ಯಾಂಡಲ್‌ಸ್ಟ್ಯಾಂಡ್.', artisan: 'Venkatachalam', region: 'Salem, Tamil Nadu', rating: 4.7, reviews: 30 },
-    { title: 'Teak Wood Floating Wall Shelves', img: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=500&q=80', descEn: 'Durable weather-resistant teak wood wall shelves with hidden brackets.', descHi: 'किताबें और पौधे रखने के लिए सागौन की लकड़ी के सुंदर फ्लोटिंग शेल्फ।', descKn: 'ವಸ್ತುಗಳನ್ನು ಜೋಡಿಸಲು ತೇಗದ ಮರದ ಬಲವಾದ ಗೋಡೆ ಶೆಲ್ಫ್‌ಗಳು.', artisan: 'Dinabandhu Sen', region: 'Kolkata, West Bengal', rating: 4.9, reviews: 81 },
-    { title: 'Carved Rosewood Jewelry Box with Velvet Lining', img: 'https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=500&q=80', descEn: 'Solid rosewood treasure chest detailed with hand-inlaid brass filigree.', descHi: 'मखमली अस्तर और पीतल की नक्काशी वाला शीशम रोजवुड का ज्वेलरी बॉक्स।', descKn: 'ವೆಲ್ವೆಟ್ ಲೈನಿಂಗ್ ಇರುವ ರೋಸ್‌вуಡ್ ಮರದ ಆಭರಣ ಪೆಟ್ಟಿಗೆ.', artisan: 'Purushottam Joshi', region: 'Nagaur, Rajasthan', rating: 4.9, reviews: 74 },
-    { title: 'Cedar Wood Essential Oil Storage Rack', img: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=500&q=80', descEn: 'Aromatic cedar wood multi-tiered holder keeping essential oils organized.', descHi: 'सुगंधित तेलों और शीशियों के लिए देवदार की लकड़ी का रैक।', descKn: 'ಸುಗಂಧ ತೈಲಗಳ ಬಾಟಲಿಗಳನ್ನು ಜೋಡಿಸಲು ಸಿಡಾರ್ ಮರದ ರ್ಯಾಕ್.', artisan: 'Kedar Saini', region: 'Bharatpur, Rajasthan', rating: 4.8, reviews: 29 },
-    { title: 'Intricate Mahogany Coaster Set', img: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&q=80', descEn: 'Set of 6 laser-carved mahogany coasters in geometric mandala motifs.', descHi: 'मंडला नक्काशी वाले महोगनी लकड़ी के 6 कोस्टर का सेट।', descKn: 'ಮಂಡಲ ಕೆತ್ತನೆ ಕೆಲಸವುಳ್ಳ ಮಹೋಗನಿ ಮರದ 6 ಕೋಸ್ಟರ್ ಸೆಟ್.', artisan: 'Ramchandra Sutradhar', region: 'Darrang, Assam', rating: 4.9, reviews: 43 },
-    { title: 'Hand-Turned Oak Salad Serving Bowl', img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=500&q=80', descEn: 'Large food-safe solid oak wood serving bowl sealed with mineral oil.', descHi: 'सलाद और फल परोसने के लिए हाथ से तराशा गया ओक की लकड़ी का बड़ा कटोरा।', descKn: 'ಸಲಾಡ್ ಬಡಿಸಲು ಒಕ್ ಮರದ ಹಸ್ತನಿರ್ಮಿತ ದೊಡ್ಡ ಬೌಲ್.', artisan: 'Mukund Kulkarni', region: 'Pune, Maharashtra', rating: 4.8, reviews: 51 },
-    { title: 'Distressed Pine Desktop Organizer Cabinet', img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=500&q=80', descEn: 'Miniature pine wood 3-drawer desktop organizer with brass pull handles.', descHi: 'स्टेशनरी और छोटे कागजात के लिए 3 दराजों वाला पाइन वुड कैबिनेट।', descKn: 'ಆಫೀಸ್ ಡೆಸ್ಕ್‌ಗಾಗಿ 3 ಡ್ರಾಯರ್‌ಗಳಿರುವ ಪೈನ್ ಮರದ ಮಿನಿ ಕ್ಯಾಬಿನೆಟ್.', artisan: 'Shankar Shettigar', region: 'Udupi, Karnataka', rating: 4.7, reviews: 37 },
-    { title: 'Birch Wood Interlocking Geometric Coasters', img: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&q=80', descEn: 'Puzzle shaped birch plywood coasters protecting surfaces in modern aesthetic.', descHi: 'आधुनिक मेज सुरक्षा के लिए इंटरलॉकिंग बर्च वुड कोस्टर का सेट।', descKn: 'ಆಧುನಿಕ ಟೇಬಲ್ ರಕ್ಷಣೆಗೆ ಜೋಡಿಸಬಹುದಾದ ಬರ್ಚ್ ಮರದ ಕೋಸ್ಟರ್‌ಗಳು.', artisan: 'Balwant Rawat', region: 'Dehradun, Uttarakhand', rating: 4.8, reviews: 33 },
-    { title: 'Maple Wood Handcrafted Keepsake Box', img: 'https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=500&q=80', descEn: 'Smooth maple wood box fitted with brass hinges for storing memories.', descHi: 'यादों और गहनों को सहेजने के लिए मैपल वुड का चिकना डिब्बा।', descKn: 'ನೆನಪುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲು ಸುಂದರ ಮೇಪಲ್ ಮರದ ಪೆಟ್ಟಿಗೆ.', artisan: 'Khemraj Prajapati', region: 'Jhitku, Madhya Pradesh', rating: 4.9, reviews: 60 },
-    { title: 'Acoustic Wooden Smartphone Amplifier Dock', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&q=80', descEn: 'Electricity-free natural sound resonating wooden acoustic horn dock for phones.', descHi: 'बिना बिजली के मोबाइल साउंड बढ़ाने वाला लकड़ी का अनोखा एम्पलीफायर।', descKn: 'ವಿದ್ಯುತ್ ಇಲ್ಲದೆ ಶಬ್ದ ಹೆಚ್ಚಿಸುವ ಮರದ ಅಕೌಸ್ಟಿಕ್ ಸ್ಪೀಕರ್ ಡೆಕ್.', artisan: 'Trilok Rathore', region: 'Indore, Madhya Pradesh', rating: 4.8, reviews: 88 },
-    { title: 'Bamboo and Driftwood Wind Chimes', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&q=80', descEn: 'Natural coastal driftwood bar holding melodic hollow bamboo chime tubes.', descHi: 'बरामदे और बालकनी के लिए ड्रिफ्टवुड और बांस की सुरीली विंड चाइम।', descKn: 'ಅಂಗಳದಲ್ಲಿ ಮಧುರ ನಾದ ನೀಡುವ ಡ್ರಿಫ್ಟ್‌ವುಡ್ ವಿಂಡ್ ಚೈಮ್.', artisan: 'Anand Vardhan', region: 'Varanasi, Uttar Pradesh', rating: 4.7, reviews: 45 },
-    { title: 'Handmade Cherry Wood Tissue Box Cover', img: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=500&q=80', descEn: 'Polished cherry wood box disguise for standard square tissue dispensers.', descHi: 'टिश्यू बॉक्स को ढकने के लिए चेरी वुड का खूबसूरत सजावटी कवर।', descKn: 'ಟಿಶ್ಯೂ ಪೇಪರ್ ಕವರ್ ಮಾಡಲು ಚೆರ್ರಿ ಮರದ ಡಿಸ್ಪೆನ್ಸರ್ ಡಬ್ಬಿ.', artisan: 'Shanti Swaroop', region: 'Firozabad, Uttar Pradesh', rating: 4.9, reviews: 52 }
-  ],
-  bamboo: [
-    { title: 'Organic Bamboo Drinking Straws Set', img: 'https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=500&q=80', descEn: 'Pack of 10 organic reusable drinking straws crafted from natural bamboo shoots.', descHi: 'प्लास्टिक मुक्त उपयोग के लिए 10 प्राकृतिक पुनरुपयोगी बांस स्ट्रॉ का पैक।', descKn: 'ಪ್ಲಾಸ್ಟಿಕ್ ಮುಕ್ತ ಬಳಕೆಗೆ 10 ನೈಸರ್ಗಿಕ ಬಿದಿರಿನ ಷರಬತ್ತು ಬಿದಿರುಗಳು.', artisan: 'Meena Bai', region: 'Guwahati, Assam', rating: 4.9, reviews: 94 },
-    { title: 'Bamboo Fiber Biodegradable Dinnerware', img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&q=80', descEn: 'Eco-friendly 4-piece bamboo fiber plate and bowl dinner set for picnics.', descHi: 'पिकनिक और घर के लिए पर्यावरण-अनुकूल बांस फाइबर के बर्तनों का सेट।', descKn: 'ಪರಿಸರ ಸ್ನೇಹಿ ಬಿದಿರಿನ ನಾರಿನ ಊಟದ ಬೌಲ್ ಮತ್ತು ಪ್ಲೇಟ್‌ಗಳ ಸೆಟ್.', artisan: 'Biren Saikia', region: 'Sivasagar, Assam', rating: 4.8, reviews: 62 },
-    { title: 'Hand-Woven Bamboo Desk Lamp', img: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&q=80', descEn: 'Woven bamboo lattice floor light shade casting warm ambient shadows.', descHi: 'कमरे में मनमोहक रोशनी बिखेरने वाला बांस की जाली का फ्लोर लैंप।', descKn: 'ಮನೆಯಲ್ಲಿ ಬೆಚ್ಚಗಿನ ಬೆಳಕನ್ನು ನೀಡುವ ಕೈಯಿಂದ ನೇಯ್ದ ಬಿದಿರಿನ ಫ್ಲೋರ್ ಲ್ಯಾಂಪ್.', artisan: 'Tarun Gogoi', region: 'Nagaon, Assam', rating: 4.9, reviews: 73 },
-    { title: 'Eco-Friendly Bamboo Toothbrush Stand', img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=500&q=80', descEn: 'Hollow ventilated bamboo stand for holding manual toothbrushes dry.', descHi: 'टूथब्रश सूखा और स्वच्छ रखने के लिए बांस का वेंटिलेटेड स्टैंड।', descKn: 'ಟೂತ್‌ಬ್ರಷ್ ಒಣಗಲು ಅನುಕೂಲಕರವಾದ ಬಿದಿರಿನ ಹೋಲ್ಡರ್.', artisan: 'Phoolmani Rabha', region: 'Goalpara, Assam', rating: 4.7, reviews: 41 },
-    { title: 'Bamboo Roll-Up Window Blinds', img: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=500&q=80', descEn: 'Natural bamboo slat roll-up shade filtering sunlight with rustic warmth.', descHi: 'धूप रोकने और खिड़की सजाने के लिए बांस की पट्टियों वाला रोलर पर्दा।', descKn: 'ಬಿಸಿಲು ತಡೆಯಲು ನೈಸರ್ಗಿಕ ಬಿದಿರಿನ ರೋಲ್-ಅಪ್ ವಿಂಡೋ ಬ್ಲೈಂಡ್ಸ್.', artisan: 'Hemanta Kalita', region: 'Kamrup, Assam', rating: 4.8, reviews: 55 },
-    { title: 'Natural Bamboo Bath Mat Grid', img: 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=500&q=80', descEn: 'Non-slip water resistant elevated bamboo slat mat for bathroom floors.', descHi: 'बाथरूम के बाहर फिसलने से बचाने वाला बांस का वॉटरप्रूफ मैट।', descKn: 'ಸ್ನಾನದ ಗೃಹಕ್ಕೆ ನೀರು ನಿರೋಧಕ ಬಿದಿರಿನ ಮ್ಯಾಟ್ ಗೇಟ್.', artisan: 'Pramila Terangpi', region: 'Karbi Anglong, Assam', rating: 4.9, reviews: 68 },
-    { title: 'Bamboo Steamer Basket for Dumplings', img: 'https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=500&q=80', descEn: '2-tier traditional bamboo basket designed for steaming dim sum and veggies.', descHi: 'मोमोज और सब्जियां भाप में पकाने के लिए बांस का 2-स्तरीय स्टीमर।', descKn: 'ಮೋಮೋಸ್ ಬೇಯಿಸಲು ಸಾಂಪ್ರದಾಯಿಕ 2-ಅಂಚಿನ ಬಿದಿರಿನ ಸ್ವೀಮರ್.', artisan: 'Nagen Das', region: 'Barpeta, Assam', rating: 4.9, reviews: 82 },
-    { title: 'Tiered Bamboo Shoe Rack Bench', img: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=500&q=80', descEn: 'Sturdy 3-tier bamboo entryway rack organizing footwear neatly.', descHi: 'जूते-चप्पल सलीके से रखने के लिए बांस की 3-स्तरीय शू रैक।', descKn: 'ಚಪ್ಪಲಿಗಳನ್ನು ಜೋಡಿಸಲು 3 ಹಂತಗಳ ಬಿದಿರಿನ ಶೂ ರ್ಯಾಕ್.', artisan: 'Basanta Boro', region: 'Kokrajhar, Assam', rating: 4.8, reviews: 50 },
-    { title: 'Slatted Bamboo Bathtub Caddy Tray', img: 'https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=500&q=80', descEn: 'Expanding bamboo bathtub bridge tray holding books, candles, and soaps.', descHi: 'बाथटब पर किताब और साबुन रखने के लिए बांस की एक्सटेंडेबल ट्रे।', descKn: 'ಬಾತ್‌ಟಬ್ ಮೇಲೆ ಪುಸ್ತಕಗಳನ್ನಿಡಲು ಬಿದಿರಿನ ಬ್ರಿಡ್ಜ್ ಟ್ರೇ.', artisan: 'Runjun Phukan', region: 'Tinsukia, Assam', rating: 4.9, reviews: 47 },
-    { title: 'Bamboo Charcoal Air Purifying Bags', img: 'https://images.unsplash.com/photo-1590736704728-f4730bb30770?w=500&q=80', descEn: 'Natural activated bamboo charcoal linen bags absorbing odors and humidity.', descHi: 'कमरे और कार की दुर्गंध हटाने के लिए बांस के चारकोल के बैग।', descKn: 'ವಾಸನೆ ತಡೆಯಲು ಸಕ್ರಿಯ ಬಿದಿರಿನ ಇದ್ದಿಲಿನ ಲಿನೆನ್ ಬ್ಯಾಗ್.', artisan: 'Kanaklata Sonowal', region: 'Dibrugarh, Assam', rating: 4.8, reviews: 76 },
-    { title: 'Handcrafted Bamboo Flute Instrument', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&q=80', descEn: 'Precision tuned traditional Bansuri bamboo concert flute.', descHi: 'मधुर संगीत के लिए हाथ से तराशी गई बांसुरी (बांस की बंसी)।', descKn: 'ಮಧುರ ಗಾನಕ್ಕೆ ನೈಸರ್ಗಿಕ ಬಿದಿರಿನ ಕೈಯಿಂದ ಮಾಡಿದ ಕೊಳಲು.', artisan: 'Jibon Nath', region: 'Darrang, Assam', rating: 4.9, reviews: 61 },
-    { title: 'Bamboo Root Sculpted Duck Figurine', img: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=500&q=80', descEn: 'Artisanal decorative duck sculpture carved out of natural bamboo root node.', descHi: 'बांस की जड़ से तराशी गई सुंदर बत्तख की शोपीस मूर्ति।', descKn: 'ಬಿದಿರಿನ ಬೇರಿನಿಂದ ಕೆತ್ತಲಾದ ಸುಂದರ ಬಾತುಕೋಳಿ ಶೋ-ಪೀಸ್.', artisan: 'Lilabati Daimary', region: 'Udalguri, Assam', rating: 4.7, reviews: 28 },
-    { title: 'Woven Bamboo Hanging Pendant Light', img: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&q=80', descEn: 'Dome shaped bamboo strand pendant lampshade for dining areas.', descHi: 'डाइनिंग एरिया की सजावट के लिए बांस की लटकन लाइट शेड।', descKn: 'ಡೈನಿಂಗ್ ಟೇಬಲ್ ಮೇಲೆ ತೂಗುಹಾಕಲು ಬಿದಿರಿನ ಪೆಂಡೆಂಟ್ ಲೈಟ್.', artisan: 'Khagen Mahanta', region: 'Sonitpur, Assam', rating: 4.9, reviews: 59 },
-    { title: 'Adjustable Bamboo Drawer Dividers', img: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=500&q=80', descEn: 'Spring-loaded expandable bamboo dividers sorting kitchen utensil drawers.', descHi: 'किचन ड्रॉअर में कटलरी अलग रखने के लिए बांस के एडजेस्टेबल डिवाइडर।', descKn: 'ಅಡುಗೆಮನೆ ಡ್ರಾಯರ್‌ಗಳಲ್ಲಿ ಸಾಮಾನನ್ನು ವಿಂಗಡಿಸಲು ಬಿದಿರಿನ ಡಿವೈಡರ್.', artisan: 'Dipali Sut', region: 'Lakhimpur, Assam', rating: 4.8, reviews: 43 },
-    { title: 'Bamboo Fiber Travel Coffee Mug', img: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=500&q=80', descEn: 'Double-wall insulated reusable bamboo fiber mug fitted with silicone lid.', descHi: 'सफर में गर्म चाय-कॉफी के लिए बांस फाइबर का ट्रैवल मग।', descKn: 'ಪ್ರಯಾಣಗಳಿಗೆ ಸೂಕ್ತವಾದ ಬಿದಿರಿನ ನಾರಿನ ಕಾಫಿ ಟ್ರಾವೆಲ್ ಮಗ್.', artisan: 'Ratan Tamang', region: 'Darjeeling, West Bengal', rating: 4.9, reviews: 70 },
-    { title: 'Minimalist Bamboo Laptop Stand Cover', img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=500&q=80', descEn: 'Ergonomic ventilated bamboo riser stand promoting proper neck posture.', descHi: 'लैपटॉप का तापमान नियंत्रित रखने और सही पोस्चर के लिए बांस का स्टैंड।', descKn: 'ಲ್ಯಾಪ್‌ಟಾಪ್ ಬಳಕೆಗೆ ಸೂಕ್ತವಾದ ಬಿದಿರಿನ ಅರ್ಗೋನಾಮಿಕ್ ಸ್ಟ್ಯಾಂಡ್.', artisan: 'Sabita Mech', region: 'Chirang, Assam', rating: 4.8, reviews: 65 },
-    { title: 'Bamboo Laundry Hamper with Liner Bag', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&q=80', descEn: 'Collapsible bamboo slat clothes basket equipped with removable canvas bag.', descHi: 'गंदे कपड़े रखने के लिए कैनवास अस्तर वाली बांस की लॉन्ड्री बास्केट।', descKn: 'ಬಟ್ಟೆಗಳ ಶೇಖರಣೆಗೆ ಕ್ಯಾನ್ವಾಸ್ ಲೈನರ್ ಇರುವ ಬಿದಿರಿನ ಬುಟ್ಟಿ.', artisan: 'Hemaprabha Chutia', region: 'Morigaon, Assam', rating: 4.9, reviews: 52 },
-    { title: 'Handheld Woven Bamboo Cooling Fan', img: 'https://images.unsplash.com/photo-1596496181848-3091d4878b24?w=500&q=80', descEn: 'Traditional handwoven bamboo strip cooling fan finished with fabric edge.', descHi: 'कपड़े के बार्डर के साथ बांस की बुनी पारंपरिक हाथ की पंखी।', descKn: 'ಸಾಂಪ್ರದಾಯಿಕ ಶೈಲಿಯಲ್ಲಿ ನೇಯ್ದ ಬಿದಿರಿನ ಕೈ ಬೀಸಣಿಗೆ.', artisan: 'Buddhes war Hazarika', region: 'Dhemaji, Assam', rating: 4.7, reviews: 34 },
-    { title: 'Bamboo Desktop Keyboard and Mouse', img: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=500&q=80', descEn: 'Hand-carved natural bamboo wireless keyboard and mouse desktop combo.', descHi: 'कंप्यूटर के लिए असली बांस का नक्काशीदार वायरलेस कीबोर्ड और माउस।', descKn: 'ಕಂಪ್ಯೂಟರ್‌ಗಾಗಿ ಬಿದಿರಿನ ಹಸ್ತನಿರ್ಮಿತ ವೈರ್‌ಲೆಸ್ ಕೀಬೋರ್ಡ್.', artisan: 'Manorama Gogoi', region: 'Jorhat, Assam', rating: 4.9, reviews: 80 },
-    { title: 'Bamboo Stakes Decorative Privacy Screen', img: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=500&q=80', descEn: 'Outdoor garden fencing panel woven tightly from whole natural bamboo poles.', descHi: 'बगीचे और बालकनी की प्राइवेसी के लिए मजबूत बांस की फेंसिंग बाड़।', descKn: 'ಬಾಲ್ಕನಿ ಪ್ರೈವೆಸಿಗಾಗಿ ಬಲವಾದ ಬಿದಿರಿನ ಫೆನ್ಸಿಂಗ್ ಸ್ಕ್ರೀನ್.', artisan: 'Pabitra Hajong', region: 'Baksa, Assam', rating: 4.8, reviews: 49 }
-  ],
-  jewelry: [
-    { title: 'Filigree Sterling Silver Drop Earrings', img: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=500&q=80', descEn: 'Intricate hand-drawn sterling silver wire filigree lace drop earrings.', descHi: 'चांदी के तार की बारीक नक्काशी वाले सुंदर झुमके।', descKn: 'ಬೆಳ್ಳಿಯ ತಂತಿಯ ಸೂಕ್ಷ್ಮ ಕೆತ್ತನೆಯುಳ್ಳ ಜುಮುಕಿ ಕಿವಿಯೋಲೆಗಳು.', artisan: 'Sarojini Baiga', region: 'Mandla, Madhya Pradesh', rating: 4.9, reviews: 77 },
-    { title: 'Hammered Brass Adjustable Cuff Bracelet', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=500&q=80', descEn: 'Bold hand-hammered solid brass wrist cuff finished in warm vintage gold.', descHi: 'हाथ से ठोके गए ब्रास पीतल का एडजस्टेबल ब्रेसलेट।', descKn: 'ಹಿತ್ತಾಳೆಯ ನಯವಾದ ಹಸ್ತನಿರ್ಮಿತ ಬಳೆ ಬ್ರೇಸ್ಲೆಟ್.', artisan: 'Ganeshi Lal', region: 'Chittorgarh, Rajasthan', rating: 4.8, reviews: 53 },
-    { title: 'Wire-Wrapped Raw Amethyst Crystal Pendant', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&q=80', descEn: 'Natural rough amethyst gemstone wrapped in oxidized copper wire cord.', descHi: 'तांबे के तार में लपेटा गया असली प्राकृतिक एमेथिस्ट क्रिस्टल पेंडेंट।', descKn: 'ತಾಮ್ರದ ತಂತಿಯಲ್ಲಿ ಸವರಲಾದ ಅಮೂಲ್ಯ ಅಮೆಥಿಸ್ಟ್ ಹಾರ.', artisan: 'Sushila Gond', region: 'Dindori, Madhya Pradesh', rating: 4.9, reviews: 62 },
-    { title: 'Beaded Seed Glass Layered Necklace', img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500&q=80', descEn: 'Multi-strand vibrant glass seed bead necklace handcrafted by tribal women.', descHi: 'रंग-बिरंगे कांच के बारीक मनकों की बहु-स्तरीय सुंदर माला।', descKn: 'ಬಣ್ಣ ಬಣ್ಣದ ಗಾಜಿನ ಮಣಿಗಳ ಸಾಲು ಸಾಲು ಹಾರ.', artisan: 'Koliya Bhil', region: 'Jhabua, Madhya Pradesh', rating: 4.7, reviews: 39 },
-    { title: 'Hand-Stamped Copper Personalized Ring', img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500&q=80', descEn: 'Solid pure copper band hand-stamped with ethnic motifs.', descHi: 'तांबे के शुद्ध धातु पर हाथ से नक्काशीदार अंगूठी।', descKn: 'ಶುದ್ಧ ತಾಮ್ರದ ಹಸ್ತನಿರ್ಮಿತ ಕೆತ್ತನೆಯ ಉಂಗುರ.', artisan: 'Manisha Maravi', region: 'Seoni, Madhya Pradesh', rating: 4.8, reviews: 44 },
-    { title: 'Boho Leather Wrap Bracelet with Jasper', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=500&q=80', descEn: 'Natural leather cord wrist wrap woven with polished ocean jasper stones.', descHi: 'जैस्पर पत्थरों और लेदर कॉर्ड से बना बोहो ब्रेसलेट।', descKn: 'ಜ್ಯಾಸ್ಪರ್ ಕಲ್ಲುಗಳು ಮತ್ತು ಚರ್ಮದ ದಾರದ ಬ್ರೇಸ್ಲೆಟ್.', artisan: 'Champa Bhil', region: 'Dhar, Madhya Pradesh', rating: 4.9, reviews: 58 },
-    { title: 'Macrame Friendship Bracelets with Charms', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=500&q=80', descEn: 'Set of 3 hand-braided macrame thread wristbands detailed with silver charms.', descHi: 'रंगीन धागों और पीतल के चार्म्स वाले 3 फ्रेंडशिप बैंड।', descKn: 'ಬಣ್ಣದ ದಾರ ಮತ್ತು ಬೆಳ್ಳಿಯ ಚಾರ್ಮ್‌ಗಳ 3 ಬ್ರೇಸ್ಲೆಟ್‌ಗಳು.', artisan: 'Radheshyam Sonar', region: 'Jaipur, Rajasthan', rating: 4.8, reviews: 31 },
-    { title: 'Murano Glass Blown Pendant Necklace', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&q=80', descEn: 'Vibrant hand-blown glass drop pendant suspended on a black silk cord.', descHi: 'रेशम के धागे पर कांच के सुंदर blown पेंडेंट वाला हार।', descKn: 'ರೇಷ್ಮೆ ದಾರದಲ್ಲಿ ಗ್ಲಾಸ್ ಬ್ಲೋನ್ ಶೈಲಿಯ ಸುಂದರ ಹಾರ.', artisan: 'Jamuna Rathwa', region: 'Chhota Udaipur, Gujarat', rating: 4.9, reviews: 65 },
-    { title: 'Enamel Painted Geometric Stud Earrings', img: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=500&q=80', descEn: 'Hand-enameled brass stud earrings featuring art-deco geometric shapes.', descHi: 'रंगीन मीनाकारी कला से रंगे पीतल के स्टड इयररिंग्स।', descKn: 'ಮೀನಾಕಾರಿ ಕಲಾತ್ಮಕ ಬಣ್ಣಗಳ ಕಿವಿಯೋಲೆಗಳು.', artisan: 'Dhaniram Santhal', region: 'Mayurbhanj, Odisha', rating: 4.7, reviews: 29 },
-    { title: 'Clay Bead Statement Collar Necklace', img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500&q=80', descEn: 'Hand-shaped terracotta clay bead strand necklace.', descHi: 'हाथ से गढ़े गए रंग-बिरंगे मिट्टी के मनकों की लंबी माला।', descKn: 'ಬಣ್ಣ ಬಣ್ಣದ ಮಣ್ಣಿನ ಮಣಿಗಳ ಸಾಂಪ್ರದಾಯಿಕ ಹಾರ.', artisan: 'Bindu Warli', region: 'Palghar, Maharashtra', rating: 4.8, reviews: 42 },
-    { title: 'Natural Sea Shell Choker Necklace', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&q=80', descEn: 'Genuine white cowrie shells hand-woven onto a braided jute cord.', descHi: 'प्राकृतिक कौड़ियों और जूट की रस्सी से बना समुद्र तटीय चोकर।', descKn: 'ನೈಸರ್ಗಿಕ ಬಿಳಿ ಕವಡೆಗಳು ಮತ್ತು ಸಣಬಿನ ದಾರದ ಚೋಕರ್.', artisan: 'Subhadra Korwa', region: 'Sarguja, Chhattisgarh', rating: 4.9, reviews: 51 },
-    { title: 'Wooden Geometric Inlay Post Earrings', img: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=500&q=80', descEn: 'Lightweight Sheesham wood studs inlaid with mother of pearl accents.', descHi: 'लकड़ी और सीप की नक्काशीदार हल्की सुंदर इयररिंग्स।', descKn: 'ಮರ ಮತ್ತು ಮುತ್ತಿನ ನೈಜ ಕೆತ್ತನೆಯ ಕಿವಿಯೋಲೆಗಳು.', artisan: 'Kanhaiya Soni', region: 'Jodhpur, Rajasthan', rating: 4.8, reviews: 36 },
-    { title: 'Resin Pressed Flower Pendant Chain', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&q=80', descEn: 'Real dried botanical flora preserved inside a crystal clear resin medallion.', descHi: 'असली ताजे सुखाए गए फूलों से बना पारदर्शी रेज़िन पेंडेंट।', descKn: 'ನೈಜ ಒಣ ಹೂವುಗಳನ್ನು ಒಳಗೊಂಡ ರಸಿನ್ ಹಾರ.', artisan: 'Champklata Bairwa', region: 'Tonk, Rajasthan', rating: 4.9, reviews: 73 },
-    { title: 'Braided Suede Tassel Accent Necklace', img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500&q=80', descEn: 'Long braided suede leather necklace finished with brass beads and fringe.', descHi: 'चमड़े की डोरी और पीतल के घुंघरू वाला एथनिक लंबा हार।', descKn: 'ಲೆದರ್ ದಾರ ಮತ್ತು ಹಿತ್ತಾಳೆಯ ಗೆಜ್ಜೆಗಳ ಉದ್ದನೆಯ ಹಾರ.', artisan: 'Sonali Patua', region: 'Naya, West Bengal', rating: 4.7, reviews: 38 },
-    { title: 'Turquoise Inlay Silver Band Ring', img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500&q=80', descEn: 'Vintage sterling silver ring band inset with genuine blue turquoise chips.', descHi: 'असली फिरोजा नीले पत्थर की नक्काशी वाली चांदी की अंगूठी।', descKn: 'ಟರ್ಕಾಯ್ಸ್ ನೀಲಿ ಕಲ್ಲು ಇರಿಸಿದ ಬೆಳ್ಳಿಯ ಉಂಗುರ.', artisan: 'Hiraman Oraon', region: 'Ranchi, Jharkhand', rating: 4.9, reviews: 84 },
-    { title: 'Abalone Shell Teardrop Dangle Earrings', img: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=500&q=80', descEn: 'Iridescent rainbow paua abalone shell set in silver ear wire drops.', descHi: 'चमकदार इंद्रधनुषी अबालोन सीप की लटकन झुमकी।', descKn: 'ಕಾಮನಬಿಲ್ಲು ಬಣ್ಣದ ಅಬಾಲೋನ್ ಚಿಪ್ಪಿನ ಕಿವಿಯೋಲೆ.', artisan: 'Kasturi Munda', region: 'Khunti, Jharkhand', rating: 4.8, reviews: 47 },
-    { title: 'Porcelain Hand-Painted Bead Bracelet', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=500&q=80', descEn: 'Glazed porcelain round beads painted in cobalt blue floral motifs.', descHi: 'ब्लू और व्हाइट चीनी मिट्टी के मनकों का हस्तनिर्मित ब्रेसलेट।', descKn: 'ನೀಲಿ ಮತ್ತು ಬಿಳಿ ಪೋರ್ಸಿಲೇನ್ ಮಣಿಗಳ ಹಸ್ತನಿರ್ಮಿತ ಬ್ರೇಸ್ಲೆಟ್.', artisan: 'Birsa Ho', region: 'Chaibasa, Jharkhand', rating: 4.9, reviews: 56 },
-    { title: 'Sterling Silver Spinner Meditation Ring', img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500&q=80', descEn: 'Wide silver thumb band ring featuring two freely spinning outer bands.', descHi: 'तनाव कम करने के लिए घूमने वाली चांदी की मेडिटेशन रिंग।', descKn: 'ಧ್ಯಾನ ಮತ್ತು ಶಾಂತಿಗೆ ಬೆಳ್ಳಿಯ ಸ್ಪನ್ನರ್ ಉಂಗುರ.', artisan: 'Surajmoni Hansda', region: 'Santhal Pargana, Jharkhand', rating: 4.9, reviews: 91 },
-    { title: 'Fine Silk Thread Wrapped Bangles', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=500&q=80', descEn: 'Set of 6 bangles wrapped tightly in vibrant raw silk threads.', descHi: 'कच्चे रेशमी धागों से लिपटी 6 रंगीन चूड़ियों का सेट।', descKn: 'ರೇಷ್ಮೆ ದಾರದಿಂದ ಸುತ್ತಲ್ಪಟ್ಟ 6 ಬಣ್ಣದ ಬಳೆಗಳು.', artisan: 'Bimala Pariyar', region: 'Gangtok, Sikkim', rating: 4.8, reviews: 60 },
-    { title: 'Raw Quartz Geode Chunk Necklace', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&q=80', descEn: 'Natural electroplated sparkling quartz crystal slice pendant chain.', descHi: 'चमकदार प्राकृतिक क्वार्ट्ज़ क्रिस्टल का आकर्षक पेंडेंट हार।', descKn: 'ಹೊಳೆಯುವ ನೈಸರ್ಗಿಕ ಕ್ವಾರ್ಟ್ಜ್ ಸ್ಫಟಿಕದ ಸುಂದರ ಹಾರ.', artisan: 'Tulsi Bhutia', region: 'Kalimpong, West Bengal', rating: 4.9, reviews: 72 }
-  ],
-  decor: [
-    { title: 'Block-Printed Cotton Throw Pillow Covers', img: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=500&q=80', descEn: 'Pure cotton cushion cover printed with wooden blocks using natural indigo dye.', descHi: 'प्राकृतिक नील से ब्लॉक-प्रिंट किया गया शुद्ध सूती कुशन कवर।', descKn: 'ನೈಸರ್ಗಿಕ ಇಂಡಿಗೋ ಬಣ್ಣದಿಂದ ಬ್ಲಾಕ್-ಪ್ರಿಂಟ್ ಮಾಡಿದ ಹತ್ತಿ ಕುಷನ್ ಕವರ್.', artisan: 'Sushma Devi', region: 'Barmer, Rajasthan', rating: 4.9, reviews: 88 },
-    { title: 'Hand-Tufted Wool Bohemian Area Rug', img: 'https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=500&q=80', descEn: 'Thick plush 100% natural wool hand-tufted rug featuring Moroccan geometric lattice.', descHi: 'कमरे के फर्श के लिए 100% ऊन का हाथ से बुना हुआ सॉफ्ट रग।', descKn: 'ಲಿವಿಂಗ್ ರೂಮ್ ಫ್ಲೋರ್‌ಗಾಗಿ ಉಣ್ಣೆಯ ಹಸ್ತನಿರ್ಮಿತ ಮೆದುವಾದ ರಗ್.', artisan: 'Shanti Lal', region: 'Jaisalmer, Rajasthan', rating: 4.8, reviews: 62 },
-    { title: 'Macrame Woven Cotton Wall Hanging', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&q=80', descEn: 'Knotted natural cotton cord wall banner with wooden dowel support.', descHi: 'घर की बोहो सजावट के लिए सूती धागों से बुनी मैक्रम वॉल हैंगिंग।', descKn: 'ಮನೆಯ ಬೋಹೋ ಅಲಂಕಾರಕ್ಕೆ ಹತ್ತಿ ದಾರದ ಮ್ಯಾಕ್ರೇಮ್ ವಾಲ್ ಹ್ಯಾಂಗಿಂಗ್.', artisan: 'Bhagwati Prasad', region: 'Churu, Rajasthan', rating: 4.9, reviews: 75 },
-    { title: 'Kantha Stitch Reversible Quilted Coverlet', img: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=500&q=80', descEn: 'Reversible hand-stitched Kantha running embroidery cotton throw blanket.', descHi: 'बंगाल की प्रसिद्ध कांता कढ़ाई वाला हाथ से सिला सूती कंथा थ्रो।', descKn: 'ಕೈಯಿಂದ ಹೊಲಿದ ಕಾಂತಾ ಕಸೂತಿಯ ಸುಂದರ ಕಾಟನ್ ಬ್ಲಾಂಕೆಟ್.', artisan: 'Kaushalya Bai', region: 'Kutch, Gujarat', rating: 4.9, reviews: 93 },
-    { title: 'Linen Sheer Rod Pocket Curtains', img: 'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=500&q=80', descEn: 'Set of 2 semi-transparent natural linen curtains allowing soft sunlight.', descHi: 'खिड़कियों और दरवाजों के लिए हल्के प्राकृतिक लिनन के परदे।', descKn: 'ಕಿಟಕಿಗಳಿಗೆ ಸಾಫ್ಟ್ ಸೂರ್ಯನ ಬೆಳಕು ನೀಡುವ ಲಿನೆನ್ ಪರದೆಗಳು.', artisan: 'Champalal Meghwal', region: 'Pali, Rajasthan', rating: 4.7, reviews: 40 },
-    { title: 'Chunky Chenille Hand-Knit Throw Blanket', img: 'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=500&q=80', descEn: 'Ultra-soft hand-knit chenille yarn blanket designed for cozy sofas.', descHi: 'सोफे पर ओढ़ने के लिए हाथ से बुना बेहद मुलायम चेनाइल थ्रो ब्लैंकेट।', descKn: 'ಸೋಫಾ ಮೇಲೆ ಹೊದೆಯಲು ಮೆದುವಾದ ಚೈನೈಲ್ ಬ್ಲಾಂಕೆಟ್.', artisan: 'Ganeshi Bai', region: 'Jalore, Rajasthan', rating: 4.9, reviews: 81 },
-    { title: 'Embroidered Silk Table Runner Mat', img: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=500&q=80', descEn: 'Raw silk dining table runner adorned with traditional Zardosi gold embroidery.', descHi: 'जरी कढ़ाई से सजाया गया शुद्ध रेशमी डाइनिंग टेबल रनर।', descKn: 'ಜರಿ ಕಸೂತಿಯಿಂದ ಶೃಂಗರಿಸಲ್ಪಟ್ಟ ರೇಷ್ಮೆ ಟೇಬಲ್ ರನ್ನರ್.', artisan: 'Mohan Kanwar', region: 'Rajsamand, Rajasthan', rating: 4.8, reviews: 54 },
-    { title: 'Mudcloth Patterned Canvas Floor Pouf', img: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=500&q=80', descEn: 'Unfilled heavy canvas seating ottoman cover screenprinted in tribal mudcloth prints.', descHi: 'बैठने और पैर टिकाने के लिए ट्राइबल प्रिंट वाला सूती फ्लोर पूफ।', descKn: 'ಕುಳಿತುಕೊಳ್ಳಲು ಗಿರಿಜನ ವಿನ್ಯಾಸದ ಹತ್ತಿ ಫ್ಲೋರ್ ಪೂಫ್.', artisan: 'Savita Khatri', region: 'Bhuj, Gujarat', rating: 4.9, reviews: 49 },
-    { title: 'Handcrafted Soy Wax Scented Candles', img: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?w=500&q=80', descEn: 'Natural aromatherapy soy wax candle poured in a reusable ceramic jar.', descHi: 'सुगंधित माहौल के लिए सेरामिक डिब्बे में हाथ से ढली सोया मोमबत्ती।', descKn: 'ಸುಗಂಧ ವಾತಾವರಣಕ್ಕೆ ಸೆರಾಮಿಕ್ ಜಾರ್‌ನಲ್ಲಿರುವ ಸೋಯಾ ಮೇಣದಬತ್ತಿ.', artisan: 'Prema Ram', region: 'Kota, Rajasthan', rating: 4.9, reviews: 97 },
-    { title: 'Woven Jute Round Floor Mat', img: 'https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=500&q=80', descEn: 'Durable braided natural jute round area rug for living room floors.', descHi: 'कमरे के फर्श के लिए जूट की हाथ से बुनी टिकाऊ गोल चटाई।', descKn: 'ಲಿವಿಂಗ್ ರೂಮ್ ಫ್ಲೋರ್‌ಗಾಗಿ ಗಟ್ಟಿಮುಟ್ಟಾದ ಸಣಬಿನ ರಗ್ ಮ್ಯಾಟ್.', artisan: 'Jamuna Devi', region: 'Chamba, Himachal Pradesh', rating: 4.8, reviews: 58 },
-    { title: 'Mosaic Glass Turkish Moroccan Lantern', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&q=80', descEn: 'Hand-cut stained glass mosaic globe pendant lantern creating vibrant shadows.', descHi: 'रंगीन कांच के मोज़ेक से बना मोरक्को स्टाइल का सजावटी लालटेन।', descKn: 'ಬಣ್ಣದ ಗಾಜಿನ ಮೊಸಾಯಿಕ್ ಟರ್ಕಿಶ್ ಶೈಲಿಯ ಸುಂದರ ಲ್ಯಾಂಟರ್ನ್.', artisan: 'Durga Shankar', region: 'Bhilwara, Rajasthan', rating: 4.9, reviews: 76 },
-    { title: 'Hand-Woven Ikat Decorative Tapestry', img: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=500&q=80', descEn: 'Traditional handloom Ikat resist-dyed cotton wall tapestry with tassel fringe.', descHi: 'इकत बुनाई कला से सजाई गई हस्तनिर्मित कॉटन वॉल टेपेस्ट्री।', descKn: 'ಇಕತ್ ನೇಯ್ಗೆ ಕಲೆಯ ಹತ್ತಿ ದಾರದ ಗೋಡೆ ಕಲಾಕೃತಿ.', artisan: 'Kesari Bairwa', region: 'Bundi, Rajasthan', rating: 4.8, reviews: 43 },
-    { title: 'Linen Waffle Weave Hand Towels', img: 'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=500&q=80', descEn: 'Pack of 2 highly absorbent textured linen-cotton waffle hand towels.', descHi: 'हाथ सुखाने के लिए जल्दी सूखने वाले 2 लिनन-कॉटन तौलियों का सेट।', descKn: 'ಬೇಗ ಒಣಗುವ ಲಿನೆನ್ ಹತ್ತಿಯ 2 ಹ್ಯಾಂಡ್ ಟವೆಲ್‌ಗಳ ಸೆಟ್.', artisan: 'Nirmala Vankar', region: 'Patan, Gujarat', rating: 4.9, reviews: 69 },
-    { title: 'Patchwork Vintage Denim Accent Pillow', img: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=500&q=80', descEn: 'Upcycled indigo denim fabric patchwork square cushion cover.', descHi: 'अपसाइकल्ड डेनिम कपड़े से बना स्टाइलिश पैचवर्क कुशन।', descKn: 'ಸ್ಟೈಲಿಶ್ ಡೆನಿಮ್ ಬಟ್ಟೆಯ ಪ್ಯಾಚ್‌ವರ್ಕ್ ಕುಷನ್ ಕವರ್.', artisan: 'Tarachand Kumawat', region: 'Ajmer, Rajasthan', rating: 4.7, reviews: 32 },
-    { title: 'Macrame Plant Hanger with Wooden Beads', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&q=80', descEn: 'Heavy duty natural cotton rope hanging plant holder for indoor greenery.', descHi: 'इंडोर पौधों के गमले टांगने के लिए मजबूत मैक्रम हैंगर।', descKn: 'ಇಂಡೋರ್ ಗಿಡಗಳ ಕುಂಡಗಳನ್ನು ತೂಗುಹಾಕಲು ಬಲವಾದ ಮ್ಯಾಕ್ರೇಮ್ ಹ್ಯಾಂಗರ್.', artisan: 'Maya Devi', region: 'Pithoragarh, Uttarakhand', rating: 4.9, reviews: 84 },
-    { title: 'Braided Denim and Jute Welcome Rug', img: 'https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=500&q=80', descEn: 'Heavy duty door mat braided combining natural jute and recycled indigo denim.', descHi: 'दरवाजे के लिए जूट और डेनिम से बुना गया टिकाऊ वेलकम डोरमैट।', descKn: 'ಮನೆಯ ಬಾಗಿಲಿಗೆ ಸಣಬು ಮತ್ತು ಡೆನಿಮ್‌ನ ಬಲವಾದ ವೆಲ್‌ಕಮ್ ಮ್ಯಾಟ್.', artisan: 'Tulsi Ram', region: 'Almora, Uttarakhand', rating: 4.8, reviews: 51 },
-    { title: 'Embroidered Velvet Drape Curtain Panels', img: 'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=500&q=80', descEn: 'Rich room-darkening velvet curtains detailed with gold thread embroidery.', descHi: 'रेशमी वेलवेट और सुनहरी कढ़ाई वाले लग्जरी कमरे के परदे।', descKn: 'ಸುಂದರ ರೇಷ್ಮೆ ವೆಲ್ವೆಟ್ ಮತ್ತು ಚಿನ್ನದ ದಾರದ ಬಾಗಿಲು ಪರದೆಗಳು.', artisan: 'Rukmani Sahu', region: 'Durg, Chhattisgarh', rating: 4.9, reviews: 63 },
-    { title: 'Handmade Papier-Mache Storage Bowls', img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=500&q=80', descEn: 'Decorative bowls molded out of recycled paper pulp and hand-painted in Kashmir.', descHi: 'काश्मीर की प्रसिद्ध पेपियर-माशे कला से चित्रित सजावटी कटोरा।', descKn: 'ಕಾಶ್ಮೀರದ ಪೇಪಿಯರ್-ಮಾಶೆ ಕಲೆಯ ಅಲಂಕಾರಿಕ ಬೌಲ್.', artisan: 'Sunderlal Gurjar', region: 'Sawai Madhopur, Rajasthan', rating: 4.8, reviews: 37 },
-    { title: 'Fringe Trim Cotton Hammock Chair', img: 'https://images.unsplash.com/photo-1582582621959-48d27397dc69?w=500&q=80', descEn: 'Comfortable hanging swing chair woven with heavy duty cotton rope and wooden bar.', descHi: 'बालकनी और लॉन में बैठने के लिए आरामदायक कॉटन का झूला।', descKn: 'ಬಾಲ್ಕನಿ ಮತ್ತು ಅಂಗಳದಲ್ಲಿ ತೂಗಾಡಲು ಹತ್ತಿಯ ಆರಾಮದಾಯಕ ಜೋಕಾಲಿ.', artisan: 'Vimla Solanki', region: 'Dungarpur, Rajasthan', rating: 4.9, reviews: 92 },
-    { title: 'Handcrafted Stained Glass Suncatcher Trio', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&q=80', descEn: 'Set of 3 leaded stained glass window hangers reflecting rainbow light beam.', descHi: 'खिड़की की सुंदरता के लिए धूप में चमकने वाले 3 रंगीन कांच के सनकैचर।', descKn: 'ಕಿಟಕಿಯ ಬಿಸಿಲಿನಲ್ಲಿ ಕಾಮನಬಿಲ್ಲು ಬೆಳಕು ಚೆಲ್ಲುವ 3 ಗ್ಲಾಸ್ ಸನ್‌ಕ್ಯಾಚರ್‌ಗಳು.', artisan: 'Babulal Jangid', region: 'Sikar, Rajasthan', rating: 4.9, reviews: 71 }
-  ]
-};
+const SAMPLE_HUBS: VillageHubItem[] = [
+  { id: 1, hubCode: 'HUB-RAMGARH-01', hubName: 'Ramgarh Central Kendra (Kalyan Store)', pincode: '452001', villageName: 'Ramgarh', district: 'Indore', state: 'Madhya Pradesh', landmark: 'Near Panchayat Bhawan', operatesCod: true },
+  { id: 2, hubCode: 'HUB-CHANDAN-02', hubName: 'Chandanpur Rural Hub (Gupta General)', pincode: '452002', villageName: 'Chandanpur', district: 'Indore', state: 'Madhya Pradesh', landmark: 'Opposite Bus Stand', operatesCod: true },
+  { id: 3, hubCode: 'HUB-NARSAPUR-03', hubName: 'Narsapur Artisanal Depot', pincode: '534275', villageName: 'Narsapur', district: 'West Godavari', state: 'Andhra Pradesh', landmark: 'Handicraft Weaver Co-op', operatesCod: true }
+];
 
-export const FALLBACK_PRODUCTS: LocalProduct[] = (() => {
-  const products: LocalProduct[] = [];
-  let currentId = 1;
-
-  for (const catKey of Object.keys(CATEGORY_ITEMS)) {
-    const meta = CATEGORY_NAMES[catKey];
-    const items = CATEGORY_ITEMS[catKey];
-
-    items.forEach((item, idx) => {
-      const itemTitle = item.title;
-      const itemImg = item.img;
-      const price = Math.round((280 + (idx * 115) % 1950) * 100) / 100;
-      const stock = 15 + ((idx * 7) % 55);
-      const sku = `${meta.prefix}-${String(idx + 1).padStart(2, '0')}`;
-
-      const titleObj = {
-        en: itemTitle,
-        hi: itemTitle,
-        kn: itemTitle,
-        mr: itemTitle,
-        gu: itemTitle
-      };
-
-      const descObj = {
-        en: item.descEn,
-        hi: item.descHi || item.descEn,
-        kn: item.descKn || item.descEn,
-        mr: item.descHi || item.descEn,
-        gu: item.descHi || item.descEn
-      };
-
-      products.push({
-        id: currentId++,
-        sku: sku,
-        category: catKey,
-        titleI18n: JSON.stringify(titleObj),
-        descriptionI18n: JSON.stringify(descObj),
-        basePrice: price,
-        stockQuantity: stock,
-        thumbnailUrl: itemImg,
-        imagesJson: JSON.stringify([itemImg]),
-        isActive: true,
-        artisanName: item.artisan,
-        artisanRegion: item.region
-      });
-    });
-=======
-export const FALLBACK_PRODUCTS: LocalProduct[] = [
+const INITIAL_PRODUCTS: LocalProduct[] = [
+  // CLOTHING
   {
     id: 1,
-    sku: 'ART-VASE-01',
-    category: 'pottery',
-    titleI18n: '{"en": "Handpainted Terracotta Vase", "hi": "हाथ से चित्रित टेराकोटा फूलदान", "mr": "हातने रंगवलेले मातीचे भांडे", "gu": "હાથથી ચીતરેલું ટેરાકોટા ફ્લાવરવાઝ"}',
-    descriptionI18n: '{"en": "Handcrafted terracotta vase painted with traditional tribal motifs by artisans in Rajasthan.", "hi": "राजस्थान के कारीगरों द्वारा पारंपरिक जनजातीय रूपांकनों के साथ चित्रित हस्तनिर्मित टेराकोटा फूलदान।"}',
-    basePrice: 899.00,
-    stockQuantity: 45,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-CLOTH-01',
+    category: 'clothing',
+    titleI18n: JSON.stringify({ en: 'Handwoven Organic Cotton Stole', hi: 'हाथ से बुना ऑर्गेनिक कॉटन स्टोल', kn: 'ಕೈಯಿಂದ ನೇಯ್ದ ಸಾವಯವ ಹತ್ತಿ ಶಾಲು' }),
+    descriptionI18n: JSON.stringify({ en: 'Lightweight breathable organic cotton stole woven on traditional pit looms.', hi: 'पारंपरिक खड्ड करघे पर बुना गया हल्का जैविक सूती स्टोल।' }),
+    basePrice: 1299,
+    stockQuantity: 40,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Lalitha Devi',
+    artisanRegion: 'Narsapur, Andhra Pradesh'
   },
   {
     id: 2,
-    sku: 'ART-BASKET-01',
-    category: 'baskets',
-    titleI18n: '{"en": "Handwoven Sabai Grass Basket", "hi": "हाथ से बुनी सबाई घास की टोकरी", "mr": "हातने विणलेली सबाई गवताची टोपली", "gu": "હાથથી વણેલી સબાઈ ઘાસની ટોપલી"}',
-    descriptionI18n: '{"en": "Eco-friendly storage basket handwoven from natural Sabai grass fibers by women artisans.", "hi": "महिला कारीगरों द्वारा प्राकृतिक सबाई घास के रेशों से हाथ से बुनी गई पर्यावरण-अनुकूल टोकरी।"}',
-    basePrice: 699.00,
-    stockQuantity: 60,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-CLOTH-02',
+    category: 'clothing',
+    titleI18n: JSON.stringify({ en: 'Handcrafted Embroidered Leather Mojari', hi: 'हाथ से बनी चमड़े की मोजड़ी', kn: 'ರೇಷ್ಮೆ ದಾರದಿಂದ ಕಸೂತಿ ಮಾಡಿದ ಚರ್ಮದ ಮೊಜರಿ' }),
+    descriptionI18n: JSON.stringify({ en: 'Traditional Rajasthani ethnic leather jutti embroidered with silk threads and mirrors.', hi: 'रेशम के धागों से कशीदाकारी की गई पारंपरिक चमड़े की मोजड़ी।' }),
+    basePrice: 999,
+    stockQuantity: 35,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Gopal Samant',
+    artisanRegion: 'Midnapore, West Bengal'
   },
   {
     id: 3,
-    sku: 'ART-JEWELRY-01',
-    category: 'jewelry',
-    titleI18n: '{"en": "Beaded Tribal Drop Earrings", "hi": "मनके वाले जनजातीय झुमके", "mr": "मण्यांचे आदिवासी कानातले", "gu": "મોતીના આદિવાસી ઝુમખા"}',
-    descriptionI18n: '{"en": "Vibrant beaded drop earrings handmade using recycled glass beads and natural thread.", "hi": "पुनर्चक्रित कांच के मनकों और प्राकृतिक धागे का उपयोग करके हस्तनिर्मित ज्वलंत झुमके।"}',
-    basePrice: 450.00,
-    stockQuantity: 80,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-CLOTH-03',
+    category: 'clothing',
+    titleI18n: JSON.stringify({ en: 'Pure Khadi Handloom Silk Dupatta', hi: 'शुद्ध खादी हैंडलूम सिल्क दुपट्टा', kn: 'ಶುದ್ಧ ಕೈಮಗ್ಗ ರೇಷ್ಮೆ ದುಪಟ್ಟಾ' }),
+    descriptionI18n: JSON.stringify({ en: 'Pure hand-spun Tussar silk dupatta featuring authentic Kantha stitch borders.', hi: 'कांथा सिलाई बॉर्डर के साथ शुद्ध हाथ से काता गया रेशमी दुपट्टा।' }),
+    basePrice: 1599,
+    stockQuantity: 28,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Sujata Roy',
+    artisanRegion: 'Shantiniketan, West Bengal'
   },
+
+  // FOOD
   {
     id: 4,
-    sku: 'ART-WOOD-01',
-    category: 'wood',
-    titleI18n: '{"en": "Carved Sheesham Wooden Jewelry Box", "hi": "नक्काशीदार शीशम की लकड़ी का आभूषण डिब्बा", "mr": "कोरलेले शीशम लाकडी दागिण्यांचे बॉक्स", "gu": "કોતરણીવાળું શીશમ લાકડાનું દાગીના બોક્સ"}',
-    descriptionI18n: '{"en": "Intricately carved wooden box made from sustainably sourced solid Sheesham wood.", "hi": "टिकाऊ शीशम की लकड़ी से बना जटिल नक्काशीदार लकड़ी का डिब्बा।"}',
-    basePrice: 1150.00,
-    stockQuantity: 30,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-FOOD-01',
+    category: 'food',
+    titleI18n: JSON.stringify({ en: 'Raw Organic Wild Forest Honey', hi: 'कच्चा ऑर्गेनिक जंगली शहद', kn: 'ಕಾಡಿನ ಹೂವುಗಳಿಂದ ಸಂಗ್ರಹಿಸಿದ ನೈಸರ್ಗಿಕ ಜೇನುತುಪ್ಪ' }),
+    descriptionI18n: JSON.stringify({ en: 'Unfiltered pure honey collected from natural wild forest flora by tribal gatherers.', hi: 'प्राकृतिक जंगलों से इकट्ठा किया गया 100% शुद्ध और अनफिल्टर्ड शहद।' }),
+    basePrice: 499,
+    stockQuantity: 120,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Sundarbans Co-op',
+    artisanRegion: 'Sundarbans, West Bengal'
   },
   {
     id: 5,
-    sku: 'ART-STOLE-01',
-    category: 'decor',
-    titleI18n: '{"en": "Handwoven Organic Cotton Stole", "hi": "हाथ से बुना ऑर्गेनिक कॉटन स्टोल", "mr": "हातने विणलेली सेंद्रिय सुती शाल", "gu": "હાથથી વણેલું ઓર્ગેનિક કોટન સ્ટોલ"}',
-    descriptionI18n: '{"en": "Lightweight breathable stole woven on traditional pit looms using natural vegetable dyes.", "hi": "प्राकृतिक वनस्पति रंगों का उपयोग करके पारंपरिक खड्ड करघे पर बुना गया हल्का शॉल।"}',
-    basePrice: 1299.00,
-    stockQuantity: 40,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-FOOD-02',
+    category: 'food',
+    titleI18n: JSON.stringify({ en: 'Hand-Ground Heritage Spice Box Set', hi: 'हाथ से पिसा हुआ विरासत मसाला बॉक्स', kn: 'ಮರದ ಪೆಟ್ಟಿಗೆಯಲ್ಲಿ ಕಲ್ಲಿನಲ್ಲಿ ಪುಡಿ ಮಾಡಿದ ಸಾವಯವ ಸಾಂಬಾರು ಪದಾರ್ಥಗಳು' }),
+    descriptionI18n: JSON.stringify({ en: 'Stone-milled organic turmeric, cumin, coriander, and garam masala in Sheesham box.', hi: 'शीशम के डिब्बे में पत्थर से पिसे हुए शुद्ध जैविक मसाले।' }),
+    basePrice: 1150,
+    stockQuantity: 63,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Jagdish Mistry',
+    artisanRegion: 'Saran, Bihar'
   },
+
+  // HEALTHCARE
   {
     id: 6,
-    sku: 'ART-BOWL-01',
-    category: 'pottery',
-    titleI18n: '{"en": "Handcrafted Unglazed Clay Bowl Set", "hi": "हस्तनिर्मित बिना पॉलिश वाली मिट्टी का कटोरा सेट", "mr": "हातने बनवलेला अनग्लेज्ड मातीचा वाडगा सेट", "gu": "હાથથી બનાવેલ માટીના વાટકા નો સેટ"}',
-    descriptionI18n: '{"en": "Traditional unglazed terracotta serving bowls that preserve authentic flavor and minerals.", "hi": "पारंपरिक बिना पॉलिश वाले टेराकोटा परोसने के कटोरे जो प्रामाणिक स्वाद बनाए रखते हैं।"}',
-    basePrice: 549.00,
-    stockQuantity: 50,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-HEALTH-01',
+    category: 'healthcare',
+    titleI18n: JSON.stringify({ en: 'Terracotta Clay Water Pitcher', hi: 'मिट्टी का पारंपरिक सुराहीदार जग', kn: 'ನೀರಿಗೆ ನೈಸರ್ಗಿಕ ತಂಪನ್ನು ನೀಡುವ ಸಾಂಪ್ರದಾಯಿಕ ಮಣ್ಣಿನ ಜಗ್' }),
+    descriptionI18n: JSON.stringify({ en: 'Evaporative cooling natural terracotta pitcher for fresh, alkaline drinking water.', hi: 'प्राकृतिक रूप से पानी को ठंडा रखने वाला मिट्टी का पारंपरिक सुराहीदार जग।' }),
+    basePrice: 899,
+    stockQuantity: 52,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Rameshwar Patel',
+    artisanRegion: 'Khurja, Uttar Pradesh'
   },
   {
     id: 7,
-    sku: 'ART-BAMBOO-01',
-    category: 'bamboo',
-    titleI18n: '{"en": "Handmade Bamboo Serving Tray", "hi": "हस्तनिर्मित बांस परोसने की ट्रे", "mr": "हातने बनवलेले बांबूचे ट्रे", "gu": "હાથથી બનાવેલી વાંસની પીરસવાની ટ્રે"}',
-    descriptionI18n: '{"en": "Durable bamboo tray crafted by master weavers in Assam, finished with organic beeswax.", "hi": "असम में मास्टर बुनकरों द्वारा तैयार की गई टिकाऊ बांस की ट्रे, जैविक मोम से परिष्कृत।"}',
-    basePrice: 399.00,
-    stockQuantity: 75,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-HEALTH-02',
+    category: 'healthcare',
+    titleI18n: JSON.stringify({ en: 'Porcelain Essential Oil Aroma Diffuser', hi: 'चीनी मिट्टी का सुगंधित डिफ्यूज़र', kn: 'ಸುಗಂಧ ತೈಲಗಳಿಗೆ ಮೇಣದಬತ್ತಿ ಹಚ್ಚುವ ಪೋರ್ಸಿಲೇನ್ ಆಯಿಲ್ ಬರ್ನರ್' }),
+    descriptionI18n: JSON.stringify({ en: 'Tea-light warm porcelain aroma oil burner casting delicate geometric light.', hi: 'सुगंधित तेलों के लिए मोमबत्ती वाला चीनी मिट्टी का डिफ्यूज़र।' }),
+    basePrice: 799,
+    stockQuantity: 67,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1603006905003-be475563bc59?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Santosh Sutar',
+    artisanRegion: 'Sawantwadi, Maharashtra'
   },
+
+  // ELECTRONICS
   {
     id: 8,
-    sku: 'ART-CUSHION-01',
-    category: 'decor',
-    titleI18n: '{"en": "Hand Block-Printed Cotton Cushion Cover", "hi": "हाथ से ब्लॉक-प्रिंटेड कॉटन कुशन कवर", "mr": "हातने ब्लॉक-प्रिंट केलेले सुती उशीचे कव्हर", "gu": "હાથથી બ્લોક-પ્રિન્ટેડ કોટન કુશન કવર"}',
-    descriptionI18n: '{"en": "Pure cotton cushion cover block-printed by traditional master artisans using natural indigo.", "hi": "प्राकृतिक नील का उपयोग करके पारंपरिक कारीगरों द्वारा ब्लॉक-प्रिंट किया गया शुद्ध सूती कुशन कवर।"}',
-    basePrice: 399.00,
-    stockQuantity: 65,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-ELEC-01',
+    category: 'electronics',
+    titleI18n: JSON.stringify({ en: 'Acoustic Wooden Smartphone Amplifier Dock', hi: 'लकड़ी का अकॉस्टिक स्मार्टफोन एम्पलीफायर', kn: 'ವಿದ್ಯುತ್ ಇಲ್ಲದೆ ಶಬ್ದ ಹೆಚ್ಚಿಸುವ ಮರದ ಅಕೌಸ್ಟಿಕ್ ಸ್ಪೀಕರ್ ಡೆಕ್' }),
+    descriptionI18n: JSON.stringify({ en: 'Electricity-free natural sound resonating wooden acoustic horn dock for phones.', hi: 'बिना बिजली के मोबाइल साउंड बढ़ाने वाला लकड़ी का अनोखा एम्पलीफायर।' }),
+    basePrice: 999,
+    stockQuantity: 88,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Trilok Rathore',
+    artisanRegion: 'Indore, Madhya Pradesh'
   },
   {
     id: 9,
-    sku: 'ART-PAINTING-01',
-    category: 'decor',
-    titleI18n: '{"en": "Handpainted Madhubani Folk Art Canvas", "hi": "हाथ से चित्रित मधुबनी लोक कला कैनवास", "mr": "हातने रंगवलेले मधुबनी लोककला कॅनव्हास", "gu": "હાથથી ચીતરેલું મધુબની લોકકળા કેનવાસ"}',
-    descriptionI18n: '{"en": "Authentic Madhubani painting painted on handmade canvas by Mithila women artisans.", "hi": "मिथिला की महिला कारीगरों द्वारा हस्तनिर्मित कैनवास पर बनाई गई प्रामाणिक मधुबनी पेंटिंग।"}',
-    basePrice: 1499.00,
-    stockQuantity: 25,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-ELEC-02',
+    category: 'electronics',
+    titleI18n: JSON.stringify({ en: 'Hand-Woven Bamboo LED Desk Lamp', hi: 'बांस की जाली का LED डेस्क लैंप', kn: 'ಕೈಯಿಂದ ನೇಯ್ದ ಬಿದಿರಿನ LED ಫ್ಲೋರ್ ಲ್ಯಾಂಪ್' }),
+    descriptionI18n: JSON.stringify({ en: 'Woven bamboo lattice floor light shade casting warm ambient shadows with 12W LED.', hi: 'कमरे में मनमोहक रोशनी बिखेरने वाला बांस की जाली का 12W LED फ्लोर लैंप।' }),
+    basePrice: 1499,
+    stockQuantity: 73,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Tarun Gogoi',
+    artisanRegion: 'Nagaon, Assam'
   },
+
+  // APPLIANCES
   {
     id: 10,
-    sku: 'ART-TEA-01',
-    category: 'pottery',
-    titleI18n: '{"en": "Jaipur Blue Pottery Ceramic Tea Set", "hi": "जयपुर ब्लू पॉटरी सिरेमिक टी सेट", "mr": "जयपूर ब्लू पॉटरी सिरॅमिक टी सेट", "gu": "જયપુર બ્લુ પોટરી સિરામિક ટી સેટ"}',
-    descriptionI18n: '{"en": "Exquisite 6-piece glazed blue pottery tea set handcrafted using quartz stone in Jaipur.", "hi": "जयपुर में क्वार्ट्ज पत्थर का उपयोग करके हस्तनिर्मित उत्कृष्ट 6-पीस ब्लू पॉटरी टी सेट।"}',
-    basePrice: 1850.00,
-    stockQuantity: 20,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-APP-01',
+    category: 'appliances',
+    titleI18n: JSON.stringify({ en: 'Bamboo Steamer Basket for Dumplings', hi: 'बांस का 2-स्तरीय स्टीमर', kn: 'ಮೋಮೋಸ್ ಬೇಯಿಸಲು ಸಾಂಪ್ರದಾಯಿಕ 2-ಅಂಚಿನ ಬಿದಿರಿನ ಸ್ವೀಮರ್' }),
+    descriptionI18n: JSON.stringify({ en: '2-tier traditional bamboo basket designed for steaming dim sum and veggies.', hi: 'मोमोज और सब्जियां भाप में पकाने के लिए बांस का 2-स्तरीय स्टीमर।' }),
+    basePrice: 799,
+    stockQuantity: 82,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Nagen Das',
+    artisanRegion: 'Barpeta, Assam'
   },
   {
     id: 11,
-    sku: 'ART-BRASS-01',
-    category: 'decor',
-    titleI18n: '{"en": "Bastar Brass Dhokra Tribal Elephant Craft", "hi": "बस्तर पीतल ढोकरा जनजातीय हाथी शिल्प", "mr": "बस्तर पितळ ढोकरा आदिवासी हत्ती कलाकृती", "gu": "બસ્તર પિત્તળ ઢોકરા આદિવાસી હાથી ક્રાફ્ટ"}',
-    descriptionI18n: '{"en": "Ancient lost-wax cast brass elephant figurine handcrafted by Dhokra metal artisans of Chhattisgarh.", "hi": "छत्तीसगढ़ के ढोकरा धातु कारीगरों द्वारा हस्तनिर्मित पीतल का हाथी।"}',
-    basePrice: 1650.00,
-    stockQuantity: 15,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-APP-02',
+    category: 'appliances',
+    titleI18n: JSON.stringify({ en: 'Engraved Sheesham Cooking Spoon Set', hi: 'शीशम लकड़ी के चम्मचों का सेट', kn: 'ನಾನ್-ಸ್ಟಿಕ್ ಪಾತ್ರೆಗಳಿಗೆ ಸೂಕ್ತವಾದ ಮರದ ಸೌಟುಗಳ ಸೆಟ್' }),
+    descriptionI18n: JSON.stringify({ en: 'Non-stick friendly hand-carved Sheesham wooden cooking spatulas set of 5.', hi: 'नान-स्टिक बर्तनों के लिए सुरक्षित हस्तनिर्मित लकड़ी के चम्मचों का सेट।' }),
+    basePrice: 599,
+    stockQuantity: 78,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Ramesh Kumar',
+    artisanRegion: 'Tikamgarh, Madhya Pradesh'
   },
+
+  // POTTERY & BASKETS & WOOD
   {
     id: 12,
-    sku: 'ART-JUTTI-01',
-    category: 'jewelry',
-    titleI18n: '{"en": "Handcrafted Embroidered Leather Mojari", "hi": "हस्तनिर्मित कढ़ाईदार चमड़े की मोजरी", "mr": "हातने बनवलेली नक्षीदार कातडी मोजडी", "gu": "હાથથી બનાવેલી એમ્બ્રોયડરી વાળી ચામડાની મોજડી"}',
-    descriptionI18n: '{"en": "Traditional Rajasthani ethnic leather jutti embroidered with silk threads and mirrors.", "hi": "रेशम के धागों और शीशों से कढ़ी हुई पारंपरिक राजस्थानी एथनिक लेदर जूती।"}',
-    basePrice: 999.00,
-    stockQuantity: 35,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-POTTERY-01',
+    category: 'pottery',
+    titleI18n: JSON.stringify({ en: 'Handpainted Terracotta Vase', hi: 'हाथ से चित्रित टेराकोटा फूलदान', kn: 'ಹಸ್ತಚಿತ್ರಿತ ಟೆರಾಕೋಟಾ ಹೂದಾನಿ' }),
+    descriptionI18n: JSON.stringify({ en: 'Handcrafted terracotta vase painted with traditional tribal motifs by artisans in Rajasthan.', hi: 'राजस्थान के कारीगरों द्वारा पारंपरिक जनजातीय रूपांकनों के साथ चित्रित।' }),
+    basePrice: 899,
+    stockQuantity: 45,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Ananya Sharma',
+    artisanRegion: 'Jaipur, Rajasthan'
   },
   {
     id: 13,
-    sku: 'ART-TOYS-01',
-    category: 'wood',
-    titleI18n: '{"en": "Channapatna Eco Wooden Stacking Toys", "hi": "चन्नापटना इको वुडन स्टैकिंग खिलौने", "mr": "चन्नापटना इको लाकडी खेळणी", "gu": "ચન્નપટના ઈકો વૂડન રમકડાં"}',
-    descriptionI18n: '{"en": "Non-toxic lac-turnery wooden toys crafted with natural vegetable dyes in Karnataka.", "hi": "कर्नाटक में प्राकृतिक वनस्पति रंगों से तैयार किए गए गैर-विषैले लकड़ी के खिलौने।"}',
-    basePrice: 650.00,
-    stockQuantity: 55,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=800&q=80"]',
-    isActive: true
+    sku: 'ART-BASKET-01',
+    category: 'baskets',
+    titleI18n: JSON.stringify({ en: 'Handwoven Sabai Grass Basket', hi: 'हाथ से बुनी सबाई घास की टोकरी', kn: 'ಕೈಯಿಂದ ನೇಯ್ದ ಸಬಾಯಿ ಹುಲ್ಲಿನ ಬುಟ್ಟಿ' }),
+    descriptionI18n: JSON.stringify({ en: 'Eco-friendly storage basket handwoven from natural Sabai grass fibers.', hi: 'प्राकृतिक सबाई घास के रेशों से हाथ से बुनी गई पर्यावरण-अनुकूल टोकरी।' }),
+    basePrice: 699,
+    stockQuantity: 60,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Savitri Bai',
+    artisanRegion: 'Mayurbhanj, Odisha'
   },
   {
     id: 14,
-    sku: 'ART-SCROLL-01',
-    category: 'decor',
-    titleI18n: '{"en": "Odisha Pattachitra Palm Leaf Scroll", "hi": "ओडिशा पट्टचित्र ताड़ के पत्ते की स्क्रॉल चित्रकारी", "mr": "ओडिशा पट्टचित्र ताडाच्या पानांचे स्क्रोल चित्र", "gu": "ઓડિશા પટ્ટાચિત્ર તાળના પાંદડાની સ્ક્ર્રોલ ચિત્રકળા"}',
-    descriptionI18n: '{"en": "Intricate mythology story carved and painted on seasoned palm leaves by Raghurajpur artisans.", "hi": "रघुराजपुर के कारीगरों द्वारा ताड़ के पत्तों पर उकेरी गई और चित्रित की गई पौराणिक कहानी।"}',
-    basePrice: 2100.00,
-    stockQuantity: 10,
-    thumbnailUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&q=80',
-    imagesJson: '["https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&q=80"]',
-    isActive: true
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
+    sku: 'ART-JEWELRY-01',
+    category: 'jewelry',
+    titleI18n: JSON.stringify({ en: 'Beaded Tribal Drop Earrings', hi: 'मनके वाले जनजातीय झुमके', kn: 'ಮಣಿಗಳುಳ್ಳ ಗಿರಿಜನ ಕಿವಿಯೋಲೆಗಳು' }),
+    descriptionI18n: JSON.stringify({ en: 'Vibrant beaded drop earrings handmade using recycled glass beads and natural thread.', hi: 'पुनर्चक्रित कांच के मनकों और धागे का उपयोग करके बने झुमके।' }),
+    basePrice: 450,
+    stockQuantity: 80,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Lalitha Devi',
+    artisanRegion: 'Narsapur, Andhra Pradesh'
+  },
+  {
+    id: 15,
+    sku: 'ART-WOOD-01',
+    category: 'wood',
+    titleI18n: JSON.stringify({ en: 'Carved Sheesham Wooden Jewelry Box', hi: 'नक्काशीदार शीशम की लकड़ी का डिब्बा', kn: 'ಕೆತ್ತಿದ ಶೀಶಮ್ ಮರದ ಆಭರಣ ಪೆಟ್ಟಿಗೆ' }),
+    descriptionI18n: JSON.stringify({ en: 'Intricately carved wooden box made from sustainably sourced solid Sheesham wood.', hi: 'टिकाऊ शीशम की लकड़ी से बना सुंदर डिब्बा।' }),
+    basePrice: 1150,
+    stockQuantity: 30,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=400&q=80',
+    imagesJson: JSON.stringify(['https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=800&q=80']),
+    isActive: true,
+    artisanName: 'Jagdish Mistry',
+    artisanRegion: 'Saran, Bihar'
   }
-
-  return products;
-})();
-
-export function getProductCategory(p: LocalProduct): string {
-  if (p.category && p.category.trim() !== '') return p.category.toLowerCase();
-  const sku = (p.sku || '').toUpperCase();
-  const title = (p.titleI18n || '').toLowerCase();
-  
-  if (sku.includes('VASE') || sku.includes('BOWL') || sku.includes('POT') || title.includes('pottery') || title.includes('terracotta') || title.includes('clay') || title.includes('फूलदान') || title.includes('कटोरा')) return 'pottery';
-  if (sku.includes('BASKET') || title.includes('basket') || title.includes('grass') || title.includes('टोकरी') || title.includes('सबाई')) return 'baskets';
-  if (sku.includes('JEWELRY') || sku.includes('EARRING') || title.includes('jewelry') || title.includes('earring') || title.includes('झुमके') || title.includes('आभूषण')) return 'jewelry';
-  if (sku.includes('WOOD') || title.includes('wood') || title.includes('sheesham') || title.includes('लकड़ी')) return 'wood';
-  if (sku.includes('BAMBOO') || title.includes('bamboo') || title.includes('बांस') || title.includes('tray')) return 'bamboo';
-  if (sku.includes('STOLE') || sku.includes('CUSHION') || title.includes('stole') || title.includes('cushion') || title.includes('decor') || title.includes('शॉल') || title.includes('कवर')) return 'decor';
-  return 'pottery';
-}
+];
 
 export async function fetchProducts(): Promise<LocalProduct[]> {
-  let backendProducts: LocalProduct[] = [];
   try {
     const res = await fetch(`${API_BASE}/products`);
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
-        backendProducts = data.map((p: any) => ({
-          id: p.id,
-          sku: p.sku,
-          category: p.category || getProductCategory(p),
-          titleI18n: typeof p.titleI18n === 'object' ? JSON.stringify(p.titleI18n) : p.titleI18n,
-          descriptionI18n: typeof p.descriptionI18n === 'object' ? JSON.stringify(p.descriptionI18n) : p.descriptionI18n,
-          basePrice: p.basePrice,
-          stockQuantity: p.stockQuantity,
-          thumbnailUrl: p.thumbnailUrl,
-          imagesJson: typeof p.imagesJson === 'object' ? JSON.stringify(p.imagesJson) : (p.imagesJson || '[]'),
-          isActive: p.isActive,
-          artisanName: p.artisanName,
-          artisanRegion: p.artisanRegion
-        }));
+        return data;
       }
     }
   } catch (err) {
-    console.warn('Network error fetching products, reading from Dexie IndexedDB local cache:', err);
+    console.warn('Backend API unavailable, serving local catalog.', err);
   }
 
-<<<<<<< HEAD
-  // Group products strictly by category with unique artisans, descriptions, ratings and images
-  const productMap = new Map<number, LocalProduct>();
-  FALLBACK_PRODUCTS.forEach((p) => productMap.set(p.id, p));
-=======
-  // Fallback to local Dexie IndexedDB
-  const cached = await db.products.toArray();
-  if (cached.length > 0) {
-    let needsUpdate = false;
-    const updated = cached.map((p) => {
-      const cat = getProductCategory(p);
-      if (p.category !== cat) {
-        needsUpdate = true;
-        return { ...p, category: cat };
-      }
-      return p;
-    });
-    if (needsUpdate) {
-      await db.products.bulkPut(updated);
-    }
-    return updated;
+  // Fallback to local Dexie IndexedDB cache or INITIAL_PRODUCTS
+  const localCount = await db.products.count();
+  if (localCount < INITIAL_PRODUCTS.length) {
+    await db.products.clear();
+    await db.products.bulkAdd(INITIAL_PRODUCTS);
   }
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
-
-  backendProducts.forEach((p) => {
-    const fallbackItem = FALLBACK_PRODUCTS.find(f => f.id === p.id);
-    if (fallbackItem) {
-      p.thumbnailUrl = fallbackItem.thumbnailUrl;
-      p.imagesJson = fallbackItem.imagesJson;
-      p.descriptionI18n = fallbackItem.descriptionI18n;
-      p.category = fallbackItem.category;
-      p.artisanName = fallbackItem.artisanName;
-      p.artisanRegion = fallbackItem.artisanRegion;
-      p.titleI18n = fallbackItem.titleI18n;
-    }
-    productMap.set(p.id, p);
-  });
-
-  const fullList = Array.from(productMap.values());
-  await db.products.clear();
-  await db.products.bulkPut(fullList);
-  return fullList;
+  return await db.products.toArray();
 }
 
-export async function fetchHubs() {
+export async function fetchProductById(id: number): Promise<LocalProduct | undefined> {
+  const products = await fetchProducts();
+  return products.find((p) => p.id === Number(id));
+}
+
+export async function fetchHubs(): Promise<VillageHubItem[]> {
   try {
     const res = await fetch(`${API_BASE}/hubs`);
     if (res.ok) {
-      return await res.json();
-    }
-  } catch (err) {
-    console.warn('Network error fetching hubs, using cached fallback');
-  }
-
-  return [
-    {
-      id: 1,
-      hubCode: 'HUB-RAMGARH-01',
-      hubName: 'Ramgarh Central Kendra (Kalyan Store)',
-      pincode: '452001',
-      villageName: 'Ramgarh',
-      district: 'Indore',
-      state: 'Madhya Pradesh',
-      landmark: 'Near Panchayat Bhawan',
-      operatesCod: true
-    },
-    {
-      id: 2,
-      hubCode: 'HUB-CHANDAN-02',
-      hubName: 'Chandanpur Rural Hub (Gupta General)',
-      pincode: '452002',
-      villageName: 'Chandanpur',
-      district: 'Indore',
-      state: 'Madhya Pradesh',
-      landmark: 'Opposite Bus Stand',
-      operatesCod: true
-    }
-  ];
-}
-
-export async function fetchMyOrders(token: string) {
-  try {
-    const res = await fetch(`${API_BASE}/orders/my-orders`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return data;
       }
-    });
-    if (res.ok) {
-      return await res.json();
     }
   } catch (err) {
-    console.warn('Network error fetching orders from database:', err);
+    console.warn('Hubs API offline, returning sample hubs.');
   }
-  return null;
+  return SAMPLE_HUBS;
 }
 
-export async function cancelOrderApi(orderId: number, reason: string, token?: string) {
+export function getProductCategory(product: LocalProduct): string {
+  if (product && product.category && product.category.trim() !== '') {
+    return product.category.toLowerCase().trim();
+  }
+  const sku = (product?.sku || '').toUpperCase();
+  const text = `${product?.titleI18n || ''} ${product?.descriptionI18n || ''}`.toLowerCase();
+
+  if (sku.includes('CLOTH') || sku.includes('STOLE') || text.includes('cotton') || text.includes('silk') || text.includes('mojari') || text.includes('dupatta') || text.includes('stole')) {
+    return 'clothing';
+  }
+  if (sku.includes('FOOD') || text.includes('honey') || text.includes('spice') || text.includes('organic food') || text.includes('turmeric')) {
+    return 'food';
+  }
+  if (sku.includes('HEALTH') || text.includes('pitcher') || text.includes('aroma') || text.includes('diffuser') || text.includes('wellness') || text.includes('clay water')) {
+    return 'healthcare';
+  }
+  if (sku.includes('ELEC') || text.includes('amplifier') || text.includes('led') || text.includes('speaker') || text.includes('dock') || text.includes('desk lamp')) {
+    return 'electronics';
+  }
+  if (sku.includes('APP') || text.includes('steamer') || text.includes('spoon') || text.includes('spatula') || text.includes('appliance') || text.includes('cooking')) {
+    return 'appliances';
+  }
+  if (sku.includes('POTTERY') || sku.includes('VASE') || sku.includes('BOWL') || text.includes('terracotta') || text.includes('clay bowl')) {
+    return 'pottery';
+  }
+  if (sku.includes('BASKET') || text.includes('basket') || text.includes('sabai')) {
+    return 'baskets';
+  }
+  if (sku.includes('JEWELRY') || text.includes('earrings') || text.includes('jewelry')) {
+    return 'jewelry';
+  }
+  if (sku.includes('WOOD') || text.includes('wooden') || text.includes('sheesham')) {
+    return 'wood';
+  }
+  if (sku.includes('BAMBOO') || text.includes('bamboo tray')) {
+    return 'bamboo';
+  }
+  if (sku.includes('CUSHION') || text.includes('cushion') || text.includes('decor')) {
+    return 'decor';
+  }
+  return 'pottery';
+}
+
+export async function fetchMyOrders(token?: string): Promise<any[]> {
   try {
-    const res = await fetch(`${API_BASE}/orders/${orderId}/cancel`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ reason })
-    });
-    if (res.ok) {
-      return await res.json();
+    if (token) {
+      const res = await fetch(`${API_BASE}/orders/my-orders`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        return await res.json();
+      }
     }
   } catch (err) {
-    console.warn('Network error cancelling order:', err);
+    console.warn('Backend fetchMyOrders offline, loading local pending orders.');
   }
-  return null;
+
+  // Fallback to local Dexie pending orders
+  const pending = await db.pendingOrders.toArray();
+  return pending.map((po) => ({
+    id: po.id,
+    orderNumber: `RR-OFF-${(po.idempotencyKey || '123456').slice(0, 6).toUpperCase()}`,
+    idempotencyKey: po.idempotencyKey,
+    hubName: po.hubName,
+    buyerPhone: po.buyerPhone,
+    totalAmount: po.totalAmount,
+    paymentType: po.paymentType,
+    paymentStatus: po.paymentType === 'COD' ? 'UNPAID' : 'PAID',
+    orderStatus: po.syncStatus === 'CANCELLED' ? 'Cancelled' : po.syncStatus === 'SYNCED' ? 'Delivered Successfully' : 'Order Placed (Offline Sync)',
+    offlineCreatedAt: po.offlineCreatedAt,
+    syncedAt: po.syncStatus === 'SYNCED' ? po.offlineCreatedAt : null,
+    deliveryDate: new Date(Date.now() + 3 * 86400000).toISOString(),
+    cancellationReason: po.cancellationReason,
+    cancelledAt: po.cancelledAt,
+    items: po.items
+  }));
 }
+
+export async function cancelOrderApi(orderId: number, reason: string, token?: string): Promise<boolean> {
+  try {
+    if (token) {
+      const res = await fetch(`${API_BASE}/orders/${orderId}/cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ reason })
+      });
+      if (res.ok) return true;
+    }
+  } catch (err) {
+    console.warn('Backend cancel API offline, updating local IndexedDB status.');
+  }
+
+  // Local Dexie fallback
+  const localOrder = await db.pendingOrders.get(orderId);
+  if (localOrder) {
+    await db.pendingOrders.update(orderId, {
+      syncStatus: 'CANCELLED',
+      cancellationReason: reason,
+      cancelledAt: new Date().toISOString()
+    });
+    return true;
+  }
+  return false;
+}
+
+export async function fetchProductReviews(productId: number): Promise<{ reviews: any[]; summary: any }> {
+  try {
+    const res = await fetch(`${API_BASE}/products/${productId}/reviews`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.reviews) {
+        return data;
+      }
+    }
+  } catch (err) {
+    console.warn('Backend reviews API offline, falling back to local Dexie store.', err);
+  }
+
+  const localReviews = await db.reviews.where('productId').equals(productId).toArray();
+  const total = localReviews.length;
+  const avg = total > 0 ? localReviews.reduce((sum, r) => sum + r.overallRating, 0) / total : 0;
+
+  const dist: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  localReviews.forEach(r => { dist[r.overallRating] = (dist[r.overallRating] || 0) + 1; });
+
+  return {
+    reviews: localReviews.length > 0 ? localReviews : [
+      {
+        id: 101,
+        productId,
+        orderId: 1,
+        buyerName: 'Sunita Devi (Verified Buyer)',
+        overallRating: 5,
+        title: 'Exquisite Craftsmanship & Authenticity!',
+        comment: 'Handcrafted with exceptional skill. The natural materials and traditional technique give it a timeless look.',
+        isVerifiedPurchase: true,
+        helpfulVotes: 14,
+        createdAt: new Date().toISOString(),
+        attributes: [
+          { attributeName: 'quality', ratingScore: 5 },
+          { attributeName: 'material_authenticity', ratingScore: 5 },
+          { attributeName: 'value_for_money', ratingScore: 4 }
+        ],
+        mediaList: [
+          { mediaType: 'IMAGE', url: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80' }
+        ]
+      }
+    ],
+    summary: {
+      averageRating: avg > 0 ? Math.round(avg * 10) / 10 : 4.9,
+      totalReviews: total > 0 ? total : 1,
+      ratingDistribution: dist,
+      attributeAverages: { quality: 4.9, material_authenticity: 4.8, value_for_money: 4.7 }
+    }
+  };
+}
+
+export async function submitProductReview(reviewData: {
+  productId: number;
+  orderId?: number;
+  overallRating: number;
+  title: string;
+  comment: string;
+  attributes: Array<{ attributeName: string; ratingScore: number }>;
+  mediaList: Array<{ mediaType: string; url: string }>;
+}): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/reviews`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(reviewData)
+    });
+    if (res.ok) {
+      const created = await res.json();
+      await db.reviews.add({
+        productId: created.productId,
+        orderId: created.orderId,
+        buyerName: created.buyerName || 'Verified Buyer',
+        overallRating: created.overallRating,
+        title: created.title,
+        comment: created.comment,
+        isVerifiedPurchase: true,
+        helpfulVotes: 0,
+        createdAt: created.createdAt || new Date().toISOString(),
+        attributes: created.attributes || reviewData.attributes,
+        mediaList: created.mediaList || reviewData.mediaList
+      });
+      return true;
+    }
+  } catch (err) {
+    console.warn('Backend review submit offline, saving to Dexie IndexedDB cache.');
+  }
+
+  await db.reviews.add({
+    productId: reviewData.productId,
+    orderId: reviewData.orderId || 1,
+    buyerName: 'Verified Artisan Supporter',
+    overallRating: reviewData.overallRating,
+    title: reviewData.title,
+    comment: reviewData.comment,
+    isVerifiedPurchase: true,
+    helpfulVotes: 0,
+    createdAt: new Date().toISOString(),
+    attributes: reviewData.attributes,
+    mediaList: reviewData.mediaList
+  });
+  return true;
+}
+
+export async function voteHelpfulReview(reviewId: number): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/reviews/${reviewId}/helpful`, { method: 'POST' });
+    if (res.ok) return true;
+  } catch (err) {
+    console.warn('Helpful vote offline endpoint fallback.');
+  }
+  return true;
+}
+

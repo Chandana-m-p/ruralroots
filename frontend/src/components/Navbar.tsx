@@ -1,49 +1,52 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
-import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { VoiceSearch } from './VoiceSearch';
-import { Heart, ShoppingBag, User, LogOut, ChevronDown, Layers, ArrowRight } from 'lucide-react';
+import { ImageSearch } from './ImageSearch';
 import { SignOutModal } from './SignOutModal';
-
-const CATEGORIES_LIST = [
-  { id: 'pottery', name: 'Pottery & Terracotta', icon: '🏺', desc: 'Handpainted Vases, Bowls & Clayware' },
-  { id: 'baskets', name: 'Handwoven Baskets', icon: '🧺', desc: 'Natural Sabai Grass & Jute Fibers' },
-  { id: 'wood', name: 'Wooden Crafts', icon: '🪵', desc: 'Carved Sheesham & Teak Wood' },
-  { id: 'bamboo', name: 'Bamboo Products', icon: '🎋', desc: 'Handcrafted Trays, Baskets & Decor' },
-  { id: 'jewelry', name: 'Handmade Jewelry', icon: '💍', desc: 'Recycled Glass & Beaded Tribal Art' },
-  { id: 'decor', name: 'Home Decor & Textiles', icon: '🧵', desc: 'Indigo Block-Printed Cushion Covers' }
-];
+import { 
+  ShoppingBag, 
+  Heart, 
+  User as UserIcon, 
+  Menu, 
+  X, 
+  ChevronDown, 
+  Search, 
+  Mic, 
+  LogOut,
+  SlidersHorizontal,
+  Package,
+  Layers,
+  ArrowRight
+} from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { lang, setLang, t } = useLanguage();
-  const { items } = useCart();
-  const { wishlist } = useWishlist();
   const { user, logout } = useAuth();
+  const { totalCartCount } = useCart();
+  const { wishlist } = useWishlist();
+  const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const totalCartCount = items.reduce((sum, i) => sum + i.quantity, 0);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+  const userDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Keep search bar in sync with URL parameter
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const s = params.get('search') || '';
-    setSearchQuery(s);
-  }, [location.search]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(e.target as Node)) {
         setShowCategoryDropdown(false);
+      }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(e.target as Node)) {
+        setShowUserDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -53,13 +56,18 @@ export const Navbar: React.FC = () => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/shop?search=${encodeURIComponent(searchQuery)}`);
+      navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
   const handleVoiceSearchResult = (text: string) => {
     setSearchQuery(text);
     navigate(`/shop?search=${encodeURIComponent(text)}`);
+  };
+
+  const handleImageSearchResult = (keyword: string) => {
+    setSearchQuery(keyword);
+    navigate(`/shop?search=${encodeURIComponent(keyword)}`);
   };
 
   const handleCategorySelect = (catId: string) => {
@@ -82,7 +90,7 @@ export const Navbar: React.FC = () => {
             </div>
           </Link>
 
-          {/* Search Bar with Voice Input Integration */}
+          {/* Search Bar with Voice Input & Camera Visual Search */}
           <form className="search-bar" onSubmit={handleSearchSubmit} style={{ display: 'flex', alignItems: 'center' }}>
             <input 
               type="text" 
@@ -91,8 +99,9 @@ export const Navbar: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               aria-label="Search"
             />
-            <div style={{ paddingRight: '4px', display: 'flex', alignItems: 'center' }}>
+            <div style={{ paddingRight: '4px', display: 'flex', alignItems: 'center', gap: '2px' }}>
               <VoiceSearch onResult={handleVoiceSearchResult} />
+              <ImageSearch onResult={handleImageSearchResult} />
             </div>
             <button type="submit" aria-label="Search">🔍</button>
           </form>
@@ -127,115 +136,198 @@ export const Navbar: React.FC = () => {
               <span className="badge" data-cart-count>{totalCartCount}</span>
             </Link>
 
-            {/* User Login/Profile */}
+            {/* User Auth Profile Dropdown */}
             {user ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Link to="/profile" className="user-chip" title="View My Account Profile">
-                  <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=faces" alt={user.fullName} />
-                  <span>Hi, {user.fullName.split(' ')[0]}</span>
-                </Link>
-                <button onClick={() => setShowSignOutModal(true)} className="icon-btn" title="Sign Out" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                  <LogOut size={16} />
+              <div ref={userDropdownRef} style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowUserDropdown(!showUserDropdown)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: 'var(--cream-2)',
+                    border: '1px solid var(--line)',
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    color: 'var(--forest)'
+                  }}
+                >
+                  <UserIcon size={16} />
+                  <span>{user.fullName || 'Member'}</span>
+                  <ChevronDown size={14} />
                 </button>
+
+                {showUserDropdown && (
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: '110%',
+                      background: 'var(--white)',
+                      boxShadow: 'var(--shadow-lg)',
+                      borderRadius: 'var(--radius)',
+                      width: '200px',
+                      zIndex: 1000,
+                      padding: '8px 0',
+                      border: '1px solid var(--line)'
+                    }}
+                  >
+                    <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--line)', fontSize: '0.8rem', color: 'var(--ink-soft)' }}>
+                      Signed in as<br/><strong>{user.phoneNumber}</strong>
+                    </div>
+                    <Link 
+                      to="/my-orders" 
+                      onClick={() => setShowUserDropdown(false)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', color: 'var(--ink)', textDecoration: 'none', fontSize: '0.88rem' }}
+                    >
+                      <Package size={16} /> {t('myOrders')}
+                    </Link>
+                    <Link 
+                      to="/admin" 
+                      onClick={() => setShowUserDropdown(false)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', color: 'var(--ink)', textDecoration: 'none', fontSize: '0.88rem' }}
+                    >
+                      <Layers size={16} /> {t('adminPortal')}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowUserDropdown(false);
+                        setShowSignOutModal(true);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '10px 16px',
+                        background: 'none',
+                        border: 'none',
+                        color: '#dc2626',
+                        cursor: 'pointer',
+                        fontSize: '0.88rem',
+                        borderTop: '1px solid var(--line)'
+                      }}
+                    >
+                      <LogOut size={16} /> {t('logout')}
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
-              <Link to="/login" className="user-chip">
-                <User size={18} />
-                <span>{t('hiGuest')}</span>
+              <Link 
+                to="/login" 
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'var(--forest)',
+                  color: 'var(--white)',
+                  padding: '6px 14px',
+                  borderRadius: '20px',
+                  textDecoration: 'none',
+                  fontSize: '0.85rem',
+                  fontWeight: 600
+                }}
+              >
+                <UserIcon size={15} /> {t('hiGuest')}
               </Link>
             )}
           </div>
         </div>
       </header>
 
-      {/* Nav */}
+      {/* Main Navigation Bar */}
       <nav className="navbar">
-        <div className="container">
-          {/* Interactive Category Dropdown Trigger */}
-          <div 
-            ref={dropdownRef}
-            style={{ position: 'relative' }}
-          >
-            <button 
-              className="cat-dropdown"
+        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          
+          {/* Artisanal Categories Dropdown */}
+          <div ref={categoryDropdownRef} style={{ position: 'relative' }}>
+            <button
+              type="button"
+              className="cat-dropdown-trigger"
               onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                background: showCategoryDropdown ? 'var(--forest)' : 'var(--cream)',
-                color: showCategoryDropdown ? 'var(--white)' : 'var(--ink)',
-                border: '1.5px solid var(--line)',
+                background: 'var(--cream-2)',
+                border: '1px solid var(--line)',
+                padding: '8px 16px',
                 borderRadius: '8px',
-                padding: '9px 16px',
-                fontWeight: 600,
-                fontSize: '0.92rem',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                fontWeight: 600,
+                color: 'var(--forest)',
+                fontSize: '0.9rem'
               }}
             >
-              <Layers size={16} />
+              <SlidersHorizontal size={16} />
               <span>{t('categories')}</span>
-              <ChevronDown size={16} style={{ transform: showCategoryDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+              <ChevronDown size={14} style={{ transform: showCategoryDropdown ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
             </button>
 
-            {/* Category Dropdown Menu */}
             {showCategoryDropdown && (
               <div 
                 style={{
                   position: 'absolute',
-                  top: 'calc(100% + 8px)',
+                  top: '110%',
                   left: 0,
-                  width: '320px',
+                  width: '260px',
                   background: 'var(--white)',
-                  borderRadius: '12px',
                   boxShadow: 'var(--shadow-lg)',
-                  border: '1px solid var(--line)',
-                  padding: '8px',
+                  borderRadius: 'var(--radius)',
                   zIndex: 999,
-                  animation: 'fadeIn 0.2s ease-out'
+                  padding: '8px 0',
+                  border: '1px solid var(--line)'
                 }}
               >
-                <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--line)', marginBottom: '4px' }}>
-                  <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--ink-soft)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {t('browseCategories')}
-                  </div>
+                <div style={{ padding: '8px 16px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--clay)', textTransform: 'uppercase' }}>
+                  {t('browseCategories')}
                 </div>
-
-                {CATEGORIES_LIST.map((cat) => (
+                {[
+                  { id: 'clothing', label: 'Clothing & Apparel', icon: '👕' },
+                  { id: 'food', label: 'Food & Organic Grocery', icon: '🍲' },
+                  { id: 'healthcare', label: 'Healthcare & Wellness', icon: '🩺' },
+                  { id: 'electronics', label: 'Electronics & Smart Tech', icon: '⚡' },
+                  { id: 'appliances', label: 'Home Appliances & Living', icon: '🏠' },
+                  { id: 'baskets', label: 'Handwoven Baskets', icon: '🧺' },
+                  { id: 'pottery', label: 'Pottery & Terracotta', icon: '🏺' },
+                  { id: 'wood', label: 'Wooden Crafts', icon: '🪵' },
+                  { id: 'bamboo', label: 'Bamboo Products', icon: '🎋' },
+                  { id: 'jewelry', label: 'Handmade Jewelry', icon: '💍' },
+                  { id: 'decor', label: 'Home Decor & Textiles', icon: '🛋️' }
+                ].map((cat) => (
                   <button
                     key={cat.id}
+                    type="button"
                     onClick={() => handleCategorySelect(cat.id)}
                     style={{
                       width: '100%',
+                      textAlign: 'left',
+                      padding: '10px 16px',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '0.88rem',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '12px',
-                      padding: '10px 12px',
-                      border: 'none',
-                      background: 'transparent',
-                      borderRadius: '8px',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      transition: 'background 0.15s ease'
+                      gap: '10px',
+                      color: 'var(--ink)'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--cream)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                   >
-                    <span style={{ fontSize: '1.4rem' }}>{cat.icon}</span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--ink)' }}>{cat.name}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--ink-soft)' }}>{cat.desc}</div>
-                    </div>
+                    <span>{cat.icon}</span>
+                    <span>{cat.label}</span>
                   </button>
                 ))}
-
-                <div style={{ borderTop: '1px solid var(--line)', marginTop: '4px', paddingTop: '4px' }}>
+                <div style={{ borderTop: '1px solid var(--line)', marginTop: '6px', paddingTop: '6px', padding: '0 8px' }}>
                   <button
-                    onClick={() => {
-                      setShowCategoryDropdown(false);
-                      navigate('/shop');
-                    }}
+                    type="button"
+                    onClick={() => { setShowCategoryDropdown(false); navigate('/shop'); }}
                     style={{
                       width: '100%',
                       display: 'flex',
@@ -260,7 +352,6 @@ export const Navbar: React.FC = () => {
           </div>
 
           <ul className="nav-links">
-<<<<<<< HEAD
             <li><Link to="/" className={isActive('/') ? 'active' : ''}>{t('home')}</Link></li>
             <li><Link to="/admin" className={isActive('/admin') ? 'active' : ''}>{t('adminPortal')}</Link></li>
             <li><Link to="/shop" className={isActive('/shop') ? 'active' : ''}>{t('shop')}</Link></li>
@@ -269,16 +360,6 @@ export const Navbar: React.FC = () => {
             <li><Link to="/about" className={isActive('/about') ? 'active' : ''}>{t('ourStory')}</Link></li>
             <li><Link to="/blog" className={isActive('/blog') ? 'active' : ''}>{t('blog')}</Link></li>
             <li><Link to="/contact" className={isActive('/contact') ? 'active' : ''}>{t('contact')}</Link></li>
-=======
-            <li><Link to="/" className={isActive('/') ? 'active' : ''}>Home</Link></li>
-            <li><Link to="/shop" className={isActive('/shop') ? 'active' : ''}>Shop</Link></li>
-            <li><Link to="/artisans" className={isActive('/artisans') ? 'active' : ''}>Artisans</Link></li>
-            <li><Link to="/track-order" className={isActive('/track-order') ? 'active' : ''}>Track Order</Link></li>
-            {user && <li><Link to="/profile" className={isActive('/profile') ? 'active' : ''}>My Profile</Link></li>}
-            <li><Link to="/our-story" className={isActive('/our-story') ? 'active' : ''}>{t('ourStory')}</Link></li>
-            <li><Link to="/blog" className={isActive('/blog') ? 'active' : ''}>{t('blog')}</Link></li>
-            <li><Link to="/contact" className={isActive('/contact') ? 'active' : ''}>Contact</Link></li>
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
           </ul>
         </div>
       </nav>

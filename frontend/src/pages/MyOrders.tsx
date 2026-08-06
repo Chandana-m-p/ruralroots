@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Footer } from '../components/Footer';
+import { WriteReviewModal } from '../components/WriteReviewModal';
 import { 
   PackageCheck, 
   PackageX, 
@@ -15,7 +16,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   XCircle,
-  ChevronRight
+  ChevronRight,
+  Star
 } from 'lucide-react';
 
 export type OrderStatusType = 'Delivered Successfully' | 'Delivered Unsuccessfully' | 'Cancelled';
@@ -128,6 +130,7 @@ export const MyOrders: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [reviewModalState, setReviewModalState] = useState<{ productId: number; productTitle: string; orderId: number } | null>(null);
 
   const fetchUserOrders = async () => {
     setLoading(true);
@@ -333,6 +336,16 @@ export const MyOrders: React.FC = () => {
                               <div className="product-qty-meta">
                                 {t('qtyLabel').replace('{{qty}}', String(item.quantity)).replace('{{price}}', itemPrice.toLocaleString('en-IN'))}
                               </div>
+                              {order.orderStatus === 'Delivered Successfully' && (
+                                <button
+                                  type="button"
+                                  className="btn btn-outline btn-sm"
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', padding: '3px 8px', marginTop: '6px' }}
+                                  onClick={() => setReviewModalState({ productId: item.productId, productTitle: title, orderId: order.id })}
+                                >
+                                  <Star size={13} color="#F59E0B" fill="#F59E0B" /> Write Review
+                                </button>
+                              )}
                             </div>
                             <div className="product-item-total">
                               ₹{itemTotal.toLocaleString('en-IN')}
@@ -399,6 +412,18 @@ export const MyOrders: React.FC = () => {
           </div>
         )}
       </div>
+
+      {reviewModalState && (
+        <WriteReviewModal
+          productId={reviewModalState.productId}
+          productTitle={reviewModalState.productTitle}
+          orderId={reviewModalState.orderId}
+          onClose={() => setReviewModalState(null)}
+          onSuccess={() => {
+            fetchUserOrders();
+          }}
+        />
+      )}
 
       <Footer />
     </div>

@@ -136,8 +136,6 @@ export const translations = {
     hubManagerRole: "ग्राम केंद्र प्रबंधक (Hub Manager)",
     accountSignIn: "खाता साइन इन",
     signInSubtitle: "ऑर्डर और ग्राम केंद्र पिकअप प्रबंधित करने के लिए लॉगिन करें",
-    ourStory: "हमारी कहानी",
-    blog: "ब्लॉग और समाचार",
     orderDetails: "ऑर्डर का विवरण",
     cancelOrder: "ऑर्डर रद्द करें",
     viewDetails: "विवरण देखें"
@@ -277,8 +275,6 @@ export const translations = {
     hubManagerRole: "Village Hub Manager",
     accountSignIn: "Account Sign In",
     signInSubtitle: "Log in to RuralRoots to manage orders and local Village Hub pickups",
-    ourStory: "Our Story",
-    blog: "Blog & Insights",
     orderDetails: "Order Details",
     cancelOrder: "Cancel Order",
     viewDetails: "View Details"
@@ -418,8 +414,6 @@ export const translations = {
     hubManagerRole: "ग्राम केंद्र व्यवस्थापक (Hub Manager)",
     accountSignIn: "खाते साइन इन",
     signInSubtitle: "ऑर्डर्स आणि ग्राम केंद्र पिकअप व्यवस्थापित करण्यासाठी लॉगिन करा",
-    ourStory: "आमची कथा",
-    blog: "ब्लॉग आणि बातम्या",
     orderDetails: "ऑर्डरचे तपशील",
     cancelOrder: "ऑर्डर रद्द करा",
     viewDetails: "तपशील पहा"
@@ -551,10 +545,7 @@ export const translations = {
     hubDashboard: "ગ્રામ કેન્દ્ર ડેશબોર્ડ",
     handoverItem: "વસ્તુ સોંપો અને રોકડ મેળવો",
     searchPlaceholder: "ઉત્પાદનો શોધો અથવા બોલો...",
-    voiceSearch: "વોઇસ સર્ચ",
-    codNotice: "ગ્રામ કેન્દ્ર પરથી માલ મેળવતી વખતે રોકડ ચૂકવો.",
     statusConfirmed: "મંજૂર",
-<<<<<<< HEAD
     statusDelivered: "ડિલિવર થયું"
   },
   kn: {
@@ -687,18 +678,13 @@ export const translations = {
     voiceSearch: "ವಾಯ್ಸ್ ಸರ್ಚ್",
     codNotice: "ಗ್ರಾಮ ಕೇಂದ್ರದಲ್ಲಿ ವಿತರಣೆಯ ಸಮಯದಲ್ಲಿ ನಗದು ಪಾವತಿಸಿ.",
     statusConfirmed: "ಖಚಿತಪಡಿಸಲಾಗಿದೆ",
-    statusDelivered: "ತಲುಪಿಸಲಾಗಿದೆ"
-=======
-    statusDelivered: "ડિલિવર થયું",
-    buyerRole: "ગ્રામીણ ગ્રાહક (Buyer)",
-    hubManagerRole: "ગ્રામ કેન્દ્ર મેનેજર (Hub Manager)",
-    accountSignIn: "એકાઉન્ટ સાઇન ઇન",
-    signInSubtitle: "ઓર્ડર અને ગ્રામ કેન્દ્ર પિકઅપ સંચાલિત કરવા માટે લોગિન કરો",
-    ourStory: "અમારી વાર્તા",
-    blog: "બ્લોગ અને અહેવાલો",
-    orderDetails: "ઓર્ડર વિગત",
-    cancelOrder: "ઓર્ડર રદ કરો",
-    viewDetails: "વિગત જુઓ"
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
+    statusDelivered: "ತಲುಪಿಸಲಾಗಿದೆ",
+    buyerRole: "ಗ್ರಾಮೀಣ ಗ್ರಾಹಕ (Buyer)",
+    hubManagerRole: "ಗ್ರಾಮ ಕೇಂದ್ರ ಮ್ಯಾನೇಜರ್ (Hub Manager)",
+    accountSignIn: "ಖಾತೆ ಸೈನ್ ಇನ್",
+    signInSubtitle: "ಆರ್ಡರ್ ಮತ್ತು ಗ್ರಾಮ ಕೇಂದ್ರ ಪಿಕ್‌ಅಪ್ ನಿರ್ವಹಿಸಲು ಲಾಗ್ ಇನ್ ಮಾಡಿ",
+    orderDetails: "ಆರ್ಡರ್ ವಿವರ",
+    cancelOrder: "ಆರ್ಡರ್ ರದ್ದುಗೊಳಿಸಿ",
+    viewDetails: "ವಿವರ ನೋಡಿ"
   }
 };

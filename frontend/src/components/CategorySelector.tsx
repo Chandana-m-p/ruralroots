@@ -5,7 +5,7 @@ export interface CategoryOption {
   id: string;
   name: string;
   count?: number;
-  icon?: string;
+  icon?: React.ReactNode;
 }
 
 interface CategorySelectorProps {
@@ -23,6 +23,11 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   const getCategoryTranslation = (id: string, fallbackName: string) => {
     if (id === 'all') return t('allCategories');
+    if (id === 'clothing') return 'Clothing & Apparel';
+    if (id === 'food') return 'Food & Organic Grocery';
+    if (id === 'healthcare') return 'Healthcare & Wellness';
+    if (id === 'electronics') return 'Electronics & Smart Tech';
+    if (id === 'appliances') return 'Home Appliances & Living';
     if (id === 'pottery') return t('potteryCategory');
     if (id === 'baskets') return t('basketsCategory');
     if (id === 'wood') return t('woodCategory');
@@ -65,7 +70,11 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 onChange={() => onSelectCategory(cat.id)}
                 className="category-radio-input"
               />
-              <span className="category-radio-custom" />
+              {cat.icon && (
+                <span className="category-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginRight: '10px' }}>
+                  {cat.icon}
+                </span>
+              )}
               <span className="category-name">{localizedCatName}</span>
             </label>
           );

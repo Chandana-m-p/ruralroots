@@ -2,11 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArtisanCard, Artisan } from '../components/ArtisanCard';
 import { Footer } from '../components/Footer';
-<<<<<<< HEAD
 import { useLanguage } from '../context/LanguageContext';
-=======
 import { X, Award, MapPin, Heart, ShoppingBag, ArrowRight, Quote } from 'lucide-react';
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
 
 const ARTISANS_LIST: Artisan[] = [
   {
@@ -114,12 +111,9 @@ Her exquisite needlework has been showcased in national craft exhibitions, and s
 ];
 
 export const Artisans: React.FC = () => {
-<<<<<<< HEAD
   const { t } = useLanguage();
-=======
   const location = useLocation();
   const navigate = useNavigate();
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [selectedArtisan, setSelectedArtisan] = useState<Artisan | null>(null);
 
@@ -164,17 +158,10 @@ export const Artisans: React.FC = () => {
 
         {/* Hero Spotlight */}
         <div className="hero" style={{ padding: '36px', borderRadius: 'var(--radius-lg)', marginBottom: '32px' }}>
-<<<<<<< HEAD
           <div style={{ maxWidth: '640px' }}>
             <h2 style={{ fontSize: '2.2rem', marginBottom: '12px' }}>{t('meetOurRuralArtisans')}</h2>
             <p style={{ color: 'var(--ink-soft)', fontSize: '1rem', lineHeight: '1.6' }}>
               {t('artisansHeroSub')}
-=======
-          <div style={{ maxWidth: '680px' }}>
-            <h2 style={{ fontSize: '2.2rem', marginBottom: '12px' }}>Meet Our Master Rural Artisans</h2>
-            <p style={{ color: 'var(--ink-soft)', fontSize: '1rem', lineHeight: '1.6' }}>
-              Every product on RuralRoots is hand-crafted by skilled master artisans across India's villages. Click on any artisan to read their personal life story, heritage craftsmanship, and village impact.
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
             </p>
           </div>
         </div>
@@ -198,11 +185,7 @@ export const Artisans: React.FC = () => {
           </div>
         </div>
 
-<<<<<<< HEAD
         {/* Artisan Grid */}
-=======
-        {/* Artisans Grid */}
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
         <div className="artisan-grid">
           {filtered.map((artisan) => (
             <ArtisanCard 

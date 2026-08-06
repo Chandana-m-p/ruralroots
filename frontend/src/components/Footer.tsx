@@ -20,19 +20,11 @@ export const Footer: React.FC = () => {
           <Link to="/shop">{t('bestSellersHeader')}</Link>
         </div>
         <div>
-<<<<<<< HEAD
           <h5>{t('companyHeader')}</h5>
           <Link to="/about">{t('ourStory')}</Link><br/>
           <Link to="/blog">{t('blog')}</Link><br/>
           <Link to="/contact">{t('contact')}</Link><br/>
-          <Link to="/hub-dashboard">{t('villageHubPortalLink')}</Link>
-=======
-          <h5>Company</h5>
-          <Link to="/our-story">Our Story</Link><br/>
-          <Link to="/blog">Blog</Link><br/>
-          <Link to="/contact">Contact</Link><br/>
-          <Link to="/hub-dashboard">Village Hub Portal</Link>
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
+          <Link to="/admin">{t('adminPortal')}</Link>
         </div>
         <div>
           <h5>{t('stayConnectedHeader')}</h5>

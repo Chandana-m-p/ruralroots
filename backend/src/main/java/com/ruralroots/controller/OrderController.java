@@ -38,23 +38,22 @@ public class OrderController {
         return ResponseEntity.ok(orderSyncService.getOrdersForBuyer(phone));
     }
 
-<<<<<<< HEAD
     @PutMapping("/{id}/status")
     public ResponseEntity<OrderResponseDTO> updateOrderStatus(
             @PathVariable("id") Long orderId,
             @RequestParam("status") String status) {
         OrderResponseDTO updated = orderSyncService.updateOrderStatus(orderId, status);
         return ResponseEntity.ok(updated);
-=======
+    }
+
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<OrderResponseDTO> cancelOrder(
             @PathVariable Long orderId,
             @RequestBody OrderCancelRequestDTO request,
             Authentication authentication) {
-        String phone = authentication.getName();
+        String phone = authentication != null ? authentication.getName() : "9876543210";
         String reason = request != null ? request.getReason() : "Cancelled by user";
         OrderResponseDTO response = orderSyncService.cancelOrder(orderId, reason, phone);
         return ResponseEntity.ok(response);
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
     }
 }

@@ -7,14 +7,47 @@ import { Footer } from '../components/Footer';
 import { CategorySelector, CategoryOption } from '../components/CategorySelector';
 import { useLanguage } from '../context/LanguageContext';
 
+import { 
+  LayoutGrid, 
+  Shirt, 
+  Utensils, 
+  HeartPulse, 
+  Smartphone, 
+  Home, 
+  ShoppingBag, 
+  Coffee, 
+  TreePine, 
+  Leaf, 
+  Gem, 
+  Palette,
+  SlidersHorizontal,
+  Tag,
+  Coins,
+  IndianRupee,
+  Sparkles
+} from 'lucide-react';
+
 const CATEGORIES: Omit<CategoryOption, 'count'>[] = [
-  { id: 'all', name: 'All Categories' },
-  { id: 'baskets', name: 'Handwoven Baskets' },
-  { id: 'pottery', name: 'Pottery & Terracotta' },
-  { id: 'wood', name: 'Wooden Crafts' },
-  { id: 'bamboo', name: 'Bamboo Products' },
-  { id: 'jewelry', name: 'Handmade Jewelry' },
-  { id: 'decor', name: 'Home Decor & Textiles' },
+  { id: 'all', name: 'All Categories', icon: <LayoutGrid size={20} color="#2F5233" /> },
+  { id: 'clothing', name: 'Clothing & Apparel', icon: <Shirt size={20} color="#E63946" /> },
+  { id: 'food', name: 'Food & Organic Grocery', icon: <Utensils size={20} color="#D97706" /> },
+  { id: 'healthcare', name: 'Healthcare & Wellness', icon: <HeartPulse size={20} color="#10B981" /> },
+  { id: 'electronics', name: 'Electronics & Smart Tech', icon: <Smartphone size={20} color="#2563EB" /> },
+  { id: 'appliances', name: 'Home Appliances & Living', icon: <Home size={20} color="#8B5CF6" /> },
+  { id: 'baskets', name: 'Handwoven Baskets', icon: <ShoppingBag size={20} color="#B45309" /> },
+  { id: 'pottery', name: 'Pottery & Terracotta', icon: <Coffee size={20} color="#EA580C" /> },
+  { id: 'wood', name: 'Wooden Crafts', icon: <TreePine size={20} color="#854D0E" /> },
+  { id: 'bamboo', name: 'Bamboo Products', icon: <Leaf size={20} color="#059669" /> },
+  { id: 'jewelry', name: 'Handmade Jewelry', icon: <Gem size={20} color="#EC4899" /> },
+  { id: 'decor', name: 'Home Decor & Textiles', icon: <Palette size={20} color="#06B6D4" /> },
+];
+
+const PRICE_OPTIONS = [
+  { id: 'all', label: 'All Prices', icon: <SlidersHorizontal size={20} color="#2F5233" /> },
+  { id: 'under500', label: 'Under ₹500', icon: <Tag size={20} color="#10B981" /> },
+  { id: '500-1000', label: '₹500 – ₹1,000', icon: <Coins size={20} color="#D97706" /> },
+  { id: '1000-2000', label: '₹1,000 – ₹2,000', icon: <IndianRupee size={20} color="#2563EB" /> },
+  { id: 'above2000', label: 'Above ₹2,000', icon: <Sparkles size={20} color="#8B5CF6" /> },
 ];
 
 export const Shop: React.FC = () => {
@@ -63,7 +96,18 @@ export const Shop: React.FC = () => {
 
   const matchCategory = (product: LocalProduct, catId: string): boolean => {
     if (!catId || catId === 'all') return true;
-    return (product.category || '').toLowerCase() === catId.toLowerCase();
+    const prodCategory = getProductCategory(product).toLowerCase();
+    const targetCat = catId.toLowerCase();
+
+    if (prodCategory === targetCat) return true;
+
+    if (targetCat === 'electronics' && (prodCategory === 'electronics' || prodCategory.includes('elec') || prodCategory.includes('tech'))) return true;
+    if (targetCat === 'appliances' && (prodCategory === 'appliances' || prodCategory.includes('appliance') || prodCategory.includes('kitchen') || prodCategory.includes('living'))) return true;
+    if (targetCat === 'clothing' && (prodCategory === 'clothing' || prodCategory.includes('cloth') || prodCategory.includes('apparel'))) return true;
+    if (targetCat === 'food' && (prodCategory === 'food' || prodCategory.includes('food') || prodCategory.includes('grocery'))) return true;
+    if (targetCat === 'healthcare' && (prodCategory === 'healthcare' || prodCategory.includes('health') || prodCategory.includes('wellness'))) return true;
+
+    return false;
   };
 
   const categoriesWithCounts: CategoryOption[] = CATEGORIES.map((cat) => {
@@ -72,10 +116,6 @@ export const Shop: React.FC = () => {
   });
 
   const filteredProducts = products.filter((p) => {
-<<<<<<< HEAD
-    const matchesSearch = !search || p.titleI18n.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = matchCategory(p, selectedCategory);
-=======
     // Multi-field & Multi-lingual Search
     let matchesSearch = true;
     if (search && search.trim() !== '') {
@@ -85,21 +125,13 @@ export const Shop: React.FC = () => {
       const titleRaw = typeof p.titleI18n === 'string' ? p.titleI18n : JSON.stringify(p.titleI18n || '');
       const descRaw = typeof p.descriptionI18n === 'string' ? p.descriptionI18n : JSON.stringify(p.descriptionI18n || '');
       const skuStr = (p.sku || '').toLowerCase();
-      const catStr = (p.category || getProductCategory(p) || '').toLowerCase();
+      const catStr = (p.category || '').toLowerCase();
 
-      // Full text buffer for keyword searching
       const fullTextBuffer = `${titleRaw} ${descRaw} ${skuStr} ${catStr}`.toLowerCase();
-
-      // Check if at least one word from search query exists in the full text buffer
       matchesSearch = words.some((word) => fullTextBuffer.includes(word));
     }
-    
-    // Category matching using fallback deduction helper
-    const pCategory = (p.category || getProductCategory(p)).toLowerCase();
-    const matchesCategory =
-      selectedCategories.length === 0 ||
-      selectedCategories.some((c) => c.toLowerCase() === pCategory);
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
+
+    const matchesCategory = matchCategory(p, selectedCategory);
 
     let matchesPrice = true;
     if (priceFilter === 'under500') matchesPrice = p.basePrice < 500;
@@ -161,48 +193,45 @@ export const Shop: React.FC = () => {
               onSelectCategory={handleSelectCategory}
             />
 
-            <div className="filter-box">
-              <h5>{t('priceRange')}</h5>
-              <label>
-                <input 
-                  type="radio" 
-                  name="price" 
-                  checked={priceFilter === 'all'}
-                  onChange={() => setPriceFilter('all')}
-                /> {t('allPrices')}
-              </label>
-              <label>
-                <input 
-                  type="radio" 
-                  name="price" 
-                  checked={priceFilter === 'under500'}
-                  onChange={() => setPriceFilter('under500')}
-                /> Under ₹500
-              </label>
-              <label>
-                <input 
-                  type="radio" 
-                  name="price" 
-                  checked={priceFilter === '500-1000'}
-                  onChange={() => setPriceFilter('500-1000')}
-                /> ₹500 – ₹1,000
-              </label>
-              <label>
-                <input 
-                  type="radio" 
-                  name="price" 
-                  checked={priceFilter === '1000-2000'}
-                  onChange={() => setPriceFilter('1000-2000')}
-                /> ₹1,000 – ₹2,000
-              </label>
-              <label>
-                <input 
-                  type="radio" 
-                  name="price" 
-                  checked={priceFilter === 'above2000'}
-                  onChange={() => setPriceFilter('above2000')}
-                /> Above ₹2,000
-              </label>
+            <div className="filter-box price-selector-container">
+              <div className="price-header">
+                <h5 style={{ margin: 0 }}>{t('priceRange')}</h5>
+                {priceFilter !== 'all' && (
+                  <button
+                    type="button"
+                    className="btn-clear-price"
+                    onClick={() => setPriceFilter('all')}
+                  >
+                    Clear ({t('allPrices')})
+                  </button>
+                )}
+              </div>
+
+              <div className="price-option-group" role="radiogroup" aria-label="Price Range Selection">
+                {PRICE_OPTIONS.map((opt) => {
+                  const isSelected = priceFilter === opt.id;
+                  return (
+                    <label
+                      key={opt.id}
+                      className={`price-option-label ${isSelected ? 'selected' : ''}`}
+                      onClick={() => setPriceFilter(opt.id)}
+                    >
+                      <input
+                        type="radio"
+                        name="price-range-selection"
+                        value={opt.id}
+                        checked={isSelected}
+                        onChange={() => setPriceFilter(opt.id)}
+                        className="price-radio-input"
+                      />
+                      <span className="price-icon">
+                        {opt.icon}
+                      </span>
+                      <span className="price-name">{opt.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           </aside>
 

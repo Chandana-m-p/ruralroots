@@ -21,15 +21,9 @@ import { Checkout } from './pages/Checkout';
 import { OrderSuccess } from './pages/OrderSuccess';
 import { HubDashboard } from './pages/HubDashboard';
 import { Login } from './pages/Login';
-<<<<<<< HEAD
 import { MyOrders } from './pages/MyOrders';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AuthWorkflow } from './pages/AuthWorkflow';
-import { LogoutVerification } from './pages/LogoutVerification';
-=======
-import { Profile } from './pages/Profile';
-import { TrackOrder } from './pages/TrackOrder';
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
 
 export const App: React.FC = () => {
   return (
@@ -56,16 +50,11 @@ export const App: React.FC = () => {
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/cart" element={<Cart />} />
                       <Route path="/checkout" element={<Checkout />} />
+                      <Route path="/order-success" element={<OrderSuccess />} />
                       <Route path="/hub-dashboard" element={<HubDashboard />} />
                       <Route path="/my-orders" element={<MyOrders />} />
                       <Route path="/login" element={<Login />} />
-<<<<<<< HEAD
                       <Route path="/auth-flow" element={<AuthWorkflow />} />
-                      <Route path="/logout-verify" element={<LogoutVerification />} />
-=======
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/track-order" element={<TrackOrder />} />
->>>>>>> bb47bee993ff0ce233311e7ca24db9ee4b2afd2e
                     </Routes>
                   </main>
                 </div>
@@ -77,5 +66,3 @@ export const App: React.FC = () => {
     </Router>
   );
 };
-
-export default App;

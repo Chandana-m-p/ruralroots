@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS orders (
     total_amount NUMERIC(12, 2) NOT NULL CHECK (total_amount >= 0),
     offline_created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     synced_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    delivery_date TIMESTAMP WITH TIME ZONE,
     cancellation_reason VARCHAR(255),
     cancelled_at TIMESTAMP WITH TIME ZONE,
     CONSTRAINT fk_orders_buyer FOREIGN KEY (buyer_id) REFERENCES users (id) ON DELETE RESTRICT,
@@ -95,3 +96,40 @@ CREATE TABLE IF NOT EXISTS order_items (
 );
 
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items (order_id);
+
+-- 6. PRODUCT REVIEWS TABLES
+CREATE TABLE IF NOT EXISTS product_reviews (
+    id BIGSERIAL PRIMARY KEY,
+    product_id BIGINT NOT NULL,
+    order_id BIGINT NOT NULL,
+    buyer_id BIGINT NOT NULL,
+    buyer_name VARCHAR(255) DEFAULT 'Anonymous Artisan Supporter',
+    overall_rating INT NOT NULL CHECK (overall_rating BETWEEN 1 AND 5),
+    title VARCHAR(150) NOT NULL,
+    comment TEXT NOT NULL,
+    is_verified_purchase BOOLEAN DEFAULT TRUE,
+    helpful_votes INT DEFAULT 0,
+    status VARCHAR(30) DEFAULT 'PUBLISHED',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_reviews_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    CONSTRAINT fk_reviews_order FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
+    CONSTRAINT fk_reviews_buyer FOREIGN KEY (buyer_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS review_attributes (
+    id BIGSERIAL PRIMARY KEY,
+    review_id BIGINT NOT NULL,
+    attribute_name VARCHAR(50) NOT NULL,
+    rating_score INT NOT NULL CHECK (rating_score BETWEEN 1 AND 5),
+    CONSTRAINT fk_attributes_review FOREIGN KEY (review_id) REFERENCES product_reviews (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS review_media (
+    id BIGSERIAL PRIMARY KEY,
+    review_id BIGINT NOT NULL,
+    media_type VARCHAR(20) NOT NULL,
+    url TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_media_review FOREIGN KEY (review_id) REFERENCES product_reviews (id) ON DELETE CASCADE
+);
+
