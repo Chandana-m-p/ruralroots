@@ -46,6 +46,8 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
   const dist = summary?.ratingDistribution || { 5: totalCount, 4: 0, 3: 0, 2: 0, 1: 0 };
   const attrs = summary?.attributeAverages || { quality: 4.9, material_authenticity: 4.8, value_for_money: 4.7 };
 
+  const [activeLightboxUrl, setActiveLightboxUrl] = useState<string | null>(null);
+
   return (
     <div className="product-reviews-section" style={{ marginTop: '40px', paddingTop: '32px', borderTop: '1px solid var(--line)' }}>
       {/* Header */}
@@ -199,14 +201,26 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
 
             {/* Media Photos Preview */}
             {rev.mediaList && rev.mediaList.length > 0 && (
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '14px' }}>
                 {rev.mediaList.map((m: any, idx: number) => (
-                  <img
-                    key={idx}
-                    src={m.url}
-                    alt="Buyer review evidence"
-                    style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--line)' }}
-                  />
+                  <div 
+                    key={idx} 
+                    onClick={() => setActiveLightboxUrl(m.url)}
+                    style={{ position: 'relative', cursor: 'pointer', borderRadius: '8px', overflow: 'hidden' }}
+                  >
+                    <img
+                      src={m.url}
+                      alt="Buyer review product photo"
+                      style={{
+                        width: '84px',
+                        height: '84px',
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        border: '1.5px solid var(--line)',
+                        transition: 'transform 0.2s ease, filter 0.2s ease'
+                      }}
+                    />
+                  </div>
                 ))}
               </div>
             )}
@@ -246,6 +260,56 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
           onSuccess={() => loadData()}
         />
       )}
+
+      {/* Lightbox Photo Preview Modal */}
+      {activeLightboxUrl && (
+        <div
+          onClick={() => setActiveLightboxUrl(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.85)',
+            backdropFilter: 'blur(5px)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}
+          >
+            <img
+              src={activeLightboxUrl}
+              alt="Buyer product review full resolution"
+              style={{ maxWidth: '100%', maxHeight: '85vh', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}
+            />
+            <button
+              onClick={() => setActiveLightboxUrl(null)}
+              style={{
+                position: 'absolute',
+                top: '-16px',
+                right: '-16px',
+                background: '#ffffff',
+                border: 'none',
+                borderRadius: '50%',
+                width: '36px',
+                height: '36px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+              }}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+

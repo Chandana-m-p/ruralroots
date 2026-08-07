@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Star, Upload, CheckCircle, X, ShieldCheck } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Star, Upload, X, ShieldCheck, Camera, Image as ImageIcon, Trash2, Plus } from 'lucide-react';
 import { submitProductReview } from '../services/api';
 
 interface WriteReviewModalProps {
@@ -24,17 +24,83 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
   const [qualityScore, setQualityScore] = useState<number>(5);
   const [authenticityScore, setAuthenticityScore] = useState<number>(5);
   const [valueScore, setValueScore] = useState<number>(5);
-  const [samplePhotoAttached, setSamplePhotoAttached] = useState<boolean>(false);
+  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const SAMPLE_PHOTOS = [
+    'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80',
+    'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=800&q=80',
+    'https://images.unsplash.com/photo-1590736704728-f4730bb30770?w=800&q=80'
+  ];
+
+  const handleFiles = (files: FileList | File[]) => {
+    const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (validFiles.length === 0) return;
+
+    const remainingSlots = 5 - uploadedPhotos.length;
+    const filesToProcess = validFiles.slice(0, remainingSlots);
+
+    filesToProcess.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setUploadedPhotos(prev => {
+            if (prev.length >= 5) return prev;
+            return [...prev, e.target!.result as string];
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      handleFiles(e.target.files);
+      e.target.value = '';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files) {
+      handleFiles(e.dataTransfer.files);
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    setUploadedPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const addSamplePhoto = () => {
+    if (uploadedPhotos.length >= 5) return;
+    const nextSample = SAMPLE_PHOTOS[uploadedPhotos.length % SAMPLE_PHOTOS.length];
+    setUploadedPhotos(prev => [...prev, nextSample]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !comment.trim()) return;
 
     setIsSubmitting(true);
-    const mediaList = samplePhotoAttached
-      ? [{ mediaType: 'IMAGE', url: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80' }]
-      : [];
+    const mediaList = uploadedPhotos.map(url => ({
+      mediaType: 'IMAGE',
+      url
+    }));
 
     const attributes = [
       { attributeName: 'quality', ratingScore: qualityScore },
@@ -75,7 +141,7 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
         style={{
           background: '#ffffff',
           borderRadius: '18px',
-          maxWidth: '560px',
+          maxWidth: '580px',
           width: '100%',
           maxHeight: '90vh',
           overflowY: 'auto',
@@ -261,37 +327,128 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
             />
           </div>
 
-          {/* Photo / Media Attachment */}
-          <div style={{ marginBottom: '20px' }}>
-            <button
-              type="button"
-              onClick={() => setSamplePhotoAttached(!samplePhotoAttached)}
+          {/* Product Photo Upload Section */}
+          <div style={{ marginBottom: '22px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.88rem', fontWeight: 600, color: 'var(--ink)' }}>
+                <Camera size={16} color="var(--forest-dark)" /> Product Photos ({uploadedPhotos.length}/5)
+              </label>
+              <button
+                type="button"
+                onClick={addSamplePhoto}
+                disabled={uploadedPhotos.length >= 5}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: uploadedPhotos.length >= 5 ? '#94A3B8' : 'var(--forest-dark)',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  cursor: uploadedPhotos.length >= 5 ? 'not-allowed' : 'pointer',
+                  textDecoration: 'underline',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Plus size={14} /> Quick Sample Photo
+              </button>
+            </div>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              accept="image/*"
+              multiple
+              style={{ display: 'none' }}
+            />
+
+            {/* Dropzone */}
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => {
+                if (uploadedPhotos.length < 5) {
+                  fileInputRef.current?.click();
+                }
+              }}
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '9px 14px',
-                borderRadius: '8px',
-                border: samplePhotoAttached ? '1.5px solid var(--forest)' : '1px dashed var(--line)',
-                background: samplePhotoAttached ? 'rgba(47, 82, 51, 0.08)' : 'var(--cream)',
-                color: samplePhotoAttached ? 'var(--forest-dark)' : 'var(--ink-soft)',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                width: '100%',
-                justifyContent: 'center'
+                border: isDragging ? '2px dashed #2F5233' : '2px dashed var(--line)',
+                background: isDragging ? 'rgba(47, 82, 51, 0.06)' : 'var(--cream)',
+                borderRadius: '12px',
+                padding: '20px 16px',
+                textAlign: 'center',
+                cursor: uploadedPhotos.length >= 5 ? 'default' : 'pointer',
+                transition: 'all 0.2s ease',
+                marginBottom: uploadedPhotos.length > 0 ? '12px' : '0'
               }}
             >
-              {samplePhotoAttached ? (
-                <>
-                  <CheckCircle size={18} color="#10B981" /> Photo Attached (Craft Evidence)
-                </>
-              ) : (
-                <>
-                  <Upload size={18} /> Attach Photo / Video Evidence
-                </>
-              )}
-            </button>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+                <div style={{ background: 'rgba(47, 82, 51, 0.1)', padding: '10px', borderRadius: '50%', color: 'var(--forest-dark)' }}>
+                  <Upload size={20} />
+                </div>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 600, color: 'var(--ink)' }}>
+                {uploadedPhotos.length >= 5
+                  ? 'Maximum 5 photos reached'
+                  : 'Click or drag & drop product photos here'}
+              </p>
+              <p style={{ margin: '4px 0 0 0', fontSize: '0.78rem', color: 'var(--ink-soft)' }}>
+                Upload photos of the physical item, craft details, or packaging received (PNG, JPG, WEBP)
+              </p>
+            </div>
+
+            {/* Thumbnail Preview Grid */}
+            {uploadedPhotos.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
+                {uploadedPhotos.map((url, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      position: 'relative',
+                      aspectRatio: '1',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      border: '1.5px solid var(--line)',
+                      background: '#F8FAFC'
+                    }}
+                  >
+                    <img
+                      src={url}
+                      alt={`Product upload ${idx + 1}`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removePhoto(idx);
+                      }}
+                      title="Remove photo"
+                      style={{
+                        position: 'absolute',
+                        top: '4px',
+                        right: '4px',
+                        background: 'rgba(0, 0, 0, 0.65)',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '20px',
+                        height: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'background 0.15s ease'
+                      }}
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Submit CTAs */}
@@ -318,3 +475,4 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
     </div>
   );
 };
+
