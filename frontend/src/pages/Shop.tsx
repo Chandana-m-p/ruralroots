@@ -1,29 +1,66 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { fetchProducts } from '../services/api';
+import { fetchProducts, getProductCategory } from '../services/api';
 import { LocalProduct } from '../db';
 import { ProductCard } from '../components/ProductCard';
 import { Footer } from '../components/Footer';
+import { CategorySelector, CategoryOption } from '../components/CategorySelector';
+import { useLanguage } from '../context/LanguageContext';
 
-const CATEGORY_MAP: Record<string, string> = {
-  baskets: 'Handwoven Baskets',
-  pottery: 'Pottery & Terracotta',
-  wood: 'Wooden Crafts',
-  bamboo: 'Bamboo Products',
-  jewelry: 'Handmade Jewelry',
-  decor: 'Home Decor & Textiles'
-};
+import { 
+  LayoutGrid, 
+  Shirt, 
+  Utensils, 
+  HeartPulse, 
+  Smartphone, 
+  Home, 
+  ShoppingBag, 
+  Coffee, 
+  TreePine, 
+  Leaf, 
+  Gem, 
+  Palette,
+  SlidersHorizontal,
+  Tag,
+  Coins,
+  IndianRupee,
+  Sparkles
+} from 'lucide-react';
+
+const CATEGORIES: Omit<CategoryOption, 'count'>[] = [
+  { id: 'all', name: 'All Categories', icon: <LayoutGrid size={20} color="#2F5233" /> },
+  { id: 'clothing', name: 'Clothing & Apparel', icon: <Shirt size={20} color="#E63946" /> },
+  { id: 'food', name: 'Food & Organic Grocery', icon: <Utensils size={20} color="#D97706" /> },
+  { id: 'healthcare', name: 'Healthcare & Wellness', icon: <HeartPulse size={20} color="#10B981" /> },
+  { id: 'electronics', name: 'Electronics & Smart Tech', icon: <Smartphone size={20} color="#2563EB" /> },
+  { id: 'appliances', name: 'Home Appliances & Living', icon: <Home size={20} color="#8B5CF6" /> },
+  { id: 'baskets', name: 'Handwoven Baskets', icon: <ShoppingBag size={20} color="#B45309" /> },
+  { id: 'pottery', name: 'Pottery & Terracotta', icon: <Coffee size={20} color="#EA580C" /> },
+  { id: 'wood', name: 'Wooden Crafts', icon: <TreePine size={20} color="#854D0E" /> },
+  { id: 'bamboo', name: 'Bamboo Products', icon: <Leaf size={20} color="#059669" /> },
+  { id: 'jewelry', name: 'Handmade Jewelry', icon: <Gem size={20} color="#EC4899" /> },
+  { id: 'decor', name: 'Home Decor & Textiles', icon: <Palette size={20} color="#06B6D4" /> },
+];
+
+const PRICE_OPTIONS = [
+  { id: 'all', label: 'All Prices', icon: <SlidersHorizontal size={20} color="#2F5233" /> },
+  { id: 'under500', label: 'Under ₹500', icon: <Tag size={20} color="#10B981" /> },
+  { id: '500-1000', label: '₹500 – ₹1,000', icon: <Coins size={20} color="#D97706" /> },
+  { id: '1000-2000', label: '₹1,000 – ₹2,000', icon: <IndianRupee size={20} color="#2563EB" /> },
+  { id: 'above2000', label: 'Above ₹2,000', icon: <Sparkles size={20} color="#8B5CF6" /> },
+];
 
 export const Shop: React.FC = () => {
+  const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const initialSearch = searchParams.get('search') || '';
-  const initialCat = searchParams.get('cat') || '';
+  const initialCat = searchParams.get('cat') || 'all';
 
   const [products, setProducts] = useState<LocalProduct[]>([]);
   const [search, setSearch] = useState(initialSearch);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCat);
   const [priceFilter, setPriceFilter] = useState<string>('all');
   const [sortOption, setSortOption] = useState<string>('featured');
 
@@ -31,54 +68,71 @@ export const Shop: React.FC = () => {
     fetchProducts().then(setProducts);
   }, []);
 
-  // Sync state when URL search params change
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const cat = params.get('cat');
+    const cat = params.get('cat') || 'all';
     const searchVal = params.get('search') || '';
+    setSelectedCategory(cat);
     setSearch(searchVal);
-
-    if (cat) {
-      const catsArray = cat.split(',').map((c) => c.trim().toLowerCase());
-      setSelectedCategories(catsArray);
-    } else {
-      setSelectedCategories([]);
-    }
   }, [location.search]);
 
-  const handleCategoryToggle = (cat: string) => {
-    const nextCategories = selectedCategories.includes(cat)
-      ? selectedCategories.filter((c) => c !== cat)
-      : [...selectedCategories, cat];
-
-    setSelectedCategories(nextCategories);
-    
-    // Update URL query parameters
+  const handleSelectCategory = (categoryId: string) => {
+    setSelectedCategory(categoryId);
     const params = new URLSearchParams(location.search);
-    if (nextCategories.length > 0) {
-      params.set('cat', nextCategories.join(','));
-    } else {
+    if (categoryId === 'all') {
       params.delete('cat');
+    } else {
+      params.set('cat', categoryId);
     }
     navigate({ search: params.toString() }, { replace: true });
   };
 
-  const handleClearAllCategories = () => {
-    setSelectedCategories([]);
-    const params = new URLSearchParams(location.search);
-    params.delete('cat');
-    navigate({ search: params.toString() }, { replace: true });
+  const handleClearAllFilters = () => {
+    setSelectedCategory('all');
+    setSearch('');
+    setPriceFilter('all');
+    navigate('/shop', { replace: true });
   };
 
-  const filteredProducts = products.filter((p) => {
-    const matchesSearch = !search || p.titleI18n.toLowerCase().includes(search.toLowerCase());
-    
-    // Category matching (supports multiple categories matching ANY of selectedCategories)
-    const matchesCategory =
-      selectedCategories.length === 0 ||
-      (p.category && selectedCategories.some((c) => c.toLowerCase() === p.category.toLowerCase()));
+  const matchCategory = (product: LocalProduct, catId: string): boolean => {
+    if (!catId || catId === 'all') return true;
+    const prodCategory = getProductCategory(product).toLowerCase();
+    const targetCat = catId.toLowerCase();
 
-    // Price range matching
+    if (prodCategory === targetCat) return true;
+
+    if (targetCat === 'electronics' && (prodCategory === 'electronics' || prodCategory.includes('elec') || prodCategory.includes('tech'))) return true;
+    if (targetCat === 'appliances' && (prodCategory === 'appliances' || prodCategory.includes('appliance') || prodCategory.includes('kitchen') || prodCategory.includes('living'))) return true;
+    if (targetCat === 'clothing' && (prodCategory === 'clothing' || prodCategory.includes('cloth') || prodCategory.includes('apparel'))) return true;
+    if (targetCat === 'food' && (prodCategory === 'food' || prodCategory.includes('food') || prodCategory.includes('grocery'))) return true;
+    if (targetCat === 'healthcare' && (prodCategory === 'healthcare' || prodCategory.includes('health') || prodCategory.includes('wellness'))) return true;
+
+    return false;
+  };
+
+  const categoriesWithCounts: CategoryOption[] = CATEGORIES.map((cat) => {
+    const count = products.filter((p) => matchCategory(p, cat.id)).length;
+    return { ...cat, count };
+  });
+
+  const filteredProducts = products.filter((p) => {
+    // Multi-field & Multi-lingual Search
+    let matchesSearch = true;
+    if (search && search.trim() !== '') {
+      const searchClean = search.toLowerCase().trim();
+      const words = searchClean.split(/\s+/).filter(Boolean);
+
+      const titleRaw = typeof p.titleI18n === 'string' ? p.titleI18n : JSON.stringify(p.titleI18n || '');
+      const descRaw = typeof p.descriptionI18n === 'string' ? p.descriptionI18n : JSON.stringify(p.descriptionI18n || '');
+      const skuStr = (p.sku || '').toLowerCase();
+      const catStr = (p.category || '').toLowerCase();
+
+      const fullTextBuffer = `${titleRaw} ${descRaw} ${skuStr} ${catStr}`.toLowerCase();
+      matchesSearch = words.some((word) => fullTextBuffer.includes(word));
+    }
+
+    const matchesCategory = matchCategory(p, selectedCategory);
+
     let matchesPrice = true;
     if (priceFilter === 'under500') matchesPrice = p.basePrice < 500;
     else if (priceFilter === '500-1000') matchesPrice = p.basePrice >= 500 && p.basePrice <= 1000;
@@ -92,127 +146,92 @@ export const Shop: React.FC = () => {
     return a.id - b.id;
   });
 
+  const activeCategoryObj = CATEGORIES.find((c) => c.id === selectedCategory);
+
   return (
     <div>
       <div className="container">
         {/* Breadcrumb */}
         <div className="breadcrumb">
-          <Link to="/">Home</Link>
+          <Link to="/">{t('home')}</Link>
           <span className="sep">›</span>
-          <span className="current">Shop</span>
+          <Link to="/shop">{t('shop')}</Link>
+          {selectedCategory !== 'all' && (
+            <>
+              <span className="sep">›</span>
+              <span className="current">{activeCategoryObj?.name}</span>
+            </>
+          )}
         </div>
+
+        {/* Active Category Banner */}
+        {selectedCategory !== 'all' && (
+          <div className="active-category-banner">
+            <div>
+              <span className="active-category-tag">Active Category</span>
+              <h3 className="active-category-title">{activeCategoryObj?.name}</h3>
+              <p className="active-category-desc">
+                Showing {filteredProducts.length} handcrafted products in this category.
+              </p>
+            </div>
+            <button 
+              className="btn btn-outline btn-sm"
+              onClick={() => handleSelectCategory('all')}
+            >
+              Show All Categories ✕
+            </button>
+          </div>
+        )}
 
         {/* Shop Layout */}
         <div className="shop-layout">
           {/* Sidebar Filters */}
           <aside>
-            <div className="filter-box">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h5 style={{ margin: 0 }}>Category</h5>
-                {selectedCategories.length > 0 && (
-                  <button 
-                    onClick={handleClearAllCategories}
-                    style={{ background: 'none', border: 'none', color: 'var(--clay)', fontSize: '0.8rem', cursor: 'pointer', padding: 0 }}
+            <CategorySelector
+              categories={categoriesWithCounts}
+              selectedCategory={selectedCategory}
+              onSelectCategory={handleSelectCategory}
+            />
+
+            <div className="filter-box price-selector-container">
+              <div className="price-header">
+                <h5 style={{ margin: 0 }}>{t('priceRange')}</h5>
+                {priceFilter !== 'all' && (
+                  <button
+                    type="button"
+                    className="btn-clear-price"
+                    onClick={() => setPriceFilter('all')}
                   >
-                    Clear All
+                    Clear ({t('allPrices')})
                   </button>
                 )}
               </div>
-              <label>
-                <input 
-                  type="checkbox" 
-                  checked={selectedCategories.includes('baskets')} 
-                  onChange={() => handleCategoryToggle('baskets')}
-                /> Handwoven Baskets
-              </label>
-              <label>
-                <input 
-                  type="checkbox" 
-                  checked={selectedCategories.includes('pottery')} 
-                  onChange={() => handleCategoryToggle('pottery')}
-                /> Pottery & Terracotta
-              </label>
-              <label>
-                <input 
-                  type="checkbox" 
-                  checked={selectedCategories.includes('wood')} 
-                  onChange={() => handleCategoryToggle('wood')}
-                /> Wooden Crafts
-              </label>
-              <label>
-                <input 
-                  type="checkbox" 
-                  checked={selectedCategories.includes('bamboo')} 
-                  onChange={() => handleCategoryToggle('bamboo')}
-                /> Bamboo Products
-              </label>
-              <label>
-                <input 
-                  type="checkbox" 
-                  checked={selectedCategories.includes('jewelry')} 
-                  onChange={() => handleCategoryToggle('jewelry')}
-                /> Handmade Jewelry
-              </label>
-              <label>
-                <input 
-                  type="checkbox" 
-                  checked={selectedCategories.includes('decor')} 
-                  onChange={() => handleCategoryToggle('decor')}
-                /> Home Decor & Textiles
-              </label>
-            </div>
 
-            <div className="filter-box">
-              <h5>Price Range</h5>
-              <label>
-                <input 
-                  type="radio" 
-                  name="price" 
-                  checked={priceFilter === 'all'}
-                  onChange={() => setPriceFilter('all')}
-                /> All Prices
-              </label>
-              <label>
-                <input 
-                  type="radio" 
-                  name="price" 
-                  checked={priceFilter === 'under500'}
-                  onChange={() => setPriceFilter('under500')}
-                /> Under ₹500
-              </label>
-              <label>
-                <input 
-                  type="radio" 
-                  name="price" 
-                  checked={priceFilter === '500-1000'}
-                  onChange={() => setPriceFilter('500-1000')}
-                /> ₹500 – ₹1,000
-              </label>
-              <label>
-                <input 
-                  type="radio" 
-                  name="price" 
-                  checked={priceFilter === '1000-2000'}
-                  onChange={() => setPriceFilter('1000-2000')}
-                /> ₹1,000 – ₹2,000
-              </label>
-              <label>
-                <input 
-                  type="radio" 
-                  name="price" 
-                  checked={priceFilter === 'above2000'}
-                  onChange={() => setPriceFilter('above2000')}
-                /> Above ₹2,000
-              </label>
-            </div>
-
-            <div className="filter-box">
-              <h5>Region</h5>
-              <label><input type="checkbox" defaultChecked /> Rajasthan</label>
-              <label><input type="checkbox" defaultChecked /> Andhra Pradesh</label>
-              <label><input type="checkbox" defaultChecked /> Madhya Pradesh</label>
-              <label><input type="checkbox" defaultChecked /> Maharashtra</label>
-              <label><input type="checkbox" defaultChecked /> Assam</label>
+              <div className="price-option-group" role="radiogroup" aria-label="Price Range Selection">
+                {PRICE_OPTIONS.map((opt) => {
+                  const isSelected = priceFilter === opt.id;
+                  return (
+                    <label
+                      key={opt.id}
+                      className={`price-option-label ${isSelected ? 'selected' : ''}`}
+                      onClick={() => setPriceFilter(opt.id)}
+                    >
+                      <input
+                        type="radio"
+                        name="price-range-selection"
+                        value={opt.id}
+                        checked={isSelected}
+                        onChange={() => setPriceFilter(opt.id)}
+                        className="price-radio-input"
+                      />
+                      <span className="price-icon">
+                        {opt.icon}
+                      </span>
+                      <span className="price-name">{opt.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           </aside>
 
@@ -220,23 +239,21 @@ export const Shop: React.FC = () => {
           <section>
             <div className="shop-toolbar">
               <span style={{ color: 'var(--ink-soft)', fontSize: '0.9rem' }}>
-                Showing {filteredProducts.length} of {products.length} products
+                {t('showingProducts').replace('{{count}}', String(filteredProducts.length)).replace('{{total}}', String(products.length))}
               </span>
               <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
-                <option value="featured">Sort: Featured</option>
-                <option value="low-high">Price: Low to High</option>
-                <option value="high-low">Price: High to Low</option>
-                <option value="newest">Newest First</option>
+                <option value="featured">{t('sortBy')} {t('sortFeatured')}</option>
+                <option value="low-high">{t('sortPriceLowHigh')}</option>
+                <option value="high-low">{t('sortPriceHighLow')}</option>
               </select>
             </div>
 
             {/* Active Filter Pills */}
-            {(selectedCategories.length > 0 || search) && (
+            {(selectedCategory !== 'all' || search) && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '20px', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.85rem', color: 'var(--ink-soft)', fontWeight: 600 }}>Active Filters:</span>
-                {selectedCategories.map((cat) => (
+                {selectedCategory !== 'all' && (
                   <span 
-                    key={cat}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -244,20 +261,20 @@ export const Shop: React.FC = () => {
                       padding: '4px 10px',
                       background: 'var(--forest)',
                       color: 'var(--white)',
-                      borderRadius: '16px',
-                      fontSize: '0.82rem',
-                      fontWeight: 500
+                      borderRadius: '20px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600
                     }}
                   >
-                    {CATEGORY_MAP[cat] || cat}
+                    Category: {activeCategoryObj?.name}
                     <button 
-                      onClick={() => handleCategoryToggle(cat)}
-                      style={{ background: 'none', border: 'none', color: 'var(--white)', cursor: 'pointer', padding: 0, fontSize: '0.9rem', lineHeight: 1 }}
+                      onClick={() => handleSelectCategory('all')} 
+                      style={{ background: 'none', border: 'none', color: 'var(--white)', cursor: 'pointer', fontWeight: 'bold' }}
                     >
                       ✕
                     </button>
                   </span>
-                ))}
+                )}
                 {search && (
                   <span 
                     style={{
@@ -267,48 +284,50 @@ export const Shop: React.FC = () => {
                       padding: '4px 10px',
                       background: 'var(--clay)',
                       color: 'var(--white)',
-                      borderRadius: '16px',
-                      fontSize: '0.82rem',
-                      fontWeight: 500
+                      borderRadius: '20px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600
                     }}
                   >
                     Search: "{search}"
                     <button 
-                      onClick={() => {
-                        setSearch('');
-                        const params = new URLSearchParams(location.search);
-                        params.delete('search');
-                        navigate({ search: params.toString() }, { replace: true });
-                      }}
-                      style={{ background: 'none', border: 'none', color: 'var(--white)', cursor: 'pointer', padding: 0, fontSize: '0.9rem', lineHeight: 1 }}
+                      onClick={() => { setSearch(''); navigate('/shop', { replace: true }); }} 
+                      style={{ background: 'none', border: 'none', color: 'var(--white)', cursor: 'pointer', fontWeight: 'bold' }}
                     >
                       ✕
                     </button>
                   </span>
                 )}
                 <button 
-                  onClick={handleClearAllCategories}
-                  style={{ background: 'none', border: 'none', color: 'var(--clay)', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600, textDecoration: 'underline', marginLeft: '6px' }}
+                  onClick={handleClearAllFilters}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--forest)',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}
                 >
                   Clear All Filters
                 </button>
               </div>
             )}
 
-            <div className="product-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-
-            {filteredProducts.length === 0 && (
-              <div className="empty-cart" style={{ marginTop: '24px', padding: '36px', textAlign: 'center', background: 'var(--white)', borderRadius: 'var(--radius)', border: '1px solid var(--line)' }}>
-                <h4 style={{ marginBottom: '8px' }}>No products found</h4>
-                <p style={{ color: 'var(--ink-soft)', fontSize: '0.95rem' }}>
-                  No products matched your selected category filters or search keywords. Try selecting different categories or clearing your active filters.
-                </p>
+            {/* Product Grid or Empty State */}
+            {filteredProducts.length > 0 ? (
+              <div className="product-grid">
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '60px 20px', background: 'var(--white)', borderRadius: '12px', border: '1px dashed var(--line)' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>🔍</div>
+                <h3 style={{ margin: '0 0 8px 0', color: 'var(--ink)' }}>{t('noProductsFound')}</h3>
                 <button 
-                  onClick={handleClearAllCategories}
+                  onClick={handleClearAllFilters} 
                   className="btn btn-primary"
                   style={{ marginTop: '16px' }}
                 >
@@ -324,4 +343,3 @@ export const Shop: React.FC = () => {
     </div>
   );
 };
-

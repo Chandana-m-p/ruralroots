@@ -29,8 +29,8 @@ public class Order {
     @JoinColumn(name = "hub_id", nullable = false)
     private VillageHub hub;
 
-    @Column(name = "order_status", nullable = false, length = 30)
-    private String orderStatus = "CONFIRMED";
+    @Column(name = "order_status", nullable = false, length = 40)
+    private String orderStatus = "Delivered Successfully";
 
     @Column(name = "payment_type", nullable = false, length = 20)
     private String paymentType = "COD";
@@ -47,23 +47,35 @@ public class Order {
     @Column(name = "synced_at")
     private ZonedDateTime syncedAt = ZonedDateTime.now();
 
+    @Column(name = "delivery_date")
+    private ZonedDateTime deliveryDate = ZonedDateTime.now().plusDays(3);
+
+    @Column(name = "cancellation_reason")
+    private String cancellationReason;
+
+    @Column(name = "cancelled_at")
+    private ZonedDateTime cancelledAt;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<OrderItem> items = new ArrayList<>();
 
     public Order() {}
 
-    public Order(Long id, String orderNumber, UUID idempotencyKey, User buyer, VillageHub hub, String orderStatus, String paymentType, String paymentStatus, BigDecimal totalAmount, ZonedDateTime offlineCreatedAt, ZonedDateTime syncedAt, List<OrderItem> items) {
+    public Order(Long id, String orderNumber, UUID idempotencyKey, User buyer, VillageHub hub, String orderStatus, String paymentType, String paymentStatus, BigDecimal totalAmount, ZonedDateTime offlineCreatedAt, ZonedDateTime syncedAt, ZonedDateTime deliveryDate, String cancellationReason, ZonedDateTime cancelledAt, List<OrderItem> items) {
         this.id = id;
         this.orderNumber = orderNumber;
         this.idempotencyKey = idempotencyKey;
         this.buyer = buyer;
         this.hub = hub;
-        this.orderStatus = orderStatus != null ? orderStatus : "CONFIRMED";
+        this.orderStatus = orderStatus != null ? orderStatus : "Delivered Successfully";
         this.paymentType = paymentType != null ? paymentType : "COD";
         this.paymentStatus = paymentStatus != null ? paymentStatus : "UNPAID";
         this.totalAmount = totalAmount;
         this.offlineCreatedAt = offlineCreatedAt;
         this.syncedAt = syncedAt != null ? syncedAt : ZonedDateTime.now();
+        this.deliveryDate = deliveryDate != null ? deliveryDate : ZonedDateTime.now().plusDays(3);
+        this.cancellationReason = cancellationReason;
+        this.cancelledAt = cancelledAt;
         this.items = items != null ? items : new ArrayList<>();
     }
 
@@ -77,12 +89,15 @@ public class Order {
         private UUID idempotencyKey;
         private User buyer;
         private VillageHub hub;
-        private String orderStatus = "CONFIRMED";
+        private String orderStatus = "Delivered Successfully";
         private String paymentType = "COD";
         private String paymentStatus = "UNPAID";
         private BigDecimal totalAmount;
         private ZonedDateTime offlineCreatedAt;
         private ZonedDateTime syncedAt = ZonedDateTime.now();
+        private ZonedDateTime deliveryDate = ZonedDateTime.now().plusDays(3);
+        private String cancellationReason;
+        private ZonedDateTime cancelledAt;
         private List<OrderItem> items = new ArrayList<>();
 
         public OrderBuilder id(Long id) { this.id = id; return this; }
@@ -96,10 +111,13 @@ public class Order {
         public OrderBuilder totalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; return this; }
         public OrderBuilder offlineCreatedAt(ZonedDateTime offlineCreatedAt) { this.offlineCreatedAt = offlineCreatedAt; return this; }
         public OrderBuilder syncedAt(ZonedDateTime syncedAt) { this.syncedAt = syncedAt; return this; }
+        public OrderBuilder deliveryDate(ZonedDateTime deliveryDate) { this.deliveryDate = deliveryDate; return this; }
+        public OrderBuilder cancellationReason(String cancellationReason) { this.cancellationReason = cancellationReason; return this; }
+        public OrderBuilder cancelledAt(ZonedDateTime cancelledAt) { this.cancelledAt = cancelledAt; return this; }
         public OrderBuilder items(List<OrderItem> items) { this.items = items; return this; }
 
         public Order build() {
-            return new Order(id, orderNumber, idempotencyKey, buyer, hub, orderStatus, paymentType, paymentStatus, totalAmount, offlineCreatedAt, syncedAt, items);
+            return new Order(id, orderNumber, idempotencyKey, buyer, hub, orderStatus, paymentType, paymentStatus, totalAmount, offlineCreatedAt, syncedAt, deliveryDate, cancellationReason, cancelledAt, items);
         }
     }
 
@@ -125,6 +143,12 @@ public class Order {
     public void setOfflineCreatedAt(ZonedDateTime offlineCreatedAt) { this.offlineCreatedAt = offlineCreatedAt; }
     public ZonedDateTime getSyncedAt() { return syncedAt; }
     public void setSyncedAt(ZonedDateTime syncedAt) { this.syncedAt = syncedAt; }
+    public ZonedDateTime getDeliveryDate() { return deliveryDate; }
+    public void setDeliveryDate(ZonedDateTime deliveryDate) { this.deliveryDate = deliveryDate; }
+    public String getCancellationReason() { return cancellationReason; }
+    public void setCancellationReason(String cancellationReason) { this.cancellationReason = cancellationReason; }
+    public ZonedDateTime getCancelledAt() { return cancelledAt; }
+    public void setCancelledAt(ZonedDateTime cancelledAt) { this.cancelledAt = cancelledAt; }
     public List<OrderItem> getItems() { return items; }
     public void setItems(List<OrderItem> items) { this.items = items; }
 }

@@ -11,6 +11,8 @@ export interface LocalProduct {
   thumbnailUrl: string;
   imagesJson: string;
   isActive: boolean;
+  artisanName?: string;
+  artisanRegion?: string;
 }
 
 export interface LocalPendingOrder {
@@ -28,7 +30,9 @@ export interface LocalPendingOrder {
     unitPrice: number;
   }>;
   offlineCreatedAt: string;
-  syncStatus: 'QUEUED' | 'SYNCED' | 'FAILED';
+  syncStatus: 'QUEUED' | 'SYNCED' | 'FAILED' | 'CANCELLED';
+  cancellationReason?: string;
+  cancelledAt?: string;
 }
 
 export interface LocalUserSession {
@@ -42,17 +46,34 @@ export interface LocalUserSession {
   selectedHubId?: number;
 }
 
+export interface LocalReview {
+  id?: number;
+  productId: number;
+  orderId: number;
+  buyerName: string;
+  overallRating: number;
+  title: string;
+  comment: string;
+  isVerifiedPurchase: boolean;
+  helpfulVotes: number;
+  createdAt: string;
+  attributes: Array<{ attributeName: string; ratingScore: number }>;
+  mediaList: Array<{ mediaType: string; url: string }>;
+}
+
 export class RuralRootsDB extends Dexie {
   products!: Table<LocalProduct>;
   pendingOrders!: Table<LocalPendingOrder>;
   userSession!: Table<LocalUserSession>;
+  reviews!: Table<LocalReview>;
 
   constructor() {
     super('RuralRootsDB');
-    this.version(1).stores({
+    this.version(2).stores({
       products: 'id, sku, isActive',
       pendingOrders: '++id, idempotencyKey, syncStatus',
-      userSession: 'key'
+      userSession: 'key',
+      reviews: '++id, productId, orderId'
     });
   }
 }

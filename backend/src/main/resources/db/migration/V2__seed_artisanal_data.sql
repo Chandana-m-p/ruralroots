@@ -1,0 +1,89 @@
+-- =============================================================================
+-- RuralRoots — Seed Artisanal Data (Flyway Migration V2)
+-- =============================================================================
+
+-- Seed Initial Users
+INSERT INTO users (id, phone_number, full_name, role, preferred_language, is_active) 
+VALUES 
+  (1, '9876543210', 'Ramesh Patel', 'ROLE_BUYER', 'en', true),
+  (2, '9123456789', 'Sunita Devi (Hub Manager)', 'ROLE_HUB_MANAGER', 'hi', true),
+  (3, '9999999999', 'System Admin', 'ROLE_ADMIN', 'en', true);
+
+-- Seed Village Hub Kendras
+INSERT INTO village_hubs (id, hub_code, hub_name, manager_id, pincode, village_name, district, state, landmark, operates_cod)
+VALUES 
+  (1, 'HUB-RAMGARH-01', 'Ramgarh Central Kendra (Kalyan Store)', 2, '452001', 'Ramgarh', 'Indore', 'Madhya Pradesh', 'Near Panchayat Bhawan', true),
+  (2, 'HUB-CHANDAN-02', 'Chandanpur Rural Hub (Gupta General)', 2, '452002', 'Chandanpur', 'Indore', 'Madhya Pradesh', 'Opposite Bus Stand', true);
+
+-- Seed Multi-lingual Artisanal Products
+INSERT INTO products (id, sku, category, title_i18n, description_i18n, base_price, stock_quantity, thumbnail_url, images_json, is_active, version)
+VALUES 
+(1, 'ART-VASE-01', 'pottery',
+  '{"en": "Handpainted Terracotta Vase", "hi": "हाथ से चित्रित टेराकोटा फूलदान", "mr": "हातने रंगवलेले मातीचे भांडे", "gu": "હાથથી ચીતરેલું ટેરાકોટા ફ્લાવરવાઝ"}', 
+  '{"en": "Handcrafted terracotta vase painted with traditional tribal motifs by artisans in Rajasthan.", "hi": "राजस्थान के कारीगरों द्वारा पारंपरिक जनजातीय रूपांकनों के साथ चित्रित हस्तनिर्मित टेराकोटा फूलदान।"}', 
+  899.00, 45, 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80', '["https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80"]', true, 0),
+
+(2, 'ART-BASKET-01', 'baskets',
+  '{"en": "Handwoven Sabai Grass Basket", "hi": "हाथ से बुनी सबाई घास की टोकरी", "mr": "हातने विणलेली सबाई गवताची टोपली", "gu": "હાથથી વણેલી સબાઈ ઘાસની ટોપલી"}', 
+  '{"en": "Eco-friendly storage basket handwoven from natural Sabai grass fibers by women artisans.", "hi": "महिला कारीगरों द्वारा प्राकृतिक सबाई घास के रेशों से हाथ से बुनी गई पर्यावरण-अनुकूल टोकरी।"}', 
+  699.00, 60, 'https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=400&q=80', '["https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=800&q=80"]', true, 0),
+
+(3, 'ART-JEWELRY-01', 'jewelry',
+  '{"en": "Beaded Tribal Drop Earrings", "hi": "मनके वाले जनजातीय झुमके", "mr": "मण्यांचे आदिवासी कानातले", "gu": "મોતીના આદિવાસી ઝુમખા"}', 
+  '{"en": "Vibrant beaded drop earrings handmade using recycled glass beads and natural thread.", "hi": "पुनर्चक्रित कांच के मनकों और प्राकृतिक धागे का उपयोग करके हस्तनिर्मित ज्वलंत झुमके।"}', 
+  450.00, 80, 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80', '["https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80"]', true, 0),
+
+(4, 'ART-WOOD-01', 'wood',
+  '{"en": "Carved Sheesham Wooden Jewelry Box", "hi": "नक्काशीदार शीशम की लकड़ी का आभूषण डिब्बा", "mr": "कोरलेले शीशम लाकडी दागिण्यांचे बॉक्स", "gu": "કોતરણીવાળું શીશમ લાકડાનું દાગીના બોક્સ"}', 
+  '{"en": "Intricately carved wooden box made from sustainably sourced solid Sheesham wood.", "hi": "टिकाऊ शीशम की लकड़ी से बना जटिल नक्काशीदार लकड़ी का डिब्बा।"}', 
+  1150.00, 30, 'https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=400&q=80', '["https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=800&q=80"]', true, 0),
+
+(5, 'ART-STOLE-01', 'decor',
+  '{"en": "Handwoven Organic Cotton Stole", "hi": "हाथ से बुना ऑर्गेनिक कॉटन स्टोल", "mr": "हातने विणलेली सेंद्रिय सुती शाल", "gu": "હાથથી વણેલું ઓર્ગેનિક કોટન સ્ટોલ"}', 
+  '{"en": "Lightweight breathable stole woven on traditional pit looms using natural vegetable dyes.", "hi": "प्राकृतिक वनस्पति रंगों का उपयोग करके पारंपरिक खड्ड करघे पर बुना गया हल्का शॉल।"}', 
+  1299.00, 40, 'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=400&q=80', '["https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=800&q=80"]', true, 0),
+
+(6, 'ART-BOWL-01', 'pottery',
+  '{"en": "Handcrafted Unglazed Clay Bowl Set", "hi": "हस्तनिर्मित बिना पॉलिश वाली मिट्टी का कटोरा सेट", "mr": "हातने बनवलेला अनग्लेज्ड मातीचा वाडगा सेट", "gu": "હાથથી બનાવેલ માટીના વાટકા નો સેટ"}', 
+  '{"en": "Traditional unglazed terracotta serving bowls that preserve authentic flavor and minerals.", "hi": "पारंपरिक बिना पॉलिश वाले टेराकोटा परोसने के कटोरे जो प्रामाणिक स्वाद बनाए रखते हैं।"}', 
+  549.00, 50, 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&q=80', '["https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80"]', true, 0),
+
+(7, 'ART-BAMBOO-01', 'bamboo',
+  '{"en": "Handmade Bamboo Serving Tray", "hi": "हस्तनिर्मित बांस परोसने की ट्रे", "mr": "हातने बनवलेले बांबूचे ट्रे", "gu": "હાથથી બનાવેલી વાંસની પીરસવાની ટ્રે"}', 
+  '{"en": "Durable bamboo tray crafted by master weavers in Assam, finished with organic beeswax.", "hi": "असम में मास्टर बुनकरों द्वारा तैयार की गई टिकाऊ बांस की ट्रे, जैविक मोम से परिष्कृत।"}', 
+  399.00, 75, 'https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=400&q=80', '["https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=800&q=80"]', true, 0),
+
+(8, 'ART-CUSHION-01', 'decor',
+  '{"en": "Hand Block-Printed Cotton Cushion Cover", "hi": "हाथ से ब्लॉक-प्रिंटेड कॉटन कुशन कवर", "mr": "हातने ब्लॉक-प्रिंट केलेले सुती उशीचे कव्हर", "gu": "હાથથી બ્લોક-પ્રિન્ટેડ કોટન કુશન કવર"}', 
+  '{"en": "Pure cotton cushion cover block-printed by traditional master artisans using natural indigo.", "hi": "प्राकृतिक नील का उपयोग करके पारंपरिक कारीगरों द्वारा ब्लॉक-प्रिंट किया गया शुद्ध सूती कुशन कवर।"}', 
+  399.00, 65, 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80', '["https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80"]', true, 0),
+
+(9, 'ART-PAINTING-01', 'decor',
+  '{"en": "Handpainted Madhubani Folk Art Canvas", "hi": "हाथ से चित्रित मधुबनी लोक कला कैनवास", "mr": "हातने रंगवलेले मधुबनी लोककला कॅनव्हास", "gu": "હાથથી ચીતરેલું મધુબની લોકકળા કેનવાસ"}',
+  '{"en": "Authentic Madhubani painting painted on handmade canvas by Mithila women artisans.", "hi": "मिथिला की महिला कारीगरों द्वारा हस्तनिर्मित कैनवास पर बनाई गई प्रामाणिक मधुबनी पेंटिंग।"}',
+  1499.00, 25, 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&q=80', '["https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800&q=80"]', true, 0),
+
+(10, 'ART-TEA-01', 'pottery',
+  '{"en": "Jaipur Blue Pottery Ceramic Tea Set", "hi": "जयपुर ब्लू पॉटरी सिरेमिक टी सेट", "mr": "जयपूर ब्लू पॉटरी सिरॅमिक टी सेट", "gu": "જયપુર બ્લુ પોટરી સિરામિક ટી સેટ"}',
+  '{"en": "Exquisite 6-piece glazed blue pottery tea set handcrafted using quartz stone in Jaipur.", "hi": "जयपुर में क्वार्ट्ज पत्थर का उपयोग करके हस्तनिर्मित उत्कृष्ट 6-पीस ब्लू पॉटरी टी सेट।"}',
+  1850.00, 20, 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80', '["https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&q=80"]', true, 0),
+
+(11, 'ART-BRASS-01', 'decor',
+  '{"en": "Bastar Brass Dhokra Tribal Elephant Craft", "hi": "बस्तर पीतल ढोकरा जनजातीय हाथी शिल्प", "mr": "बस्तर पितळ ढोकरा आदिवासी हत्ती कलाकृती", "gu": "બસ્તર પિત્તળ ઢોકરા આદિવાસી હાથી ક્રાફ્ટ"}',
+  '{"en": "Ancient lost-wax cast brass elephant figurine handcrafted by Dhokra metal artisans of Chhattisgarh.", "hi": "छत्तीसगढ़ के ढोकरा धातु कारीगरों द्वारा हस्तनिर्मित पीतल का हाथी।"}',
+  1650.00, 15, 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=400&q=80', '["https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=800&q=80"]', true, 0),
+
+(12, 'ART-JUTTI-01', 'jewelry',
+  '{"en": "Handcrafted Embroidered Leather Mojari", "hi": "हस्तनिर्मित कढ़ाईदार चमड़े की मोजरी", "mr": "हातने बनवलेली नक्षीदार कातडी मोजडी", "gu": "હાથથી બનાવેલી એમ્બ્રોયડરી વાળી ચામડાની મોજડી"}',
+  '{"en": "Traditional Rajasthani ethnic leather jutti embroidered with silk threads and mirrors.", "hi": "रेशम के धागों और शीशों से कढ़ी हुई पारंपरिक राजस्थानी एथनिक लेदर जूती।"}',
+  999.00, 35, 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80', '["https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800&q=80"]', true, 0),
+
+(13, 'ART-TOYS-01', 'wood',
+  '{"en": "Channapatna Eco Wooden Stacking Toys", "hi": "चन्नापटना इको वुडन स्टैकिंग खिलौने", "mr": "चन्नापटना इको लाकडी खेळणी", "gu": "ચન્નપટના ઈકો વૂડન રમકડાં"}',
+  '{"en": "Non-toxic lac-turnery wooden toys crafted with natural vegetable dyes in Karnataka.", "hi": "कर्नाटक में प्राकृतिक वनस्पति रंगों से तैयार किए गए गैर-विषैले लकड़ी के खिलौने।"}',
+  650.00, 55, 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=400&q=80', '["https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=800&q=80"]', true, 0),
+
+(14, 'ART-SCROLL-01', 'decor',
+  '{"en": "Odisha Pattachitra Palm Leaf Scroll", "hi": "ओडिशा पट्टचित्र ताड़ के पत्ते की स्क्रॉल चित्रकारी", "mr": "ओडिशा पट्टचित्र ताडाच्या पानांचे स्क्रोल चित्र", "gu": "ઓડિશા પટ્ટાચિત્ર તાળના પાંદડાની સ્ક્ર્રોલ ચિત્રકળા"}',
+  '{"en": "Intricate mythology story carved and painted on seasoned palm leaves by Raghurajpur artisans.", "hi": "रघुराजपुर के कारीगरों द्वारा ताड़ के पत्तों पर उकेरी गई और चित्रित की गई पौराणिक कहानी।"}',
+  2100.00, 10, 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&q=80', '["https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&q=80"]', true, 0);

@@ -13,6 +13,7 @@ interface CartContextType {
   updateQuantity: (productId: number, qty: number) => void;
   clearCart: () => void;
   totalAmount: number;
+  totalCartCount: number;
   selectedHubId: number | null;
   setSelectedHubId: (id: number) => void;
 }
@@ -27,7 +28,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [selectedHubId, setSelectedHubIdState] = useState<number | null>(() => {
     const saved = localStorage.getItem('rr_selected_hub');
-    return saved ? Number(saved) : 1; // Default Hub 1 (Ramgarh)
+    return saved ? Number(saved) : 1;
   });
 
   useEffect(() => {
@@ -67,6 +68,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const totalAmount = items.reduce((sum, item) => sum + (item.product.basePrice * item.quantity), 0);
+  const totalCartCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <CartContext.Provider value={{
@@ -76,6 +78,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateQuantity,
       clearCart,
       totalAmount,
+      totalCartCount,
       selectedHubId,
       setSelectedHubId
     }}>

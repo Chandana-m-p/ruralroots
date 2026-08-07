@@ -31,6 +31,7 @@ public class ProductService {
         return ProductDTO.builder()
                 .id(p.getId())
                 .sku(p.getSku())
+                .category(p.getCategory())
                 .titleI18n(p.getTitleI18n())
                 .descriptionI18n(p.getDescriptionI18n())
                 .basePrice(p.getBasePrice())

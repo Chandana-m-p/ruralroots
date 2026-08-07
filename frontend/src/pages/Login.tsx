@@ -1,511 +1,545 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Phone, KeyRound, Shield, User, Lock, Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Footer } from '../components/Footer';
+import { 
+  Phone, 
+  Lock, 
+  KeyRound, 
+  Eye, 
+  EyeOff, 
+  ShoppingBag, 
+  User, 
+  ShieldCheck, 
+  MessageSquare,
+  Sparkles,
+  CheckCircle2
+} from 'lucide-react';
 
 export const Login: React.FC = () => {
-  const { login } = useAuth();
+  const { loginWithCredentials, requestOtp, verifyOtp, loginAsDemo } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  // Auth Mode: 'CREDENTIALS' or 'OTP'
-  const [authMethod, setAuthMethod] = useState<'CREDENTIALS' | 'OTP'>('CREDENTIALS');
-
-  // Credentials State
-  const [username, setUsername] = useState('buyer@ruralroots.in');
-  const [password, setPassword] = useState('password123');
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
-
-  // Phone / OTP State
+  const [authMode, setAuthMode] = useState<'CREDENTIALS' | 'OTP'>('CREDENTIALS');
   const [phone, setPhone] = useState('9876543210');
-  const [otpStep, setOtpStep] = useState<'PHONE' | 'OTP'>('PHONE');
-  const [otp, setOtp] = useState('1234');
-
-  // Role Selection
+  const [password, setPassword] = useState('Password123!');
   const [role, setRole] = useState<'ROLE_BUYER' | 'ROLE_HUB_MANAGER'>('ROLE_BUYER');
+  const [rememberMe, setRememberMe] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
-  // UI state
+  // OTP State
+  const [otpStep, setOtpStep] = useState<'PHONE' | 'VERIFY'>('PHONE');
+  const [otp, setOtp] = useState('');
+  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '']);
+  const [smsNotification, setSmsNotification] = useState<{ code: string; time: string } | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
+
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
-  // Handle Login with Credentials (Username/Email + Password)
-  const handleCredentialLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage('');
-    setSuccessMessage('');
+  const digitRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null)
+  ];
 
-    if (!username.trim() || !password.trim()) {
-      setErrorMessage('Please enter both username/email and password.');
-      return;
+  const applyPreset = (roleType: 'BUYER' | 'HUB') => {
+    if (roleType === 'BUYER') {
+      setPhone('9876543210');
+      setPassword('Password123!');
+      setRole('ROLE_BUYER');
+    } else {
+      setPhone('9876543211');
+      setPassword('ManagerPass123!');
+      setRole('ROLE_HUB_MANAGER');
     }
+  };
 
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
     setLoading(true);
 
     try {
-      // Attempt backend credentials authentication API
-      const res = await fetch('/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, role })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        login({
-          userId: data.userId || 1,
-          phoneNumber: data.phoneNumber || phone,
-          fullName: data.fullName || (role === 'ROLE_HUB_MANAGER' ? 'Sunita Devi (Hub Manager)' : 'Ramesh Patel'),
-          role: data.role || role,
-          token: data.token || 'JWT_SESSION_TOKEN'
-        });
-        setSuccessMessage('Login successful! Redirecting...');
-        setTimeout(() => navigate(role === 'ROLE_HUB_MANAGER' ? '/hub-dashboard' : '/'), 600);
-      } else {
-        // Fallback for local offline authentication demo
-        const isHub = role === 'ROLE_HUB_MANAGER' || username.includes('hub');
-        const userFullName = isHub ? 'Sunita Devi (Hub Manager)' : 'Ramesh Patel (Rural Buyer)';
-        const assignedRole = isHub ? 'ROLE_HUB_MANAGER' : 'ROLE_BUYER';
-
-        login({
-          userId: 1,
-          phoneNumber: '9876543210',
-          fullName: userFullName,
-          role: assignedRole,
-          token: 'MOCK_CREDENTIALS_JWT_TOKEN'
-        });
-
-        setSuccessMessage(`Welcome back, ${userFullName.split(' ')[0]}! Redirecting...`);
-        setTimeout(() => navigate(assignedRole === 'ROLE_HUB_MANAGER' ? '/hub-dashboard' : '/'), 600);
-      }
-    } catch {
-      // Offline fallback
-      const isHub = role === 'ROLE_HUB_MANAGER' || username.includes('hub');
-      const userFullName = isHub ? 'Sunita Devi (Hub Manager)' : 'Ramesh Patel (Rural Buyer)';
-      const assignedRole = isHub ? 'ROLE_HUB_MANAGER' : 'ROLE_BUYER';
-
-      login({
-        userId: 1,
-        phoneNumber: '9876543210',
-        fullName: userFullName,
-        role: assignedRole,
-        token: 'MOCK_CREDENTIALS_JWT_TOKEN'
-      });
-
-      setSuccessMessage(`Welcome back, ${userFullName.split(' ')[0]}! Redirecting...`);
-      setTimeout(() => navigate(assignedRole === 'ROLE_HUB_MANAGER' ? '/hub-dashboard' : '/'), 600);
+      await loginWithCredentials(phone, password, role);
+      navigate('/');
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Login failed. Please check phone number and password.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle Request OTP
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage('');
-    if (!phone || phone.length < 10) {
-      setErrorMessage('Please enter a valid 10-digit mobile number.');
-      return;
-    }
+    setErrorMsg('');
     setLoading(true);
+
     try {
-      await fetch('/api/v1/auth/request-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: phone, role })
-      });
-    } catch {
-      // Offline fallback
+      const generatedCode = await requestOtp(phone, role);
+      setSmsNotification({ code: generatedCode, time: new Date().toLocaleTimeString() });
+      setOtpStep('VERIFY');
+      setOtpDigits(['1', '2', '3', '4']);
+      setOtp('1234');
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to send OTP.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-    setOtpStep('OTP');
   };
 
-  // Handle Verify OTP
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg('');
     setLoading(true);
-    setErrorMessage('');
+    const finalOtp = otpDigits.join('') || otp;
 
     try {
-      const res = await fetch('/api/v1/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: phone, otp })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        login({
-          userId: data.userId,
-          phoneNumber: data.phoneNumber,
-          fullName: data.fullName,
-          role: data.role,
-          token: data.token
-        });
-      } else {
-        login({
-          userId: 1,
-          phoneNumber: phone,
-          fullName: role === 'ROLE_HUB_MANAGER' ? 'Sunita Devi (Hub Manager)' : 'Ramesh Patel',
-          role: role,
-          token: 'MOCK_OFFLINE_JWT_TOKEN'
-        });
-      }
-    } catch {
-      login({
-        userId: 1,
-        phoneNumber: phone,
-        fullName: role === 'ROLE_HUB_MANAGER' ? 'Sunita Devi (Hub Manager)' : 'Ramesh Patel',
-        role: role,
-        token: 'MOCK_OFFLINE_JWT_TOKEN'
-      });
+      await verifyOtp(phone, finalOtp);
+      navigate('/');
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Invalid OTP code.');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-    navigate(role === 'ROLE_HUB_MANAGER' ? '/hub-dashboard' : '/');
   };
 
-  // Quick Preset Helper
-  const applyPreset = (type: 'BUYER' | 'HUB') => {
-    if (type === 'BUYER') {
-      setUsername('buyer@ruralroots.in');
-      setPassword('buyer123');
-      setRole('ROLE_BUYER');
-    } else {
-      setUsername('hub.manager@ruralroots.in');
-      setPassword('hub123');
-      setRole('ROLE_HUB_MANAGER');
+  const handleDemoLogin = (selectedRole: 'ROLE_BUYER' | 'ROLE_HUB_MANAGER') => {
+    setLoading(true);
+    setTimeout(() => {
+      loginAsDemo(selectedRole);
+      setLoading(false);
+      navigate('/');
+    }, 400);
+  };
+
+  const fillOtpFromSms = () => {
+    if (smsNotification) {
+      const code = smsNotification.code;
+      const digits = code.split('').slice(0, 4);
+      setOtpDigits(digits);
+      setOtp(code);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    }
+  };
+
+  const handleDigitChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const newDigits = [...otpDigits];
+    newDigits[index] = value.slice(-1);
+    setOtpDigits(newDigits);
+    setOtp(newDigits.join(''));
+
+    if (value && index < 3) {
+      digitRefs[index + 1].current?.focus();
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
+      digitRefs[index - 1].current?.focus();
     }
   };
 
   return (
     <div>
-      <div className="page-container login-container" style={{ padding: '40px 16px' }}>
-        <div className="login-card" style={{ maxWidth: '440px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <div 
-              style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '50%',
-                background: 'var(--cream-2)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '12px',
-                color: 'var(--forest)'
-              }}
-            >
-              <Shield size={32} />
+      <div className="container" style={{ minHeight: '75vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px' }}>
+        <div 
+          style={{
+            maxWidth: '440px',
+            width: '100%',
+            background: '#FFFFFF',
+            borderRadius: '20px',
+            boxShadow: '0 20px 40px rgba(30, 62, 43, 0.08), 0 4px 12px rgba(0,0,0,0.04)',
+            border: '1px solid #EAE4D8',
+            padding: '32px 28px',
+            boxSizing: 'border-box'
+          }}
+        >
+          {/* LOGO & TITLE HEADER */}
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '54px', height: '54px', background: 'var(--cream-2)', borderRadius: '50%', marginBottom: '12px' }}>
+              <span style={{ fontSize: '1.8rem' }}>🌱</span>
             </div>
-            <h2 style={{ fontSize: '1.6rem', marginBottom: '6px' }}>Account Sign In</h2>
-            <p style={{ fontSize: '0.9rem', color: 'var(--ink-soft)' }}>
-              Log in to RuralRoots to manage orders and local Village Hub pickups
+            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#1C3C27', margin: '0 0 6px 0' }}>
+              {t('login')} to RuralRoots
+            </h2>
+            <p style={{ color: '#6B7280', fontSize: '0.9rem', margin: 0 }}>
+              Connecting Rural Artisans to Homes Nationwide
             </p>
           </div>
 
-          {/* Auth Method Selector Tabs */}
+          {/* AUTHENTICATION METHOD TAB SELECTOR */}
           <div 
             style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              background: 'var(--cream-2)',
-              borderRadius: '8px',
+              display: 'flex',
+              background: '#F3EFE6',
               padding: '4px',
+              borderRadius: '12px',
               marginBottom: '24px'
             }}
           >
             <button
               type="button"
-              onClick={() => { setAuthMethod('CREDENTIALS'); setErrorMessage(''); }}
+              onClick={() => { setAuthMode('CREDENTIALS'); setErrorMsg(''); }}
               style={{
-                padding: '9px',
+                flex: 1,
+                padding: '10px 12px',
+                fontSize: '0.85rem',
+                fontWeight: 700,
                 border: 'none',
-                borderRadius: '6px',
-                fontWeight: 600,
-                fontSize: '0.88rem',
-                background: authMethod === 'CREDENTIALS' ? 'var(--white)' : 'transparent',
-                color: authMethod === 'CREDENTIALS' ? 'var(--forest)' : 'var(--ink-soft)',
-                boxShadow: authMethod === 'CREDENTIALS' ? '0 2px 8px rgba(0,0,0,0.06)' : 'none',
+                borderRadius: '9px',
                 cursor: 'pointer',
+                background: authMode === 'CREDENTIALS' ? '#FFFFFF' : 'transparent',
+                color: authMode === 'CREDENTIALS' ? '#1C3C27' : '#6B7280',
+                boxShadow: authMode === 'CREDENTIALS' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
                 transition: 'all 0.2s ease'
               }}
             >
-              Credentials Login
+              Password Login
             </button>
             <button
               type="button"
-              onClick={() => { setAuthMethod('OTP'); setErrorMessage(''); }}
+              onClick={() => { setAuthMode('OTP'); setErrorMsg(''); }}
               style={{
-                padding: '9px',
+                flex: 1,
+                padding: '10px 12px',
+                fontSize: '0.85rem',
+                fontWeight: 700,
                 border: 'none',
-                borderRadius: '6px',
-                fontWeight: 600,
-                fontSize: '0.88rem',
-                background: authMethod === 'OTP' ? 'var(--white)' : 'transparent',
-                color: authMethod === 'OTP' ? 'var(--forest)' : 'var(--ink-soft)',
-                boxShadow: authMethod === 'OTP' ? '0 2px 8px rgba(0,0,0,0.06)' : 'none',
+                borderRadius: '9px',
                 cursor: 'pointer',
+                background: authMode === 'OTP' ? '#FFFFFF' : 'transparent',
+                color: authMode === 'OTP' ? '#1C3C27' : '#6B7280',
+                boxShadow: authMode === 'OTP' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
                 transition: 'all 0.2s ease'
               }}
             >
-              Mobile OTP Login
+              SMS OTP Login
             </button>
           </div>
 
-          {/* Feedback Banners */}
-          {errorMessage && (
+          {/* ERROR ALERT BANNER */}
+          {errorMsg && (
             <div 
               style={{
-                background: '#FEE2E2',
+                background: '#FEF2F2',
+                border: '1px solid #FCA5A5',
                 color: '#991B1B',
                 padding: '10px 14px',
                 borderRadius: '8px',
-                fontSize: '0.88rem',
-                marginBottom: '16px',
+                fontSize: '0.85rem',
+                marginBottom: '20px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}
             >
-              <AlertCircle size={16} />
-              <span>{errorMessage}</span>
+              <span>⚠️</span>
+              <span>{errorMsg}</span>
             </div>
           )}
 
-          {successMessage && (
-            <div 
-              style={{
-                background: '#D1FAE5',
-                color: '#065F46',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                fontSize: '0.88rem',
-                marginBottom: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              <CheckCircle2 size={16} />
-              <span>{successMessage}</span>
-            </div>
-          )}
-
-          {/* METHOD 1: CREDENTIALS FORM */}
-          {authMethod === 'CREDENTIALS' ? (
-            <form onSubmit={handleCredentialLogin} className="login-form">
-              {/* Username/Email Input */}
-              <div className="form-group" style={{ marginBottom: '16px' }}>
-                <label className="form-label">Username or Email</label>
-                <div className="input-with-icon">
-                  <User size={18} />
-                  <input 
-                    type="text" 
+          {/* AUTH FORM MODE 1: PASSWORD CREDENTIALS */}
+          {authMode === 'CREDENTIALS' ? (
+            <form onSubmit={handleCredentialsSubmit}>
+              {/* MOBILE PHONE INPUT */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#4B5563', marginBottom: '6px', display: 'block' }}>
+                  Mobile Phone Number
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <Phone size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+                  <input
+                    type="tel"
+                    pattern="[0-9]{10}"
                     required
-                    placeholder="Enter email or username"
-                    className="form-input" 
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="10-digit phone number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    style={{ width: '100%', padding: '12px 14px 12px 42px', fontSize: '0.95rem', borderRadius: '10px', border: '1px solid #D1D5DB', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
-              {/* Password Input */}
-              <div className="form-group" style={{ marginBottom: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                  <label className="form-label" style={{ margin: 0 }}>Password</label>
-                  <a 
-                    href="#forgot" 
-                    onClick={(e) => { e.preventDefault(); alert('Password reset link sent to your registered mobile/email.'); }} 
-                    style={{ fontSize: '0.8rem', color: 'var(--clay)', fontWeight: 500 }}
-                  >
-                    Forgot Password?
-                  </a>
-                </div>
-                <div className="input-with-icon" style={{ position: 'relative' }}>
-                  <Lock size={18} />
-                  <input 
-                    type={showPassword ? 'text' : 'password'} 
+              {/* PASSWORD INPUT */}
+              <div style={{ marginBottom: '18px' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#4B5563', marginBottom: '6px', display: 'block' }}>
+                  Account Password
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <Lock size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
                     required
                     placeholder="Enter password"
-                    className="form-input" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    style={{ paddingRight: '40px' }}
+                    style={{ width: '100%', padding: '12px 42px 12px 42px', fontSize: '0.95rem', borderRadius: '10px', border: '1px solid #D1D5DB', outline: 'none', boxSizing: 'border-box' }}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      color: 'var(--ink-soft)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
+                    style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280' }}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
 
-              {/* Role Radio Selector */}
-              <div className="role-selector" style={{ marginBottom: '16px' }}>
-                <label className="role-option">
-                  <input 
-                    type="radio" 
-                    name="role" 
-                    checked={role === 'ROLE_BUYER'} 
-                    onChange={() => setRole('ROLE_BUYER')} 
-                  />
-                  <span> ग्रामीण ग्राहक (Buyer)</span>
-                </label>
+              {/* FORGOT PASSWORD & REMEMBER ME */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', fontSize: '0.85rem' }}>
+                <a href="#" onClick={(e) => { e.preventDefault(); alert('Password reset link sent to your mobile number.'); }} style={{ color: '#274E32', fontWeight: 700, textDecoration: 'none' }}>
+                  Forgot Password?
+                </a>
 
-                <label className="role-option">
-                  <input 
-                    type="radio" 
-                    name="role" 
-                    checked={role === 'ROLE_HUB_MANAGER'} 
-                    onChange={() => setRole('ROLE_HUB_MANAGER')} 
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4B5563', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    style={{ accentColor: '#274E32' }}
                   />
-                  <span> ग्राम केंद्र (Hub Manager)</span>
+                  Remember Me
                 </label>
               </div>
 
-              {/* Remember Me */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-                <input 
-                  type="checkbox" 
-                  id="remember"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                />
-                <label htmlFor="remember" style={{ fontSize: '0.88rem', color: 'var(--ink-soft)', cursor: 'pointer' }}>
-                  Remember my session on this browser
-                </label>
-              </div>
-
-              <button type="submit" disabled={loading} className="btn-primary btn-block" style={{ padding: '14px' }}>
-                {loading ? 'Authenticating...' : 'Sign In with Credentials'}
+              {/* PRIMARY SUBMIT BUTTON */}
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  fontSize: '1.05rem',
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  background: 'linear-gradient(135deg, #2D5837 0%, #1F3E28 100%)',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 14px rgba(45, 88, 55, 0.3)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                🌿 {loading ? 'Logging in...' : 'Log In'}
               </button>
 
-              {/* Quick Demo Credentials Bar */}
-              <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--line)', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.78rem', color: 'var(--ink-soft)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>
-                  Quick Demo Accounts (1-Click Fill)
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button 
-                    type="button" 
-                    onClick={() => applyPreset('BUYER')}
-                    style={{ flex: 1, padding: '6px 8px', fontSize: '0.8rem', background: 'var(--cream)', border: '1px solid var(--line)', borderRadius: '6px', fontWeight: 500, cursor: 'pointer' }}
-                  >
-                    👤 Demo Buyer
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={() => applyPreset('HUB')}
-                    style={{ flex: 1, padding: '6px 8px', fontSize: '0.8rem', background: 'var(--cream)', border: '1px solid var(--line)', borderRadius: '6px', fontWeight: 500, cursor: 'pointer' }}
-                  >
-                    🏪 Demo Hub Manager
-                  </button>
-                </div>
+              <div style={{ textAlign: 'center', marginTop: '14px' }}>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('OTP')}
+                  style={{ background: 'none', border: 'none', color: '#274E32', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer' }}
+                >
+                  or log in with OTP instead
+                </button>
               </div>
             </form>
           ) : (
-            /* METHOD 2: PHONE & SMS OTP FORM */
-            otpStep === 'PHONE' ? (
-              <form onSubmit={handleRequestOtp} className="login-form">
-                <div className="form-group" style={{ marginBottom: '16px' }}>
-                  <label className="form-label">{t('enterPhone')}</label>
-                  <div className="input-with-icon">
-                    <Phone size={18} />
-                    <input 
-                      type="tel" 
-                      pattern="[0-9]{10}"
-                      required
-                      autoFocus
-                      placeholder="10-digit mobile number"
-                      className="form-input" 
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </div>
-                </div>
+            /* AUTH FORM MODE 2: OTP FORM */
+            <form onSubmit={otpStep === 'PHONE' ? handleRequestOtp : handleVerifyOtp}>
 
-                <div className="role-selector" style={{ marginBottom: '20px' }}>
-                  <label className="role-option">
-                    <input 
-                      type="radio" 
-                      name="role-otp" 
-                      checked={role === 'ROLE_BUYER'} 
-                      onChange={() => setRole('ROLE_BUYER')} 
-                    />
-                    <span>ग्रामीण ग्राहक (Buyer)</span>
-                  </label>
-
-                  <label className="role-option">
-                    <input 
-                      type="radio" 
-                      name="role-otp" 
-                      checked={role === 'ROLE_HUB_MANAGER'} 
-                      onChange={() => setRole('ROLE_HUB_MANAGER')} 
-                    />
-                    <span>ग्राम केंद्र (Hub Manager)</span>
-                  </label>
-                </div>
-
-                <button type="submit" disabled={loading} className="btn-primary btn-block" style={{ padding: '14px' }}>
-                  {loading ? 'Sending SMS...' : t('requestOtp')}
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleVerifyOtp} className="login-form">
-                <div className="form-group" style={{ marginBottom: '16px' }}>
-                  <label className="form-label">{t('enterOtp')} (Demo OTP: 1234)</label>
-                  <div className="input-with-icon">
-                    <KeyRound size={18} />
-                    <input 
-                      type="text" 
-                      pattern="[0-9]{4}"
-                      maxLength={4}
-                      required
-                      autoFocus
-                      className="form-input otp-input" 
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <button type="submit" disabled={loading} className="btn-primary btn-block" style={{ padding: '14px', marginBottom: '12px' }}>
-                  {loading ? 'Verifying...' : t('verifyOtp')}
-                </button>
-
-                <button 
-                  type="button"
-                  onClick={() => setOtpStep('PHONE')}
-                  style={{ width: '100%', background: 'none', border: 'none', color: 'var(--ink-soft)', fontSize: '0.85rem', cursor: 'pointer' }}
+              {/* SMS NOTIFICATION TOAST CARD */}
+              {smsNotification && (
+                <div
+                  onClick={fillOtpFromSms}
+                  style={{
+                    background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
+                    color: '#F8FAFC',
+                    padding: '12px 14px',
+                    borderRadius: '10px',
+                    marginBottom: '16px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
                 >
-                  ← Change Mobile Number
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <MessageSquare size={16} color="#38BDF8" />
+                    <div>
+                      <div style={{ fontSize: '0.7rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>
+                        📱 SMS NOTIFICATION GATEWAY
+                      </div>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFF' }}>
+                        OTP Code: <span style={{ color: '#38BDF8', letterSpacing: '2px' }}>{smsNotification.code}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); fillOtpFromSms(); }}
+                    style={{
+                      background: copiedCode ? '#16A34A' : '#2563EB',
+                      color: '#FFF',
+                      border: 'none',
+                      padding: '5px 10px',
+                      borderRadius: '6px',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {copiedCode ? 'Filled!' : 'Auto-fill'}
+                  </button>
+                </div>
+              )}
+
+              {otpStep === 'PHONE' ? (
+                <div>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#4B5563', marginBottom: '8px', display: 'block' }}>
+                    Enter 10-Digit Mobile Number
+                  </label>
+                  <div style={{ position: 'relative', marginBottom: '20px' }}>
+                    <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', fontWeight: 700, color: '#274E32' }}>
+                      🇮🇳 +91
+                    </span>
+                    <input
+                      type="tel"
+                      pattern="[0-9]{10}"
+                      maxLength={10}
+                      required
+                      placeholder="Enter mobile number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                      style={{ width: '100%', padding: '12px 14px 12px 75px', fontSize: '1rem', fontWeight: 700, borderRadius: '10px', border: '1px solid #D1D5DB', outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <button type="submit" disabled={loading} style={{ width: '100%', padding: '14px', fontSize: '1.05rem', fontWeight: 700, color: '#FFF', background: '#274E32', border: 'none', borderRadius: '10px', cursor: 'pointer' }}>
+                    {loading ? 'Sending OTP...' : 'Send OTP'}
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#4B5563', marginBottom: '10px', display: 'block', textAlign: 'center' }}>
+                    Enter 4-Digit Verification Code
+                  </label>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '14px' }}>
+                    {otpDigits.map((digit, idx) => (
+                      <input
+                        key={idx}
+                        ref={digitRefs[idx]}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) => handleDigitChange(idx, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(idx, e)}
+                        style={{ width: '50px', height: '56px', fontSize: '1.5rem', fontWeight: 800, textAlign: 'center', borderRadius: '10px', border: digit ? '2px solid #274E32' : '1px solid #D1D5DB', outline: 'none' }}
+                      />
+                    ))}
+                  </div>
+
+                  <button type="submit" disabled={loading || otpDigits.join('').length < 4} style={{ width: '100%', padding: '14px', fontSize: '1.05rem', fontWeight: 700, color: '#FFF', background: '#274E32', border: 'none', borderRadius: '10px', cursor: 'pointer', opacity: otpDigits.join('').length < 4 ? 0.6 : 1 }}>
+                    {loading ? 'Verifying...' : 'Verify OTP & Sign In'}
+                  </button>
+                </div>
+              )}
+
+              <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('CREDENTIALS')}
+                  style={{ background: 'none', border: 'none', color: '#274E32', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer' }}
+                >
+                  Log in with Password instead
                 </button>
-              </form>
-            )
+              </div>
+            </form>
           )}
+
+          {/* QUICK 1-CLICK DEMO LOGINS SECTION */}
+          <div style={{ background: '#FAF7F2', borderRadius: '16px', padding: '18px 16px', border: '1px solid #EAE4D8', marginTop: '24px', marginBottom: '24px' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'center', marginBottom: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+              ⚡ QUICK 1-CLICK DEMO LOGINS
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              {/* BUYER DEMO CARD */}
+              <div style={{ background: '#F0F7F3', borderRadius: '12px', padding: '14px', border: '1px solid #C8E6D3', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#274E32', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
+                      <ShoppingBag size={14} />
+                    </div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#1C3C27' }}>Buyer Demo</div>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#6B7280', lineHeight: 1.3, marginBottom: '12px' }}>
+                    Experience shopping as a buyer
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('ROLE_BUYER')}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    color: '#FFFFFF',
+                    background: '#274E32',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Login as Buyer
+                </button>
+              </div>
+
+              {/* MANAGER DEMO CARD */}
+              <div style={{ background: '#FDF7E7', borderRadius: '12px', padding: '14px', border: '1px solid #F3E3B8', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#C48B3F', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
+                      <User size={14} />
+                    </div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#92400E' }}>Manager Demo</div>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#6B7280', lineHeight: 1.3, marginBottom: '12px' }}>
+                    Manage products & orders efficiently
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('ROLE_HUB_MANAGER')}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    color: '#FFFFFF',
+                    background: '#C48B3F',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Login as Manager
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* SECURITY FOOTER DISCLAIMER */}
+          <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+            <ShieldCheck size={14} color="#10B981" />
+            <span>Your account is protected with secure encryption</span>
+          </div>
+
         </div>
       </div>
       <Footer />
     </div>
   );
 };
-

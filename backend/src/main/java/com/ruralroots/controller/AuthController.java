@@ -20,8 +20,8 @@ public class AuthController {
 
     @PostMapping("/request-otp")
     public ResponseEntity<Map<String, String>> requestOtp(@Valid @RequestBody AuthRequestDTO request) {
-        String msg = authService.requestOtp(request);
-        return ResponseEntity.ok(Map.of("message", msg, "status", "SUCCESS"));
+        Map<String, String> result = authService.requestOtp(request);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/verify-otp")
