@@ -5,8 +5,9 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import { VoiceSearch } from './VoiceSearch';
-import { Heart, ShoppingBag, User, LogOut, ChevronDown, Layers, ArrowRight } from 'lucide-react';
+import { Heart, ShoppingBag, User, LogOut, ChevronDown, Layers, ArrowRight, Camera } from 'lucide-react';
 import { SignOutModal } from './SignOutModal';
+import { VisualSearchModal } from './VisualSearchModal';
 
 const CATEGORIES_LIST = [
   { id: 'pottery', name: 'Pottery & Terracotta', icon: '🏺', desc: 'Handpainted Vases, Bowls & Clayware' },
@@ -28,6 +29,8 @@ export const Navbar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [showVisualSearchModal, setShowVisualSearchModal] = useState(false);
+  const [visualImagePreview, setVisualImagePreview] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const totalCartCount = items.reduce((sum, i) => sum + i.quantity, 0);
@@ -62,6 +65,11 @@ export const Navbar: React.FC = () => {
     navigate(`/shop?search=${encodeURIComponent(text)}`);
   };
 
+  const handleVisualSearchResult = (category: string, imagePreviewUrl: string) => {
+    setVisualImagePreview(imagePreviewUrl);
+    navigate(`/shop?cat=${encodeURIComponent(category)}`);
+  };
+
   const handleCategorySelect = (catId: string) => {
     setShowCategoryDropdown(false);
     navigate(`/shop?cat=${catId}`);
@@ -82,7 +90,7 @@ export const Navbar: React.FC = () => {
             </div>
           </Link>
 
-          {/* Search Bar with Voice Input Integration */}
+          {/* Search Bar with Voice Input & Camera Visual Search Integration */}
           <form className="search-bar" onSubmit={handleSearchSubmit} style={{ display: 'flex', alignItems: 'center' }}>
             <input 
               type="text" 
@@ -91,7 +99,33 @@ export const Navbar: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               aria-label="Search"
             />
-            <div style={{ paddingRight: '4px', display: 'flex', alignItems: 'center' }}>
+            {visualImagePreview && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--cream)', padding: '2px 6px', borderRadius: '4px', margin: '0 4px' }}>
+                <img src={visualImagePreview} alt="Visual search" style={{ width: '22px', height: '22px', borderRadius: '4px', objectFit: 'cover' }} />
+                <button type="button" onClick={() => setVisualImagePreview(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, fontSize: '10px' }}>✕</button>
+              </div>
+            )}
+            <div style={{ paddingRight: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <button
+                type="button"
+                onClick={() => setShowVisualSearchModal(true)}
+                title="Visual Search with Camera or Gallery Photo"
+                aria-label="Visual Search"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--forest)',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  transition: 'background 0.2s ease'
+                }}
+              >
+                <Camera size={18} />
+              </button>
               <VoiceSearch onResult={handleVoiceSearchResult} />
             </div>
             <button type="submit" aria-label="Search">🔍</button>
@@ -262,7 +296,7 @@ export const Navbar: React.FC = () => {
             <li><Link to="/" className={isActive('/') ? 'active' : ''}>Home</Link></li>
             <li><Link to="/shop" className={isActive('/shop') ? 'active' : ''}>Shop</Link></li>
             <li><Link to="/artisans" className={isActive('/artisans') ? 'active' : ''}>Artisans</Link></li>
-            <li><Link to="/track-order" className={isActive('/track-order') ? 'active' : ''}>Track Order</Link></li>
+            <li><Link to="/my-orders" className={isActive('/my-orders') || isActive('/track-order') ? 'active' : ''}>My Orders</Link></li>
             {user && <li><Link to="/profile" className={isActive('/profile') ? 'active' : ''}>My Profile</Link></li>}
             <li><Link to="/our-story" className={isActive('/our-story') ? 'active' : ''}>{t('ourStory')}</Link></li>
             <li><Link to="/blog" className={isActive('/blog') ? 'active' : ''}>{t('blog')}</Link></li>
@@ -270,6 +304,13 @@ export const Navbar: React.FC = () => {
           </ul>
         </div>
       </nav>
+
+      {/* VISUAL SEARCH CAMERA / GALLERY MODAL */}
+      <VisualSearchModal
+        isOpen={showVisualSearchModal}
+        onClose={() => setShowVisualSearchModal(false)}
+        onSearchImage={handleVisualSearchResult}
+      />
 
       {/* SIGN OUT CONFIRMATION MODAL */}
       <SignOutModal

@@ -51,6 +51,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <Link to={`/product/${product.id}`}>
           <h4>{title}</h4>
         </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '4px 0 6px', fontSize: '0.8rem' }}>
+          <span style={{ color: '#F59E0B', fontWeight: 700 }}>★ 4.8</span>
+          <span style={{ color: 'var(--ink-soft)' }}>(24 reviews)</span>
+        </div>
         <div className="price">₹{Number(product.basePrice).toLocaleString('en-IN')}</div>
         
         <button 

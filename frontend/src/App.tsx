@@ -22,7 +22,7 @@ import { OrderSuccess } from './pages/OrderSuccess';
 import { HubDashboard } from './pages/HubDashboard';
 import { Login } from './pages/Login';
 import { Profile } from './pages/Profile';
-import { TrackOrder } from './pages/TrackOrder';
+import { MyOrders } from './pages/MyOrders';
 
 export const App: React.FC = () => {
   return (
@@ -52,7 +52,8 @@ export const App: React.FC = () => {
                       <Route path="/hub-dashboard" element={<HubDashboard />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/profile" element={<Profile />} />
-                      <Route path="/track-order" element={<TrackOrder />} />
+                      <Route path="/my-orders" element={<MyOrders />} />
+                      <Route path="/track-order" element={<MyOrders />} />
                     </Routes>
                   </main>
                 </div>
