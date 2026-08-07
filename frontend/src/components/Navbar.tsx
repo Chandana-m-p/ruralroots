@@ -7,15 +7,15 @@ import { useLanguage } from '../context/LanguageContext';
 import { VoiceSearch } from './VoiceSearch';
 import { ImageSearch } from './ImageSearch';
 import { SignOutModal } from './SignOutModal';
-import { 
-  ShoppingBag, 
-  Heart, 
-  User as UserIcon, 
-  Menu, 
-  X, 
-  ChevronDown, 
-  Search, 
-  Mic, 
+import {
+  ShoppingBag,
+  Heart,
+  User as UserIcon,
+  Menu,
+  X,
+  ChevronDown,
+  Search,
+  Mic,
   LogOut,
   SlidersHorizontal,
   Package,
@@ -92,9 +92,9 @@ export const Navbar: React.FC = () => {
 
           {/* Search Bar with Voice Input & Camera Visual Search */}
           <form className="search-bar" onSubmit={handleSearchSubmit} style={{ display: 'flex', alignItems: 'center' }}>
-            <input 
-              type="text" 
-              placeholder="Search handmade products..." 
+            <input
+              type="text"
+              placeholder="Search handmade products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               aria-label="Search"
@@ -110,9 +110,9 @@ export const Navbar: React.FC = () => {
           <div className="topbar-actions">
             {/* Language Dropdown Selector */}
             <div className="lang-select-wrapper" style={{ position: 'relative' }}>
-              <select 
-                className="lang-select" 
-                value={lang} 
+              <select
+                className="lang-select"
+                value={lang}
                 onChange={(e) => setLang(e.target.value as any)}
                 style={{ background: 'transparent', border: '1px solid var(--line)', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer' }}
               >
@@ -162,7 +162,7 @@ export const Navbar: React.FC = () => {
                 </button>
 
                 {showUserDropdown && (
-                  <div 
+                  <div
                     style={{
                       position: 'absolute',
                       right: 0,
@@ -177,17 +177,17 @@ export const Navbar: React.FC = () => {
                     }}
                   >
                     <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--line)', fontSize: '0.8rem', color: 'var(--ink-soft)' }}>
-                      Signed in as<br/><strong>{user.phoneNumber}</strong>
+                      Signed in as<br /><strong>{user.phoneNumber}</strong>
                     </div>
-                    <Link 
-                      to="/my-orders" 
+                    <Link
+                      to="/my-orders"
                       onClick={() => setShowUserDropdown(false)}
                       style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', color: 'var(--ink)', textDecoration: 'none', fontSize: '0.88rem' }}
                     >
                       <Package size={16} /> {t('myOrders')}
                     </Link>
-                    <Link 
-                      to="/admin" 
+                    <Link
+                      to="/admin"
                       onClick={() => setShowUserDropdown(false)}
                       style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', color: 'var(--ink)', textDecoration: 'none', fontSize: '0.88rem' }}
                     >
@@ -220,8 +220,8 @@ export const Navbar: React.FC = () => {
                 )}
               </div>
             ) : (
-              <Link 
-                to="/login" 
+              <Link
+                to="/login"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -245,7 +245,7 @@ export const Navbar: React.FC = () => {
       {/* Main Navigation Bar */}
       <nav className="navbar">
         <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          
+
           {/* Artisanal Categories Dropdown */}
           <div ref={categoryDropdownRef} style={{ position: 'relative' }}>
             <button
@@ -272,7 +272,7 @@ export const Navbar: React.FC = () => {
             </button>
 
             {showCategoryDropdown && (
-              <div 
+              <div
                 style={{
                   position: 'absolute',
                   top: '110%',
