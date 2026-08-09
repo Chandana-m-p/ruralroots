@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Footer } from '../components/Footer';
 import { OrderDetailsData } from '../components/OrderDetailsModal';
 import { db } from '../db';
+import orderService from '../services/orderService';
 
 export const MyOrders: React.FC = () => {
   const { t } = useLanguage();
@@ -75,35 +76,58 @@ export const MyOrders: React.FC = () => {
     }
   };
 
-  // Load orders from IndexedDB pendingOrders + defaults
+  // Load orders from backend API & IndexedDB pendingOrders + defaults
   useEffect(() => {
     async function loadOrders() {
       try {
+        const backendOrders = await orderService.getMyOrders();
         const localSyncList = await db.pendingOrders.toArray();
-        const converted: OrderDetailsData[] = localSyncList.map((item) => {
-          return {
-            id: item.id || Date.now(),
-            orderNumber: `RR-${Math.floor(100000 + Math.random() * 900000)}`,
-            idempotencyKey: item.idempotencyKey,
-            buyerName: 'Valued Rural Customer',
-            buyerPhone: item.buyerPhone || '9876543210',
-            hubName: item.hubName || 'Ramgarh Central Kendra',
-            hubLandmark: 'Near Village Square',
-            orderStatus: item.syncStatus === 'SYNCED' ? 'DELIVERED' : 'CONFIRMED',
-            paymentType: item.paymentType || 'COD (Cash on Delivery)',
-            totalAmount: item.totalAmount || 899,
-            syncedAt: item.offlineCreatedAt ? new Date(item.offlineCreatedAt).toLocaleString() : 'Recent Order',
-            items: (item.items || []).map((it) => ({
-              productId: it.productId,
-              title: it.productTitle,
-              quantity: it.quantity,
-              unitPrice: it.unitPrice,
-              thumbnailUrl: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80'
-            }))
-          };
-        });
 
-        const initialList = [...converted, ...Object.values(sampleOrdersDatabase)];
+        const convertedBackend: OrderDetailsData[] = backendOrders.map((ord) => ({
+          id: ord.id,
+          orderNumber: ord.orderNumber,
+          idempotencyKey: ord.idempotencyKey,
+          buyerName: ord.buyerName || 'Valued Buyer',
+          buyerPhone: ord.buyerPhone,
+          hubId: ord.hubId,
+          hubName: ord.hubName,
+          hubLandmark: ord.hubLandmark,
+          orderStatus: ord.orderStatus,
+          paymentType: ord.paymentType,
+          paymentStatus: ord.paymentStatus,
+          totalAmount: ord.totalAmount,
+          syncedAt: ord.syncedAt ? new Date(ord.syncedAt).toLocaleString() : 'Synced',
+          items: (ord.items || []).map((it) => ({
+            productId: it.productId,
+            title: it.productTitle,
+            quantity: it.quantity,
+            unitPrice: it.unitPrice,
+            thumbnailUrl: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80'
+          }))
+        }));
+
+        const convertedLocal: OrderDetailsData[] = localSyncList.map((item) => ({
+          id: item.id || Date.now(),
+          orderNumber: `RR-${Math.floor(100000 + Math.random() * 900000)}`,
+          idempotencyKey: item.idempotencyKey,
+          buyerName: 'Valued Rural Customer',
+          buyerPhone: item.buyerPhone || '9876543210',
+          hubName: item.hubName || 'Ramgarh Central Kendra',
+          hubLandmark: 'Near Village Square',
+          orderStatus: item.syncStatus === 'SYNCED' ? 'DELIVERED' : 'CONFIRMED',
+          paymentType: item.paymentType || 'COD (Cash on Delivery)',
+          totalAmount: item.totalAmount || 899,
+          syncedAt: item.offlineCreatedAt ? new Date(item.offlineCreatedAt).toLocaleString() : 'Recent Order',
+          items: (item.items || []).map((it) => ({
+            productId: it.productId,
+            title: it.productTitle,
+            quantity: it.quantity,
+            unitPrice: it.unitPrice,
+            thumbnailUrl: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80'
+          }))
+        }));
+
+        const initialList = [...convertedBackend, ...convertedLocal, ...Object.values(sampleOrdersDatabase)];
         setHistoryOrders(initialList);
 
         if (initialNum && sampleOrdersDatabase[initialNum]) {
@@ -113,7 +137,7 @@ export const MyOrders: React.FC = () => {
           setOrderQuery(initialList[0].orderNumber);
         }
       } catch (err) {
-        console.warn('Failed reading Dexie orders:', err);
+        console.warn('Error reading orders:', err);
         setHistoryOrders(Object.values(sampleOrdersDatabase));
       }
     }

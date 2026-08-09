@@ -1,4 +1,6 @@
 import { db, LocalProduct } from '../db';
+import productService from './productService';
+import hubService from './hubService';
 
 const API_BASE = '/api/v1';
 
@@ -188,89 +190,11 @@ export function getProductCategory(p: LocalProduct): string {
 }
 
 export async function fetchProducts(): Promise<LocalProduct[]> {
-  try {
-    const res = await fetch(`${API_BASE}/products`);
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        await db.products.clear();
-        const productsToStore: LocalProduct[] = data.map((p: any) => ({
-          id: p.id,
-          sku: p.sku,
-          category: p.category || getProductCategory(p),
-          titleI18n: typeof p.titleI18n === 'object' ? JSON.stringify(p.titleI18n) : p.titleI18n,
-          descriptionI18n: typeof p.descriptionI18n === 'object' ? JSON.stringify(p.descriptionI18n) : p.descriptionI18n,
-          basePrice: p.basePrice,
-          stockQuantity: p.stockQuantity,
-          thumbnailUrl: p.thumbnailUrl,
-          imagesJson: typeof p.imagesJson === 'object' ? JSON.stringify(p.imagesJson) : (p.imagesJson || '[]'),
-          isActive: p.isActive
-        }));
-        await db.products.bulkPut(productsToStore);
-        return productsToStore;
-      }
-    }
-  } catch (err) {
-    console.warn('Network error fetching products, reading from Dexie IndexedDB local cache:', err);
-  }
-
-  // Fallback to local Dexie IndexedDB
-  const cached = await db.products.toArray();
-  if (cached.length > 0) {
-    let needsUpdate = false;
-    const updated = cached.map((p) => {
-      const cat = getProductCategory(p);
-      if (p.category !== cat) {
-        needsUpdate = true;
-        return { ...p, category: cat };
-      }
-      return p;
-    });
-    if (needsUpdate) {
-      await db.products.bulkPut(updated);
-    }
-    return updated;
-  }
-
-  // Cache fallback products into Dexie IndexedDB if DB is empty
-  await db.products.bulkPut(FALLBACK_PRODUCTS);
-  return FALLBACK_PRODUCTS;
+  return await productService.getAllProducts();
 }
 
 export async function fetchHubs() {
-  try {
-    const res = await fetch(`${API_BASE}/hubs`);
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch (err) {
-    console.warn('Network error fetching hubs, using cached fallback');
-  }
-
-  return [
-    {
-      id: 1,
-      hubCode: 'HUB-RAMGARH-01',
-      hubName: 'Ramgarh Central Kendra (Kalyan Store)',
-      pincode: '452001',
-      villageName: 'Ramgarh',
-      district: 'Indore',
-      state: 'Madhya Pradesh',
-      landmark: 'Near Panchayat Bhawan',
-      operatesCod: true
-    },
-    {
-      id: 2,
-      hubCode: 'HUB-CHANDAN-02',
-      hubName: 'Chandanpur Rural Hub (Gupta General)',
-      pincode: '452002',
-      villageName: 'Chandanpur',
-      district: 'Indore',
-      state: 'Madhya Pradesh',
-      landmark: 'Opposite Bus Stand',
-      operatesCod: true
-    }
-  ];
+  return await hubService.getAllHubs();
 }
 
 export async function fetchMyOrders(token: string) {

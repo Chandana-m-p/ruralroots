@@ -1,6 +1,7 @@
-import { db, LocalPendingOrder } from '../db';
+import { db } from '../db';
+import orderService from './orderService';
 
-export async function syncPendingOrders(token: string): Promise<number> {
+export async function syncPendingOrders(token?: string): Promise<number> {
   const queuedOrders = await db.pendingOrders.where('syncStatus').equals('QUEUED').toArray();
   if (queuedOrders.length === 0) return 0;
 
@@ -16,26 +17,17 @@ export async function syncPendingOrders(token: string): Promise<number> {
         offlineCreatedAt: order.offlineCreatedAt,
         items: order.items.map(i => ({
           productId: i.productId,
+          productTitle: i.productTitle,
           quantity: i.quantity,
           unitPrice: i.unitPrice
         }))
       };
 
-      const res = await fetch('/api/v1/orders/sync', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (res.ok || res.status === 201) {
-        if (order.id) {
-          await db.pendingOrders.update(order.id, { syncStatus: 'SYNCED' });
-        }
-        syncedCount++;
+      await orderService.syncOrder(payload);
+      if (order.id) {
+        await db.pendingOrders.update(order.id, { syncStatus: 'SYNCED' });
       }
+      syncedCount++;
     } catch (err) {
       console.warn('Sync failed for order idempotency key:', order.idempotencyKey, err);
     }
