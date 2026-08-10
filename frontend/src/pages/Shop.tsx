@@ -99,15 +99,7 @@ export const Shop: React.FC = () => {
     const prodCategory = getProductCategory(product).toLowerCase();
     const targetCat = catId.toLowerCase();
 
-    if (prodCategory === targetCat) return true;
-
-    if (targetCat === 'electronics' && (prodCategory === 'electronics' || prodCategory.includes('elec') || prodCategory.includes('tech'))) return true;
-    if (targetCat === 'appliances' && (prodCategory === 'appliances' || prodCategory.includes('appliance') || prodCategory.includes('kitchen') || prodCategory.includes('living'))) return true;
-    if (targetCat === 'clothing' && (prodCategory === 'clothing' || prodCategory.includes('cloth') || prodCategory.includes('apparel'))) return true;
-    if (targetCat === 'food' && (prodCategory === 'food' || prodCategory.includes('food') || prodCategory.includes('grocery'))) return true;
-    if (targetCat === 'healthcare' && (prodCategory === 'healthcare' || prodCategory.includes('health') || prodCategory.includes('wellness'))) return true;
-
-    return false;
+    return prodCategory === targetCat;
   };
 
   const categoriesWithCounts: CategoryOption[] = CATEGORIES.map((cat) => {

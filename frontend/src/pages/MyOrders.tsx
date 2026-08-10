@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Footer } from '../components/Footer';
 import { WriteReviewModal } from '../components/WriteReviewModal';
+import { CustomerServiceModal, ServiceMode } from '../components/CustomerServiceModal';
 import { 
   PackageCheck, 
   PackageX, 
@@ -17,10 +18,11 @@ import {
   AlertTriangle,
   XCircle,
   ChevronRight,
-  Star
+  Star,
+  RotateCcw
 } from 'lucide-react';
 
-export type OrderStatusType = 'Delivered Successfully' | 'Delivered Unsuccessfully' | 'Cancelled';
+export type OrderStatusType = 'Delivered Successfully' | 'Delivered Unsuccessfully' | 'Cancelled' | 'Return Requested' | 'Exchange Requested' | 'Returned';
 
 export interface OrderItemDetail {
   productId: number;
@@ -131,6 +133,19 @@ export const MyOrders: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [reviewModalState, setReviewModalState] = useState<{ productId: number; productTitle: string; orderId: number } | null>(null);
+  const [serviceModalState, setServiceModalState] = useState<{
+    orderId: number;
+    orderNumber: string;
+    productId?: number;
+    productTitle?: string;
+    mode: ServiceMode;
+  } | null>(null);
+
+  const [inlineFormKey, setInlineFormKey] = useState<string | null>(null);
+  const [inlineType, setInlineType] = useState<'RETURN' | 'EXCHANGE'>('RETURN');
+  const [inlineReason, setInlineReason] = useState<string>('DAMAGED_IN_TRANSIT');
+  const [inlineComment, setInlineComment] = useState<string>('');
+  const [inlineSubmitting, setInlineSubmitting] = useState(false);
 
   const fetchUserOrders = async () => {
     setLoading(true);
@@ -196,11 +211,25 @@ export const MyOrders: React.FC = () => {
             <span>{t('deliveredUnsuccessfulBadge')}</span>
           </span>
         );
-      case 'Cancelled':
+      case 'Returned':
         return (
-          <span className="order-status-pill status-cancelled">
-            <XCircle size={15} />
-            <span>{t('cancelledBadge')}</span>
+          <span className="order-status-pill" style={{ background: '#F3E8FF', color: '#6B21A8', border: '1px solid #E9D5FF', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <RotateCcw size={15} />
+            <span>Returned</span>
+          </span>
+        );
+      case 'Return Requested':
+        return (
+          <span className="order-status-pill" style={{ background: '#FEF3C7', color: '#B45309', border: '1px solid #FCD34D', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <RotateCcw size={15} />
+            <span>Return Requested</span>
+          </span>
+        );
+      case 'Exchange Requested':
+        return (
+          <span className="order-status-pill" style={{ background: '#E0E7FF', color: '#3730A3', border: '1px solid #C7D2FE', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <RefreshCw size={15} />
+            <span>Exchange Requested</span>
           </span>
         );
       default:
@@ -281,6 +310,15 @@ export const MyOrders: React.FC = () => {
             <XCircle size={16} style={{ color: '#f59e0b' }} />
             <span>{t('cancelledFilter').replace('{{count}}', String(orders.filter(o => o.orderStatus === 'Cancelled').length))}</span>
           </button>
+
+          <button
+            type="button"
+            className={`orders-tab ${filterStatus === 'Returned' ? 'active' : ''}`}
+            onClick={() => setFilterStatus('Returned')}
+          >
+            <RotateCcw size={16} style={{ color: '#8b5cf6' }} />
+            <span>Returned ({orders.filter(o => o.orderStatus === 'Returned').length})</span>
+          </button>
         </div>
 
         {loading ? (
@@ -337,13 +375,135 @@ export const MyOrders: React.FC = () => {
                                 {t('qtyLabel').replace('{{qty}}', String(item.quantity)).replace('{{price}}', itemPrice.toLocaleString('en-IN'))}
                               </div>
                               {order.orderStatus === 'Delivered Successfully' && (
+                                <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
+                                  <button
+                                    type="button"
+                                    className="btn btn-outline btn-sm"
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', padding: '3px 8px' }}
+                                    onClick={() => setReviewModalState({ productId: item.productId, productTitle: title, orderId: order.id })}
+                                  >
+                                    <Star size={13} color="#F59E0B" fill="#F59E0B" /> Write Review
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-outline btn-sm"
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', padding: '3px 8px', color: 'var(--forest)' }}
+                                    onClick={() => {
+                                      const key = `${order.id}-${item.productId}`;
+                                      setInlineFormKey((prev) => (prev === key ? null : key));
+                                    }}
+                                  >
+                                    <RotateCcw size={13} /> {inlineFormKey === `${order.id}-${item.productId}` ? 'Hide Return/Exchange' : 'Return / Exchange'}
+                                  </button>
+                                </div>
+                              )}
+
+                              {inlineFormKey === `${order.id}-${item.productId}` && (
+                                <div style={{ marginTop: '12px', background: 'var(--cream)', border: '1.5px solid var(--forest)', padding: '14px', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                  <div style={{ fontWeight: 700, fontSize: '0.84rem', color: 'var(--forest-dark)' }}>
+                                    Direct Return / Exchange Form
+                                  </div>
+                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                    <button
+                                      type="button"
+                                      onClick={() => setInlineType('RETURN')}
+                                      style={{
+                                        padding: '6px 10px',
+                                        fontSize: '0.8rem',
+                                        fontWeight: 700,
+                                        borderRadius: '6px',
+                                        border: inlineType === 'RETURN' ? '2px solid var(--forest)' : '1px solid var(--line)',
+                                        background: inlineType === 'RETURN' ? 'var(--cream-2)' : '#fff',
+                                        color: inlineType === 'RETURN' ? 'var(--forest)' : 'var(--ink)',
+                                        cursor: 'pointer'
+                                      }}
+                                    >
+                                      ↩️ Return for Refund
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setInlineType('EXCHANGE')}
+                                      style={{
+                                        padding: '6px 10px',
+                                        fontSize: '0.8rem',
+                                        fontWeight: 700,
+                                        borderRadius: '6px',
+                                        border: inlineType === 'EXCHANGE' ? '2px solid var(--forest)' : '1px solid var(--line)',
+                                        background: inlineType === 'EXCHANGE' ? 'var(--cream-2)' : '#fff',
+                                        color: inlineType === 'EXCHANGE' ? 'var(--forest)' : 'var(--ink)',
+                                        cursor: 'pointer'
+                                      }}
+                                    >
+                                      🔄 Exchange Item
+                                    </button>
+                                  </div>
+
+                                  <div>
+                                    <label style={{ fontSize: '0.78rem', fontWeight: 700, display: 'block', marginBottom: '4px' }}>
+                                      Mandatory Reason *
+                                    </label>
+                                    <select
+                                      value={inlineReason}
+                                      onChange={(e) => setInlineReason(e.target.value)}
+                                      style={{ width: '100%', padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--line)', fontSize: '0.82rem', background: '#fff' }}
+                                    >
+                                      <option value="DAMAGED_IN_TRANSIT">Product damaged or broken during transit</option>
+                                      <option value="DEFECTIVE_OR_NON_FUNCTIONAL">Product defective, cracked, or non-functional</option>
+                                      <option value="ITEM_NOT_AS_DESCRIBED">Item differs significantly from photos/description</option>
+                                      <option value="WRONG_ITEM_DELIVERED">Received wrong item or size</option>
+                                      <option value="QUALITY_DISSATISFACTION">Dissatisfied with material quality</option>
+                                    </select>
+                                  </div>
+
+                                  <div>
+                                    <label style={{ fontSize: '0.78rem', fontWeight: 700, display: 'block', marginBottom: '4px' }}>
+                                      Detailed Remarks *
+                                    </label>
+                                    <textarea
+                                      rows={2}
+                                      value={inlineComment}
+                                      onChange={(e) => setInlineComment(e.target.value)}
+                                      placeholder="Describe reason for return/exchange..."
+                                      style={{ width: '100%', padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--line)', fontSize: '0.82rem', background: '#fff' }}
+                                    />
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    className="btn btn-primary btn-sm"
+                                    style={{ alignSelf: 'flex-start', padding: '6px 14px', fontSize: '0.8rem', borderRadius: '6px' }}
+                                    disabled={inlineSubmitting}
+                                    onClick={async () => {
+                                      setInlineSubmitting(true);
+                                      const nextStatus = inlineType === 'EXCHANGE' ? 'Exchange Requested' : 'Returned';
+                                      setOrders((prev) =>
+                                        prev.map((o) => (o.id === order.id ? { ...o, orderStatus: nextStatus } : o))
+                                      );
+                                      setInlineFormKey(null);
+                                      setInlineComment('');
+                                      setInlineSubmitting(false);
+                                    }}
+                                  >
+                                    {inlineSubmitting ? 'Submitting...' : 'Submit Request'}
+                                  </button>
+                                </div>
+                              )}
+                              {order.orderStatus !== 'Delivered Successfully' && order.orderStatus !== 'Cancelled' && (
                                 <button
                                   type="button"
                                   className="btn btn-outline btn-sm"
-                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', padding: '3px 8px', marginTop: '6px' }}
-                                  onClick={() => setReviewModalState({ productId: item.productId, productTitle: title, orderId: order.id })}
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', padding: '3px 8px', marginTop: '6px', color: '#dc2626', borderColor: '#fca5a5' }}
+                                  onClick={() =>
+                                    setServiceModalState({
+                                      orderId: order.id,
+                                      orderNumber: order.orderNumber,
+                                      productId: item.productId,
+                                      productTitle: title,
+                                      mode: 'CANCELLATION'
+                                    })
+                                  }
                                 >
-                                  <Star size={13} color="#F59E0B" fill="#F59E0B" /> Write Review
+                                  <PackageX size={13} /> Cancel Order
                                 </button>
                               )}
                             </div>
@@ -400,6 +560,7 @@ export const MyOrders: React.FC = () => {
                         <option value="Delivered Successfully">🟢 {t('deliveredSuccessFilter').replace(' ({{count}})', '')}</option>
                         <option value="Delivered Unsuccessfully">🔴 {t('deliveredUnsuccessfulBadge')}</option>
                         <option value="Cancelled">🟡 {t('cancelledBadge')}</option>
+                        <option value="Returned">🟣 Returned</option>
                       </select>
                     </div>
 
@@ -420,6 +581,26 @@ export const MyOrders: React.FC = () => {
           orderId={reviewModalState.orderId}
           onClose={() => setReviewModalState(null)}
           onSuccess={() => {
+            fetchUserOrders();
+          }}
+        />
+      )}
+
+      {serviceModalState && (
+        <CustomerServiceModal
+          isOpen={true}
+          onClose={() => setServiceModalState(null)}
+          orderId={serviceModalState.orderId}
+          orderNumber={serviceModalState.orderNumber}
+          productId={serviceModalState.productId}
+          productTitle={serviceModalState.productTitle}
+          mode={serviceModalState.mode}
+          onSuccess={(reqType) => {
+            const nextStatus: OrderStatusType =
+              reqType === 'CANCELLATION' ? 'Cancelled' : reqType === 'EXCHANGE' ? 'Exchange Requested' : 'Returned';
+            setOrders((prev) =>
+              prev.map((o) => (o.id === serviceModalState.orderId ? { ...o, orderStatus: nextStatus } : o))
+            );
             fetchUserOrders();
           }}
         />

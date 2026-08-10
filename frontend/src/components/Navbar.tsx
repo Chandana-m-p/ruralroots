@@ -180,13 +180,6 @@ export const Navbar: React.FC = () => {
                       Signed in as<br /><strong>{user.phoneNumber}</strong>
                     </div>
                     <Link
-                      to="/my-orders"
-                      onClick={() => setShowUserDropdown(false)}
-                      style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', color: 'var(--ink)', textDecoration: 'none', fontSize: '0.88rem' }}
-                    >
-                      <Package size={16} /> {t('myOrders')}
-                    </Link>
-                    <Link
                       to="/admin"
                       onClick={() => setShowUserDropdown(false)}
                       style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', color: 'var(--ink)', textDecoration: 'none', fontSize: '0.88rem' }}
@@ -353,7 +346,6 @@ export const Navbar: React.FC = () => {
 
           <ul className="nav-links">
             <li><Link to="/" className={isActive('/') ? 'active' : ''}>{t('home')}</Link></li>
-            <li><Link to="/admin" className={isActive('/admin') ? 'active' : ''}>{t('adminPortal')}</Link></li>
             <li><Link to="/shop" className={isActive('/shop') ? 'active' : ''}>{t('shop')}</Link></li>
             <li><Link to="/my-orders" className={isActive('/my-orders') ? 'active' : ''}>{t('myOrders')}</Link></li>
             <li><Link to="/artisans" className={isActive('/artisans') ? 'active' : ''}>{t('artisans')}</Link></li>

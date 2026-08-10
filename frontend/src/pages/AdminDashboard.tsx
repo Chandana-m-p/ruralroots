@@ -34,6 +34,8 @@ export const AdminDashboard: React.FC = () => {
   const [selectedArtisanModal, setSelectedArtisanModal] = useState<any>(null);
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [actionSuccessBanner, setActionSuccessBanner] = useState('');
+  const [adminEmail, setAdminEmail] = useState('admin@ruralroots.in');
+  const [cacheInterval, setCacheInterval] = useState('5 minutes (Default)');
 
   // Top Selling Rural Product Categories
   const [topCategories] = useState([
@@ -1224,17 +1226,31 @@ export const AdminDashboard: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
                   <label style={{ fontSize: '0.85rem', fontWeight: 700, display: 'block', marginBottom: '6px' }}>Chief Administrator Email</label>
-                  <input type="text" readOnly value="admin@ruralroots.in" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #D1D5DB', background: '#F9FAFB' }} />
+                  <input
+                    type="email"
+                    value={adminEmail}
+                    onChange={(e) => setAdminEmail(e.target.value)}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #D1D5DB' }}
+                  />
                 </div>
                 <div>
                   <label style={{ fontSize: '0.85rem', fontWeight: 700, display: 'block', marginBottom: '6px' }}>PWA Offline Cache Refresh Interval</label>
-                  <select style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #D1D5DB' }}>
-                    <option>5 minutes (Default)</option>
-                    <option>15 minutes</option>
-                    <option>30 minutes</option>
+                  <select
+                    value={cacheInterval}
+                    onChange={(e) => setCacheInterval(e.target.value)}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #D1D5DB' }}
+                  >
+                    <option value="5 minutes (Default)">5 minutes (Default)</option>
+                    <option value="15 minutes">15 minutes</option>
+                    <option value="30 minutes">30 minutes</option>
                   </select>
                 </div>
-                <button onClick={() => showActionToast('System settings saved successfully.')} className="btn-primary" style={{ padding: '12px', borderRadius: '8px', fontWeight: 700 }}>
+                <button
+                  type="button"
+                  onClick={() => showActionToast(`System settings updated: Cache Interval (${cacheInterval}).`)}
+                  className="btn-primary"
+                  style={{ padding: '12px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
+                >
                   Save Platform Settings
                 </button>
               </div>

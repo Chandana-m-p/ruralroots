@@ -38,7 +38,7 @@ VALUES
   '{"en": "Intricately carved wooden box made from sustainably sourced solid Sheesham wood.", "hi": "टिकाऊ शीशम की लकड़ी से बना जटिल नक्काशीदार लकड़ी का डिब्बा।"}', 
   1150.00, 30, 'https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=400&q=80', '["https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=800&q=80"]', true, 0),
 
-(5, 'ART-STOLE-01', 'decor',
+(5, 'ART-STOLE-01', 'clothing',
   '{"en": "Handwoven Organic Cotton Stole", "hi": "हाथ से बुना ऑर्गेनिक कॉटन स्टोल", "mr": "हातने विणलेली सेंद्रिय सुती शाल", "gu": "હાથથી વણેલું ઓર્ગેનિક કોટન સ્ટોલ"}', 
   '{"en": "Lightweight breathable stole woven on traditional pit looms using natural vegetable dyes.", "hi": "प्राकृतिक वनस्पति रंगों का उपयोग करके पारंपरिक खड्ड करघे पर बुना गया हल्का शॉल।"}', 
   1299.00, 40, 'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=400&q=80', '["https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=800&q=80"]', true, 0),
@@ -73,7 +73,7 @@ VALUES
   '{"en": "Ancient lost-wax cast brass elephant figurine handcrafted by Dhokra metal artisans of Chhattisgarh.", "hi": "छत्तीसगढ़ के ढोकरा धातु कारीगरों द्वारा हस्तनिर्मित पीतल का हाथी।"}',
   1650.00, 15, 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=400&q=80', '["https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=800&q=80"]', true, 0),
 
-(12, 'ART-JUTTI-01', 'jewelry',
+(12, 'ART-JUTTI-01', 'clothing',
   '{"en": "Handcrafted Embroidered Leather Mojari", "hi": "हस्तनिर्मित कढ़ाईदार चमड़े की मोजरी", "mr": "हातने बनवलेली नक्षीदार कातडी मोजडी", "gu": "હાથથી બનાવેલી એમ્બ્રોયડરી વાળી ચામડાની મોજડી"}',
   '{"en": "Traditional Rajasthani ethnic leather jutti embroidered with silk threads and mirrors.", "hi": "रेशम के धागों और शीशों से कढ़ी हुई पारंपरिक राजस्थानी एथनिक लेदर जूती।"}',
   999.00, 35, 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80', '["https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800&q=80"]', true, 0),
@@ -86,4 +86,34 @@ VALUES
 (14, 'ART-SCROLL-01', 'decor',
   '{"en": "Odisha Pattachitra Palm Leaf Scroll", "hi": "ओडिशा पट्टचित्र ताड़ के पत्ते की स्क्रॉल चित्रकारी", "mr": "ओडिशा पट्टचित्र ताडाच्या पानांचे स्क्रोल चित्र", "gu": "ઓડિશા પટ્ટાચિત્ર તાળના પાંદડાની સ્ક્ર્રોલ ચિત્રકળા"}',
   '{"en": "Intricate mythology story carved and painted on seasoned palm leaves by Raghurajpur artisans.", "hi": "रघुराजपुर के कारीगरों द्वारा ताड़ के पत्तों पर उकेरी गई और चित्रित की गई पौराणिक कहानी।"}',
-  2100.00, 10, 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&q=80', '["https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&q=80"]', true, 0);
+  2100.00, 10, 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&q=80', '["https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&q=80"]', true, 0),
+
+(15, 'ART-BRASS-02', 'appliances',
+  '{"en": "Hand-Hammered Kansa Bronze Thali Set", "hi": "हाथ से निर्मित कांसा थाली सेट", "mr": "हातने बनवलेला कांस्य ताट संच", "gu": "હાથથી બનાવેલ કાંસાની થાળી સેટ", "kn": "ಹಸ್ತನಿರ್ಮಿತ ಕಂಚಿನ ಊಟದ ತಟ್ಟೆ ಸೆಟ್"}',
+  '{"en": "Traditional 5-piece hand-hammered Kansa bell metal dinner set crafted by hereditary coppersmiths of Odisha.", "hi": "ओडिशा के कारीगरों द्वारा पारंपरिक 5-पीस हस्तनिर्मित कांसा थाली सेट।"}',
+  2499.00, 25, 'https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?w=400&q=80', '["https://images.unsplash.com/photo-1615486511484-92e172cc4fe0?w=800&q=80"]', true, 0),
+
+(16, 'ART-CLOTH-04', 'clothing',
+  '{"en": "Hand-Tied Kutch Bandhani Silk Dupatta", "hi": "हाथ से बंधाई कच्ची बांधनी सिल्क दुपट्टा", "mr": "हातने बांधलेली कच्छी बांधणी रेशमी शाल", "gu": "હાથથી બાંધેલું કચ્છ બાંધણી સિલ્ક દુપટ્ટો", "kn": "ಕೈಯಿಂದ ಕಟ್ಟಿದ ಕಚ್ ಬಾಂದಿನಿ ರೇಷ್ಮೆ ದುಪಟ್ಟಾ"}',
+  '{"en": "Vibrant pure silk dupatta with fine hand-tied tie-dye knots created by women artisans of Kutch.", "hi": "कच्छ की महिला कारीगरों द्वारा हस्तनिर्मित बंधाई और रंगाई के साथ जीवंत शुद्ध रेशमी दुपट्टा।"}',
+  1850.00, 35, 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&q=80', '["https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80"]', true, 0),
+
+(17, 'ART-FOOD-03', 'food',
+  '{"en": "Kachi Ghani Cold-Pressed Mustard Oil", "hi": "काची घानी कच्चा सरसों का तेल", "mr": "लाकडी घाण्याचे लाकूड दाबलेले मोहरीचे तेल", "gu": "કાચી ઘાણી શુદ્ધ રાઈનું તેલ", "kn": "ಕಚ್ಚಾ ಗಾಣದ ಸಾಸಿವೆ ಎಣ್ಣೆ"}',
+  '{"en": "Pure 100% unrefined cold-pressed mustard oil extracted using traditional wooden ghani mills in rural Rajasthan.", "hi": "पारंपरिक लकड़ी की घानी से निकाला गया 100% शुद्ध अपरिष्कृत सरसों का तेल।"}',
+  349.00, 150, 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&q=80', '["https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=80"]', true, 0),
+
+(18, 'ART-TOYS-02', 'wood',
+  '{"en": "Kondapalli Wooden Bullock Cart Toy", "hi": "कोंडापल्ली लकड़ी की बैलगाड़ी खिलौना", "mr": "कोंडापल्ली लाकडी बैलगाडीचे खेळणे", "gu": "કોંડાપલ્લી લાકડાની બળદગાડી રમકડું", "kn": "ಹಸ್ತನಿರ್ಮಿತ ಕೊಂಡಪಲ್ಲಿ ಮರದ ಎತ್ತಿನ ಬಂಡಿ"}',
+  '{"en": "Traditional eco-friendly wooden bullock cart toy painted with non-toxic vegetable colors by Kondapalli artisans.", "hi": "गैर-विषैले वनस्पति रंगों से पेंट की गई पारंपरिक लकड़ी की बैलगाड़ी का खिलौना।"}',
+  799.00, 40, 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=400&q=80', '["https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=800&q=80"]', true, 0),
+
+(19, 'ART-HEALTH-03', 'healthcare',
+  '{"en": "Organic Khus Vetiver Soap Bar Set", "hi": "जैविक खस हर्बल स्नान साबुन सेट", "mr": "सेंद्रिय वाळा हर्बल आंघोळीचा साबण सेट", "gu": "ઓર્ગેનિક વાળા હર્બલ સાબુ સેટ", "kn": "ಸಾವಯವ ಬಿಳಿಚಿಕು ನೈಸರ್ಗಿಕ ಸ್ನಾನದ ಸಾಬೂನು"}',
+  '{"en": "Set of 3 cold-processed coconut & vetiver root soaps hand-blended by women self-help groups.", "hi": "महिला स्वयं सहायता समूहों द्वारा हस्तनिर्मित नारियल और खस की जड़ से बने हर्बल साबुन।"}',
+  299.00, 100, 'https://images.unsplash.com/photo-1607006344380-b6775a0824a7?w=400&q=80', '["https://images.unsplash.com/photo-1607006344380-b6775a0824a7?w=800&q=80"]', true, 0),
+
+(20, 'ART-DECOR-02', 'decor',
+  '{"en": "Natural Braided Jute Floor Runner Rug", "hi": "प्राकृतिक बुना हुआ जूट फ्लोर रनर", "mr": "न नैसर्गिक ज्यूटचा मॅट रनर", "gu": "કુદરતી ક્ષણની મેટ રનર", "kn": "ನೈಸರ್ಗಿಕ ಸೆಣಬಿನ ನೆಲದ ಹಾಸು"}',
+  '{"en": "Eco-friendly natural jute floor runner rug braided on traditional handlooms for rustic home interiors.", "hi": "देसी घरेलू सजावट के लिए पारंपरिक हथकरघे पर बुना गया प्राकृतिक जूट फ्लोर रनर।"}',
+  1399.00, 30, 'https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=400&q=80', '["https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=800&q=80"]', true, 0);

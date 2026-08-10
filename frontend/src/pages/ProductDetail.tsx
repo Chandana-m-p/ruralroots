@@ -18,22 +18,57 @@ export const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<LocalProduct | null>(null);
   const [qty, setQty] = useState(1);
   const [selectedImage, setSelectedImage] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchProducts().then((list) => {
-      const found = list.find((p) => String(p.id) === String(id));
-      if (found) {
-        setProduct(found);
-        setSelectedImage(found.thumbnailUrl);
-      } else if (list.length > 0) {
-        setProduct(list[0]);
-        setSelectedImage(list[0].thumbnailUrl);
-      }
-    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setLoading(true);
+    setError(null);
+
+    fetchProducts()
+      .then((list) => {
+        const found = list.find((p) => String(p.id) === String(id));
+        if (found) {
+          setProduct(found);
+          setSelectedImage(found.thumbnailUrl);
+        } else if (list.length > 0) {
+          setProduct(list[0]);
+          setSelectedImage(list[0].thumbnailUrl);
+        } else {
+          setError('Product not found in catalog.');
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch product detail:', err);
+        setError('Unable to load product details. Please check your network connection.');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [id]);
 
-  if (!product) {
-    return <div className="container" style={{ padding: '40px 0' }}>Loading product details...</div>;
+  if (loading) {
+    return (
+      <div className="container" style={{ padding: '60px 0', textAlign: 'center' }}>
+        <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--forest)' }}>
+          🌱 Loading artisanal product details...
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="container" style={{ padding: '60px 0', textAlign: 'center' }}>
+        <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#dc2626', marginBottom: '16px' }}>
+          {error || 'Product Not Found'}
+        </div>
+        <button className="btn btn-primary" onClick={() => navigate('/shop')}>
+          Back to Shop Catalog
+        </button>
+      </div>
+    );
   }
 
   const title = getLocalizedTitle(product.titleI18n);

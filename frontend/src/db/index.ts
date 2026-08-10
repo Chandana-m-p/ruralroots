@@ -61,11 +61,26 @@ export interface LocalReview {
   mediaList: Array<{ mediaType: string; url: string }>;
 }
 
+export interface LocalAddress {
+  id?: number;
+  remoteId?: number;
+  label: string;
+  fullName: string;
+  phoneNumber: string;
+  addressLine: string;
+  villageOrCity: string;
+  district: string;
+  state: string;
+  pincode: string;
+  isDefault: boolean;
+}
+
 export class RuralRootsDB extends Dexie {
   products!: Table<LocalProduct>;
   pendingOrders!: Table<LocalPendingOrder>;
   userSession!: Table<LocalUserSession>;
   reviews!: Table<LocalReview>;
+  userAddresses!: Table<LocalAddress>;
 
   constructor() {
     super('RuralRootsDB');
@@ -74,6 +89,13 @@ export class RuralRootsDB extends Dexie {
       pendingOrders: '++id, idempotencyKey, syncStatus',
       userSession: 'key',
       reviews: '++id, productId, orderId'
+    });
+    this.version(3).stores({
+      products: 'id, sku, isActive',
+      pendingOrders: '++id, idempotencyKey, syncStatus',
+      userSession: 'key',
+      reviews: '++id, productId, orderId',
+      userAddresses: '++id, remoteId, isDefault'
     });
   }
 }

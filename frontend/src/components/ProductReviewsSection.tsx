@@ -14,6 +14,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
   const [loading, setLoading] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [votedHelpful, setVotedHelpful] = useState<Record<number, boolean>>({});
+  const [activeLightboxUrl, setActiveLightboxUrl] = useState<string | null>(null);
 
   const loadData = () => {
     setLoading(true);
@@ -41,12 +42,10 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
     return <div style={{ padding: '24px 0', color: 'var(--ink-soft)' }}>Loading buyer feedback...</div>;
   }
 
-  const avgScore = summary?.averageRating || 4.9;
-  const totalCount = summary?.totalReviews || reviews.length;
+  const avgScore = Number(summary?.averageRating ?? 4.9);
+  const totalCount = Number(summary?.totalReviews ?? reviews.length);
   const dist = summary?.ratingDistribution || { 5: totalCount, 4: 0, 3: 0, 2: 0, 1: 0 };
   const attrs = summary?.attributeAverages || { quality: 4.9, material_authenticity: 4.8, value_for_money: 4.7 };
-
-  const [activeLightboxUrl, setActiveLightboxUrl] = useState<string | null>(null);
 
   return (
     <div className="product-reviews-section" style={{ marginTop: '40px', paddingTop: '32px', borderTop: '1px solid var(--line)' }}>
@@ -86,15 +85,15 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
         {/* Rating Score */}
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderRight: '1px solid var(--line)', paddingRight: '16px' }}>
           <span style={{ fontSize: '3.2rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: 'var(--forest-dark)', lineHeight: 1 }}>
-            {avgScore.toFixed(1)}
+            {Number(avgScore || 0).toFixed(1)}
           </span>
           <div style={{ display: 'flex', gap: '4px', margin: '8px 0' }}>
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
                 size={20}
-                color={star <= Math.round(avgScore) ? '#F59E0B' : '#CBD5E1'}
-                fill={star <= Math.round(avgScore) ? '#F59E0B' : 'transparent'}
+                color={star <= Math.round(Number(avgScore || 0)) ? '#F59E0B' : '#CBD5E1'}
+                fill={star <= Math.round(Number(avgScore || 0)) ? '#F59E0B' : 'transparent'}
               />
             ))}
           </div>
@@ -106,7 +105,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
         {/* Rating Bars */}
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '6px' }}>
           {[5, 4, 3, 2, 1].map((stars) => {
-            const count = dist[stars] || 0;
+            const count = Number(dist[stars] || 0);
             const pct = totalCount > 0 ? (count / totalCount) * 100 : 0;
             return (
               <div key={stars} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem' }}>
@@ -127,24 +126,26 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
             <span>🎨 Craftsmanship</span>
-            <span style={{ fontWeight: 700, color: '#2F5233' }}>{(attrs.quality || 4.9).toFixed(1)} / 5</span>
+            <span style={{ fontWeight: 700, color: '#2F5233' }}>{Number(attrs.quality ?? 4.9).toFixed(1)} / 5</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
             <span>🌿 Material Authenticity</span>
-            <span style={{ fontWeight: 700, color: '#059669' }}>{(attrs.material_authenticity || 4.8).toFixed(1)} / 5</span>
+            <span style={{ fontWeight: 700, color: '#059669' }}>{Number(attrs.material_authenticity ?? 4.8).toFixed(1)} / 5</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
             <span>💰 Value for Money</span>
-            <span style={{ fontWeight: 700, color: '#D97706' }}>{(attrs.value_for_money || 4.7).toFixed(1)} / 5</span>
+            <span style={{ fontWeight: 700, color: '#D97706' }}>{Number(attrs.value_for_money ?? 4.7).toFixed(1)} / 5</span>
           </div>
         </div>
       </div>
 
       {/* Review List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {reviews.map((rev) => (
+        {reviews.map((rev) => {
+          const revDate = rev.createdAt && !isNaN(Date.parse(rev.createdAt)) ? new Date(rev.createdAt) : new Date();
+          return (
           <div
-            key={rev.id}
+            key={rev.id || Math.random()}
             style={{
               background: '#ffffff',
               borderRadius: '14px',
@@ -162,8 +163,8 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
                       <Star
                         key={star}
                         size={16}
-                        color={star <= rev.overallRating ? '#F59E0B' : '#CBD5E1'}
-                        fill={star <= rev.overallRating ? '#F59E0B' : 'transparent'}
+                        color={star <= Number(rev.overallRating || 5) ? '#F59E0B' : '#CBD5E1'}
+                        fill={star <= Number(rev.overallRating || 5) ? '#F59E0B' : 'transparent'}
                       />
                     ))}
                   </div>
@@ -172,7 +173,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
                   <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{rev.buyerName || 'Verified Buyer'}</span>
                   <span>•</span>
-                  <span>{new Date(rev.createdAt || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <span>{revDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                 </div>
               </div>
 
@@ -249,7 +250,8 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
               </button>
             </div>
           </div>
-        ))}
+        );
+        })}
       </div>
 
       {showModal && (

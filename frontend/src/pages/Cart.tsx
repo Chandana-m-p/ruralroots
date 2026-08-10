@@ -44,13 +44,17 @@ export const Cart: React.FC = () => {
                 return (
                   <div key={product.id} className="cart-item">
                     <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                      <img 
-                        src={product.thumbnailUrl} 
-                        alt={title} 
-                        style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px' }} 
-                      />
+                      <Link to={`/product/${product.id}`}>
+                        <img 
+                          src={product.thumbnailUrl} 
+                          alt={title} 
+                          style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer' }} 
+                        />
+                      </Link>
                       <div>
-                        <h4 style={{ margin: 0, fontSize: '1rem' }}>{title}</h4>
+                        <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'var(--ink)' }}>
+                          <h4 style={{ margin: 0, fontSize: '1rem' }}>{title}</h4>
+                        </Link>
                         <div className="meta" style={{ color: 'var(--ink-soft)', fontSize: '0.85rem', marginTop: '4px' }}>
                           Price: ₹{Number(product.basePrice).toLocaleString('en-IN')}
                         </div>

@@ -6,8 +6,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { useOffline } from '../context/OfflineContext';
 import { db } from '../db';
 import { syncPendingOrders } from '../services/sync';
-import { fetchHubs } from '../services/api';
-import { Footer } from '../components/Footer';
 import { 
   CreditCard, 
   QrCode, 
@@ -19,6 +17,18 @@ import {
   CheckCircle2, 
   RefreshCw
 } from 'lucide-react';
+import { LocalAddress } from '../db';
+import { Footer } from '../components/Footer';
+import { 
+  fetchHubs, 
+  fetchUserAddresses, 
+  createUserAddress, 
+  updateUserAddress, 
+  deleteUserAddress, 
+  setDefaultUserAddress 
+} from '../services/api';
+import { SavedAddressSelector } from '../components/SavedAddressSelector';
+import { AddressManagerModal } from '../components/AddressManagerModal';
 
 type PaymentMethodType = 'UPI' | 'CARD' | 'NETBANKING' | 'COD';
 type CheckoutStep = 'DETAILS' | 'PAYMENT_PROCEDURE' | 'SUCCESS';
@@ -47,6 +57,12 @@ export const Checkout: React.FC = () => {
   const [address, setAddress] = useState('Gram Panchayat Road, House #42');
   const [pincode, setPincode] = useState('452001');
 
+  // Saved Addresses State
+  const [savedAddresses, setSavedAddresses] = useState<LocalAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | undefined>(undefined);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [addressToEdit, setAddressToEdit] = useState<LocalAddress | null>(null);
+
   // Payment Selection State
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('UPI');
   const [upiId, setUpiId] = useState('9876543210@upi');
@@ -63,6 +79,23 @@ export const Checkout: React.FC = () => {
   // Preserved Order Summary Snapshot (Prevents fallback to static shipping 149 after cart is cleared)
   const [confirmedSummary, setConfirmedSummary] = useState<OrderSummaryState | null>(null);
 
+  const loadAddresses = async () => {
+    const list = await fetchUserAddresses(token || undefined);
+    setSavedAddresses(list);
+    if (list.length > 0) {
+      const defaultAddr = list.find((a) => a.isDefault) || list[0];
+      setSelectedAddressId(defaultAddr.id);
+      applyAddress(defaultAddr);
+    }
+  };
+
+  const applyAddress = (addr: LocalAddress) => {
+    setName(addr.fullName);
+    setPhone(addr.phoneNumber);
+    setAddress(`${addr.addressLine}, ${addr.villageOrCity}, ${addr.district}, ${addr.state}`);
+    setPincode(addr.pincode);
+  };
+
   useEffect(() => {
     fetchHubs().then((data) => {
       setHubs(data);
@@ -70,7 +103,32 @@ export const Checkout: React.FC = () => {
         setSelectedHub(data[0].id);
       }
     });
-  }, []);
+    loadAddresses();
+  }, [token]);
+
+  const handleSelectAddress = (addr: LocalAddress) => {
+    setSelectedAddressId(addr.id);
+    applyAddress(addr);
+  };
+
+  const handleSaveAddress = async (addressData: Omit<LocalAddress, 'id'>, editId?: number) => {
+    if (editId) {
+      await updateUserAddress(editId, addressData, token || undefined);
+    } else {
+      await createUserAddress(addressData, token || undefined);
+    }
+    await loadAddresses();
+  };
+
+  const handleDeleteAddress = async (addressId: number) => {
+    await deleteUserAddress(addressId, token || undefined);
+    await loadAddresses();
+  };
+
+  const handleSetDefaultAddress = async (addressId: number) => {
+    await setDefaultUserAddress(addressId, token || undefined);
+    await loadAddresses();
+  };
 
   // Timer countdown for Payment Procedure step
   useEffect(() => {
@@ -627,8 +685,43 @@ export const Checkout: React.FC = () => {
                   </label>
                 </div>
 
+                {/* Saved Address Selection Component */}
+                {savedAddresses.length > 0 ? (
+                  <SavedAddressSelector
+                    addresses={savedAddresses}
+                    selectedAddressId={selectedAddressId}
+                    onSelectAddress={handleSelectAddress}
+                    onAddNew={() => {
+                      setAddressToEdit(null);
+                      setShowAddressModal(true);
+                    }}
+                    onEdit={(addr) => {
+                      setAddressToEdit(addr);
+                      setShowAddressModal(true);
+                    }}
+                    onDelete={handleDeleteAddress}
+                    onSetDefault={handleSetDefaultAddress}
+                  />
+                ) : (
+                  <div style={{ marginBottom: '16px', background: 'var(--cream-2)', padding: '16px', borderRadius: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontWeight: 600 }}>No Saved Addresses Found</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddressToEdit(null);
+                          setShowAddressModal(true);
+                        }}
+                        style={{ padding: '6px 12px', background: 'var(--forest)', color: 'var(--white)', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}
+                      >
+                        + Add Address
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <label>
-                  Delivery Address / Landmark *
+                  Selected Delivery Address Details / Landmark *
                   <textarea 
                     required 
                     value={address} 
@@ -725,6 +818,17 @@ export const Checkout: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* ADDRESS MANAGER MODAL */}
+      <AddressManagerModal
+        isOpen={showAddressModal}
+        onClose={() => {
+          setShowAddressModal(false);
+          setAddressToEdit(null);
+        }}
+        onSave={handleSaveAddress}
+        editAddress={addressToEdit}
+      />
 
       <Footer />
     </div>
