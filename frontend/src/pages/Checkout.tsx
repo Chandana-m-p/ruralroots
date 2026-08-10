@@ -199,8 +199,13 @@ export const Checkout: React.FC = () => {
     // Store confirmed summary state so Success Page shows accurate total
     setConfirmedSummary(summarySnapshot);
 
+    const orderNumStr = `RR-${Math.floor(100000 + Math.random() * 900000)}`;
+
     const newPendingOrder = {
       idempotencyKey,
+      orderNumber: orderNumStr,
+      orderStatus: 'ORDER_PLACED',
+      deliveryDate: new Date(Date.now() + 3 * 86400000).toISOString(),
       hubId: chosenHubObj ? chosenHubObj.id : 1,
       hubName: chosenHubObj ? chosenHubObj.hubName : 'Ramgarh Central Kendra',
       buyerPhone: phone,

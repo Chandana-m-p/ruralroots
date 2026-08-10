@@ -460,6 +460,8 @@ export async function fetchProducts(): Promise<LocalProduct[]> {
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
+        await db.products.clear();
+        await db.products.bulkAdd(data);
         return data;
       }
     }
@@ -468,11 +470,8 @@ export async function fetchProducts(): Promise<LocalProduct[]> {
   }
 
   // Fallback to local Dexie IndexedDB cache or INITIAL_PRODUCTS
-  const localCount = await db.products.count();
-  if (localCount < INITIAL_PRODUCTS.length) {
-    await db.products.clear();
-    await db.products.bulkAdd(INITIAL_PRODUCTS);
-  }
+  await db.products.clear();
+  await db.products.bulkAdd(INITIAL_PRODUCTS);
   return await db.products.toArray();
 }
 

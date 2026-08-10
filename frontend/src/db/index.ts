@@ -18,6 +18,9 @@ export interface LocalProduct {
 export interface LocalPendingOrder {
   id?: number;
   idempotencyKey: string;
+  orderNumber?: string;
+  orderStatus?: string;
+  deliveryDate?: string;
   hubId: number;
   hubName: string;
   buyerPhone: string;

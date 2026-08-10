@@ -4,6 +4,7 @@ import { Search, Package, MapPin, Truck, CheckCircle2, Clock, XCircle, Printer, 
 import { useLanguage } from '../context/LanguageContext';
 import { Footer } from '../components/Footer';
 import { OrderDetailsModal, OrderDetailsData } from '../components/OrderDetailsModal';
+import { db } from '../db';
 
 export const TrackOrder: React.FC = () => {
   const { t } = useLanguage();
@@ -17,6 +18,56 @@ export const TrackOrder: React.FC = () => {
 
   // Sample Orders Lookup Database
   const sampleOrdersDatabase: Record<string, OrderDetailsData> = {
+    'RR-889101': {
+      id: 1,
+      orderNumber: 'RR-889101',
+      idempotencyKey: 'a1111111-1111-1111-1111-111111111111',
+      buyerName: 'Ananya Sharma',
+      buyerPhone: '9876543210',
+      hubId: 1,
+      hubName: 'Ramgarh Central Kendra (Kalyan Store)',
+      hubLandmark: 'Near Panchayat Bhawan, Ramgarh Village Square',
+      orderStatus: 'DELIVERED',
+      paymentType: 'UPI',
+      paymentStatus: 'PAID',
+      totalAmount: 1150.00,
+      createdAt: '29 Jul 2026, 11:20 AM',
+      syncedAt: '29 Jul 2026, 11:20 AM',
+      items: [
+        {
+          productId: 4,
+          title: 'Carved Sheesham Wooden Jewelry Box',
+          quantity: 1,
+          unitPrice: 1150.00,
+          thumbnailUrl: 'https://images.unsplash.com/photo-1611486212557-88be5ff6f941?w=400&q=80'
+        }
+      ]
+    },
+    'RR-889102': {
+      id: 2,
+      orderNumber: 'RR-889102',
+      idempotencyKey: 'a2222222-2222-2222-2222-222222222222',
+      buyerName: 'Ananya Sharma',
+      buyerPhone: '9876543210',
+      hubId: 1,
+      hubName: 'Ramgarh Central Kendra (Kalyan Store)',
+      hubLandmark: 'Near Panchayat Bhawan, Ramgarh Village Square',
+      orderStatus: 'DELIVERED',
+      paymentType: 'COD (Cash on Delivery)',
+      paymentStatus: 'PAID',
+      totalAmount: 899.00,
+      createdAt: '2 Aug 2026, 04:15 PM',
+      syncedAt: '2 Aug 2026, 04:15 PM',
+      items: [
+        {
+          productId: 1,
+          title: 'Handpainted Terracotta Vase',
+          quantity: 1,
+          unitPrice: 899.00,
+          thumbnailUrl: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80'
+        }
+      ]
+    },
     'RR-889123': {
       id: 101,
       orderNumber: 'RR-889123',
@@ -26,11 +77,12 @@ export const TrackOrder: React.FC = () => {
       hubId: 1,
       hubName: 'Ramgarh Central Kendra (Kalyan Store)',
       hubLandmark: 'Near Panchayat Bhawan, Ramgarh Village Square',
-      orderStatus: 'CONFIRMED',
+      orderStatus: 'ORDER_PLACED',
       paymentType: 'COD (Cash on Delivery)',
       paymentStatus: 'PENDING_HANDOVER',
       totalAmount: 1598.00,
-      syncedAt: 'Today, 10:15 AM',
+      createdAt: '10 Aug 2026, 10:15 AM',
+      syncedAt: '10 Aug 2026, 10:15 AM',
       items: [
         {
           productId: 1,
@@ -61,7 +113,8 @@ export const TrackOrder: React.FC = () => {
       paymentType: 'COD (Cash on Delivery)',
       paymentStatus: 'PAID_IN_CASH',
       totalAmount: 1150.00,
-      syncedAt: '2 Aug 2026, 03:40 PM',
+      createdAt: '25 Jul 2026, 02:30 PM',
+      syncedAt: '25 Jul 2026, 02:30 PM',
       items: [
         {
           productId: 4,
@@ -74,7 +127,7 @@ export const TrackOrder: React.FC = () => {
     }
   };
 
-  const handleSearch = (e?: React.FormEvent) => {
+  const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const clean = orderQuery.trim().toUpperCase();
     if (!clean) return;
@@ -82,36 +135,72 @@ export const TrackOrder: React.FC = () => {
     setSearching(true);
     setNotFound(false);
 
-    setTimeout(() => {
-      if (sampleOrdersDatabase[clean]) {
-        setSearchedOrder(sampleOrdersDatabase[clean]);
-      } else {
-        // Dynamic fallback order object for demo query
-        setSearchedOrder({
-          id: Date.now(),
-          orderNumber: clean,
-          idempotencyKey: 'c7d8e9f0-1234-5678-90ab-cdef12345678',
-          buyerName: 'Valued Rural Buyer',
-          buyerPhone: '9876543210',
-          hubName: 'Nearest Village Hub Store',
-          hubLandmark: 'Local Village Main Square',
-          orderStatus: 'DISPATCHED',
-          paymentType: 'COD (Cash on Delivery)',
-          totalAmount: 799.00,
-          syncedAt: 'Recent Order',
-          items: [
-            {
-              productId: 5,
-              title: 'Handcrafted Rural Product',
-              quantity: 1,
-              unitPrice: 799.00,
-              thumbnailUrl: 'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=400&q=80'
-            }
-          ]
-        });
-      }
+    if (sampleOrdersDatabase[clean]) {
+      setSearchedOrder(sampleOrdersDatabase[clean]);
       setSearching(false);
-    }, 400);
+      return;
+    }
+
+    try {
+      const pendingList = await db.pendingOrders.toArray();
+      const match = pendingList.find(
+        (po) =>
+          (po.orderNumber && po.orderNumber.toUpperCase() === clean) ||
+          po.idempotencyKey.toUpperCase().includes(clean)
+      );
+
+      if (match) {
+        setSearchedOrder({
+          id: match.id,
+          orderNumber: match.orderNumber || clean,
+          idempotencyKey: match.idempotencyKey,
+          buyerName: 'Valued Rural Buyer',
+          buyerPhone: match.buyerPhone,
+          hubName: match.hubName,
+          hubLandmark: 'Village Kendra Station',
+          orderStatus: match.orderStatus || 'ORDER_PLACED',
+          paymentType: match.paymentType,
+          totalAmount: match.totalAmount,
+          offlineCreatedAt: match.offlineCreatedAt,
+          syncedAt: match.offlineCreatedAt,
+          items: match.items.map((it) => ({
+            productId: it.productId,
+            title: typeof it.productTitle === 'string' ? it.productTitle : 'Handcrafted Product',
+            quantity: it.quantity,
+            unitPrice: it.unitPrice
+          }))
+        });
+        setSearching(false);
+        return;
+      }
+    } catch (err) {
+      console.warn('TrackOrder IndexedDB lookup warning:', err);
+    }
+
+    // Dynamic fallback order object for demo query
+    setSearchedOrder({
+      id: Date.now(),
+      orderNumber: clean,
+      idempotencyKey: 'c7d8e9f0-1234-5678-90ab-cdef12345678',
+      buyerName: 'Valued Rural Buyer',
+      buyerPhone: '9876543210',
+      hubName: 'Nearest Village Hub Store',
+      hubLandmark: 'Local Village Main Square',
+      orderStatus: 'ORDER_PLACED',
+      paymentType: 'COD (Cash on Delivery)',
+      totalAmount: 799.00,
+      syncedAt: 'Just Now',
+      items: [
+        {
+          productId: 5,
+          title: 'Handcrafted Rural Product',
+          quantity: 1,
+          unitPrice: 799.00,
+          thumbnailUrl: 'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=400&q=80'
+        }
+      ]
+    });
+    setSearching(false);
   };
 
   useEffect(() => {

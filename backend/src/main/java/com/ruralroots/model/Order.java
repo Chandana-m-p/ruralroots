@@ -30,7 +30,7 @@ public class Order {
     private VillageHub hub;
 
     @Column(name = "order_status", nullable = false, length = 40)
-    private String orderStatus = "Delivered Successfully";
+    private String orderStatus = "ORDER_PLACED";
 
     @Column(name = "payment_type", nullable = false, length = 20)
     private String paymentType = "COD";
@@ -67,7 +67,7 @@ public class Order {
         this.idempotencyKey = idempotencyKey;
         this.buyer = buyer;
         this.hub = hub;
-        this.orderStatus = orderStatus != null ? orderStatus : "Delivered Successfully";
+        this.orderStatus = orderStatus != null ? orderStatus : "ORDER_PLACED";
         this.paymentType = paymentType != null ? paymentType : "COD";
         this.paymentStatus = paymentStatus != null ? paymentStatus : "UNPAID";
         this.totalAmount = totalAmount;
@@ -89,7 +89,7 @@ public class Order {
         private UUID idempotencyKey;
         private User buyer;
         private VillageHub hub;
-        private String orderStatus = "Delivered Successfully";
+        private String orderStatus = "ORDER_PLACED";
         private String paymentType = "COD";
         private String paymentStatus = "UNPAID";
         private BigDecimal totalAmount;

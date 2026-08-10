@@ -20,13 +20,13 @@ INSERT INTO products (id, sku, category, title_i18n, description_i18n, base_pric
 VALUES (1, 'ART-VASE-01', 'pottery',
   '{"en": "Handpainted Terracotta Vase", "hi": "हाथ से चित्रित टेराकोटा फूलदान", "mr": "हातने रंगवलेले मातीचे भांडे", "gu": "હાથથી ચીતરેલું ટેરાકોટા ફ્લાવરવાઝ", "kn": "ಹಸ್ತಚಿತ್ರಿತ ಟೆರಾಕೋಟಾ ಹೂದಾನಿ"}', 
   '{"en": "Handcrafted terracotta vase painted with traditional tribal motifs by artisans in Rajasthan.", "hi": "राजस्थान के कारीगरों द्वारा पारंपरिक जनजातीय रूपांकनों के साथ चित्रित हस्तनिर्मित टेराकोटा फूलदान।"}', 
-  899.00, 45, 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80', '["https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80"]', true, 0);
+  899.00, 45, 'https://th.bing.com/th/id/OIP.SGR9Tmw2jVoJrOrK2z5q8gHaKi?r=0&o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3', '["https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80"]', true, 0);
 
 INSERT INTO products (id, sku, category, title_i18n, description_i18n, base_price, stock_quantity, thumbnail_url, images_json, is_active, version)
 VALUES (2, 'ART-BASKET-01', 'baskets',
   '{"en": "Handwoven Sabai Grass Basket", "hi": "हाथ से बुनी सबाई घास की टोकरी", "mr": "हातने विणलेली सबाई गवताची टोपली", "gu": "હાથથી વણેલી સબાઈ ઘાસની ટોપલી", "kn": "ಕೈಯಿಂದ ನೇಯ್ದ ಸಬಾಯಿ ಹುಲ್ಲಿನ ಬುಟ್ಟಿ"}', 
   '{"en": "Eco-friendly storage basket handwoven from natural Sabai grass fibers by women artisans.", "hi": "महिला कारीगरों द्वारा प्राकृतिक सबाई घास के रेशों से हाथ से बुनी गई पर्यावरण-अनुकूल टोकरी。"}', 
-  699.00, 60, 'https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=400&q=80', '["https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=800&q=80"]', true, 0);
+  699.00, 60, 'https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=400&q=80', '["https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=800&q=80"]', true, 0);
 
 INSERT INTO products (id, sku, category, title_i18n, description_i18n, base_price, stock_quantity, thumbnail_url, images_json, is_active, version)
 VALUES (3, 'ART-JEWELRY-01', 'jewelry',
@@ -62,7 +62,7 @@ INSERT INTO products (id, sku, category, title_i18n, description_i18n, base_pric
 VALUES (8, 'ART-CUSHION-01', 'decor',
   '{"en": "Hand Block-Printed Cotton Cushion Cover", "hi": "हाथ से ब्लॉक-प्रिंटेड कॉटन कुशन कवर", "mr": "हातने ब्लॉक-प्रिंट केलेले सुती उशीचे कव्हर", "gu": "હાથથી બ્લોક-प्रિન્ટેડ કોટન કુશન કવર"}', 
   '{"en": "Pure cotton cushion cover block-printed by traditional master artisans using natural indigo.", "hi": "प्राकृतिक नील का उपयोग करके पारंपरिक कारीगरों द्वारा ब्लॉक-प्रिंट किया गया शुद्ध सूती कुशन कवर。"}', 
-  399.00, 65, 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80', '["https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=800&q=80"]', true, 0);
+  399.00, 65, 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=400&q=80', '["https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=800&q=80"]', true, 0);
 
 INSERT INTO products (id, sku, category, title_i18n, description_i18n, base_price, stock_quantity, thumbnail_url, images_json, is_active, version)
 VALUES (9, 'ART-PAINTING-01', 'decor',
@@ -110,7 +110,7 @@ INSERT INTO products (id, sku, category, title_i18n, description_i18n, base_pric
 VALUES (16, 'ART-CLOTH-04', 'clothing',
   '{"en": "Hand-Tied Kutch Bandhani Silk Dupatta", "hi": "हाथ से बंधाई कच्ची बांधनी सिल्क दुपट्टा", "mr": "हातने बांधलेली कच्छी बांधणी रेशमी शाल", "gu": "હાથથી બાંધેલું કચ્છ બાંધણી સિલ્ક દુપટ્ટો", "kn": "ಕೈಯಿಂದ ಕಟ್ಟಿದ ಕಚ್ ಬಾಂದಿನಿ ರೇಷ್ಮೆ ದುಪಟ್ಟಾ"}',
   '{"en": "Vibrant pure silk dupatta with fine hand-tied tie-dye knots created by women artisans of Kutch.", "hi": "कच्छ की महिला कारीगरों द्वारा हस्तनिर्मित बंधाई और रंगाई के साथ जीवंत शुद्ध रेशमी दुपट्टा。"}',
-  1850.00, 35, 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&q=80', '["https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80"]', true, 0);
+  1850.00, 35, 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400&q=80', '["https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&q=80"]', true, 0);
 
 INSERT INTO products (id, sku, category, title_i18n, description_i18n, base_price, stock_quantity, thumbnail_url, images_json, is_active, version)
 VALUES (17, 'ART-FOOD-03', 'food',
@@ -122,7 +122,7 @@ INSERT INTO products (id, sku, category, title_i18n, description_i18n, base_pric
 VALUES (18, 'ART-TOYS-02', 'wood',
   '{"en": "Kondapalli Wooden Bullock Cart Toy", "hi": "कोंडापल्ली लकड़ी की बैलगाड़ी खिलौना", "mr": "कोंडापल्ली लाकडी बैलगाडीचे खेळणे", "gu": "કોંડાપલ્લી લાકડાની બળદગાડી રમકડું", "kn": "ಹಸ್ತನಿರ್ಮಿತ ಕೊಂಡಪಲ್ಲಿ ಮರದ ಎತ್ತಿನ ಬಂಡಿ"}',
   '{"en": "Traditional eco-friendly wooden bullock cart toy painted with non-toxic vegetable colors by Kondapalli artisans.", "hi": "गैर-विषैले वनस्पति रंगों से पेंट की गई पारंपरिक लकड़ी की बैलगाड़ी का खिलौना。"}',
-  799.00, 40, 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=400&q=80', '["https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=800&q=80"]', true, 0);
+  799.00, 40, 'https://images.unsplash.com/photo-1560507074-b9eb43faab00?w=400&q=80', '["https://images.unsplash.com/photo-1560507074-b9eb43faab00?w=800&q=80"]', true, 0);
 
 INSERT INTO products (id, sku, category, title_i18n, description_i18n, base_price, stock_quantity, thumbnail_url, images_json, is_active, version)
 VALUES (19, 'ART-HEALTH-03', 'healthcare',
@@ -137,27 +137,42 @@ VALUES (20, 'ART-DECOR-02', 'decor',
   1399.00, 30, 'https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=400&q=80', '["https://images.unsplash.com/photo-1622560481156-01ac25e4c0ac?w=800&q=80"]', true, 0);
 
 -- Seed Orders with required Status Management States:
--- 1. Delivered Successfully
--- 2. Delivered Unsuccessfully
--- 3. Cancelled
+-- Seed Orders with required Status Management States & Staggered Realistic Dates
+-- 1. Delivered Successfully (Purchased 12 days ago, Delivered 9 days ago)
+-- 2. Delivered Successfully (Purchased 8 days ago, Delivered 5 days ago)
+-- 3. Delivered Unsuccessfully (Purchased 5 days ago, Attempted 2 days ago)
+-- 4. Dispatched (Purchased 2 days ago, Delivery expected in 1 day)
+-- 5. Cancelled (Purchased 1 day ago)
 
 INSERT INTO orders (id, order_number, idempotency_key, buyer_id, hub_id, order_status, payment_type, payment_status, total_amount, offline_created_at, synced_at, delivery_date)
-VALUES (1, 'RR-889101', 'a1111111-1111-1111-1111-111111111111', 1, 1, 'Delivered Successfully', 'UPI', 'PAID', 1150.00, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), DATEADD('DAY', -2, CURRENT_TIMESTAMP()));
+VALUES (1, 'RR-889101', 'a1111111-1111-1111-1111-111111111111', 1, 1, 'Delivered Successfully', 'UPI', 'PAID', 1150.00, DATEADD('DAY', -12, CURRENT_TIMESTAMP()), DATEADD('DAY', -12, CURRENT_TIMESTAMP()), DATEADD('DAY', -9, CURRENT_TIMESTAMP()));
 
 INSERT INTO order_items (id, order_id, product_id, quantity, unit_price)
 VALUES (1, 1, 4, 1, 1150.00);
 
 INSERT INTO orders (id, order_number, idempotency_key, buyer_id, hub_id, order_status, payment_type, payment_status, total_amount, offline_created_at, synced_at, delivery_date)
-VALUES (2, 'RR-889102', 'a2222222-2222-2222-2222-222222222222', 1, 1, 'Delivered Unsuccessfully', 'COD', 'UNPAID', 899.00, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), DATEADD('DAY', -1, CURRENT_TIMESTAMP()));
+VALUES (2, 'RR-889102', 'a2222222-2222-2222-2222-222222222222', 1, 1, 'Delivered Successfully', 'COD', 'PAID', 899.00, DATEADD('DAY', -8, CURRENT_TIMESTAMP()), DATEADD('DAY', -8, CURRENT_TIMESTAMP()), DATEADD('DAY', -5, CURRENT_TIMESTAMP()));
 
 INSERT INTO order_items (id, order_id, product_id, quantity, unit_price)
 VALUES (2, 2, 1, 1, 899.00);
 
 INSERT INTO orders (id, order_number, idempotency_key, buyer_id, hub_id, order_status, payment_type, payment_status, total_amount, offline_created_at, synced_at, delivery_date)
-VALUES (3, 'RR-889103', 'a3333333-3333-3333-3333-333333333333', 1, 2, 'Cancelled', 'CARD', 'REFUNDED', 699.00, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), DATEADD('DAY', 0, CURRENT_TIMESTAMP()));
+VALUES (3, 'RR-889103', 'a3333333-3333-3333-3333-333333333333', 1, 2, 'Delivered Unsuccessfully', 'COD', 'UNPAID', 699.00, DATEADD('DAY', -5, CURRENT_TIMESTAMP()), DATEADD('DAY', -5, CURRENT_TIMESTAMP()), DATEADD('DAY', -2, CURRENT_TIMESTAMP()));
 
 INSERT INTO order_items (id, order_id, product_id, quantity, unit_price)
 VALUES (3, 3, 2, 1, 699.00);
+
+INSERT INTO orders (id, order_number, idempotency_key, buyer_id, hub_id, order_status, payment_type, payment_status, total_amount, offline_created_at, synced_at, delivery_date)
+VALUES (4, 'RR-889104', 'a4444444-4444-4444-4444-444444444444', 1, 1, 'DISPATCHED', 'UPI', 'PAID', 1299.00, DATEADD('DAY', -2, CURRENT_TIMESTAMP()), DATEADD('DAY', -2, CURRENT_TIMESTAMP()), DATEADD('DAY', 1, CURRENT_TIMESTAMP()));
+
+INSERT INTO order_items (id, order_id, product_id, quantity, unit_price)
+VALUES (4, 4, 5, 1, 1299.00);
+
+INSERT INTO orders (id, order_number, idempotency_key, buyer_id, hub_id, order_status, payment_type, payment_status, total_amount, offline_created_at, synced_at, delivery_date)
+VALUES (5, 'RR-889105', 'a5555555-5555-5555-5555-555555555555', 1, 2, 'Cancelled', 'CARD', 'REFUNDED', 450.00, DATEADD('DAY', -1, CURRENT_TIMESTAMP()), DATEADD('DAY', -1, CURRENT_TIMESTAMP()), DATEADD('DAY', 2, CURRENT_TIMESTAMP()));
+
+INSERT INTO order_items (id, order_id, product_id, quantity, unit_price)
+VALUES (5, 5, 3, 1, 450.00);
 
 -- Seed Verified Post-Purchase Reviews
 INSERT INTO product_reviews (id, product_id, order_id, buyer_id, buyer_name, overall_rating, title, comment, is_verified_purchase, helpful_votes, status, created_at)

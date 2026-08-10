@@ -5,6 +5,8 @@ import { useLanguage } from '../context/LanguageContext';
 import { Footer } from '../components/Footer';
 import { WriteReviewModal } from '../components/WriteReviewModal';
 import { CustomerServiceModal, ServiceMode } from '../components/CustomerServiceModal';
+import { OrderDetailsModal, OrderDetailsData } from '../components/OrderDetailsModal';
+import { db } from '../db';
 import { 
   PackageCheck, 
   PackageX, 
@@ -19,10 +21,30 @@ import {
   XCircle,
   ChevronRight,
   Star,
-  RotateCcw
+  RotateCcw,
+  Truck,
+  Clock,
+  MapPin,
+  Eye
 } from 'lucide-react';
 
-export type OrderStatusType = 'Delivered Successfully' | 'Delivered Unsuccessfully' | 'Cancelled' | 'Return Requested' | 'Exchange Requested' | 'Returned';
+export type OrderStatusType = 
+  | 'ORDER_PLACED' 
+  | 'Order Placed' 
+  | 'DISPATCHED' 
+  | 'Dispatched' 
+  | 'IN_TRANSIT' 
+  | 'In Transit' 
+  | 'READY_FOR_PICKUP' 
+  | 'Ready for Pickup' 
+  | 'Delivered Successfully' 
+  | 'DELIVERED' 
+  | 'Delivered Unsuccessfully' 
+  | 'Cancelled' 
+  | 'CANCELLED' 
+  | 'Return Requested' 
+  | 'Exchange Requested' 
+  | 'Returned';
 
 export interface OrderItemDetail {
   productId: number;
@@ -62,9 +84,9 @@ const FALLBACK_DEMO_ORDERS: OrderEntry[] = [
     paymentType: 'UPI',
     paymentStatus: 'PAID',
     totalAmount: 1150.00,
-    offlineCreatedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
-    syncedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
-    deliveryDate: new Date(Date.now() - 1 * 86400000).toISOString(),
+    offlineCreatedAt: new Date(Date.now() - 12 * 86400000).toISOString(),
+    syncedAt: new Date(Date.now() - 12 * 86400000).toISOString(),
+    deliveryDate: new Date(Date.now() - 9 * 86400000).toISOString(),
     items: [
       {
         productId: 4,
@@ -82,13 +104,13 @@ const FALLBACK_DEMO_ORDERS: OrderEntry[] = [
     buyerName: 'Ananya Sharma',
     hubName: 'Ramgarh Central Kendra (Kalyan Store)',
     hubLandmark: 'Near Panchayat Bhawan',
-    orderStatus: 'Delivered Unsuccessfully',
+    orderStatus: 'Delivered Successfully',
     paymentType: 'COD',
-    paymentStatus: 'UNPAID',
+    paymentStatus: 'PAID',
     totalAmount: 899.00,
-    offlineCreatedAt: new Date(Date.now() - 5 * 86400000).toISOString(),
-    syncedAt: new Date(Date.now() - 5 * 86400000).toISOString(),
-    deliveryDate: new Date(Date.now() - 2 * 86400000).toISOString(),
+    offlineCreatedAt: new Date(Date.now() - 8 * 86400000).toISOString(),
+    syncedAt: new Date(Date.now() - 8 * 86400000).toISOString(),
+    deliveryDate: new Date(Date.now() - 5 * 86400000).toISOString(),
     items: [
       {
         productId: 1,
@@ -106,19 +128,67 @@ const FALLBACK_DEMO_ORDERS: OrderEntry[] = [
     buyerName: 'Ananya Sharma',
     hubName: 'Chandanpur Rural Hub (Gupta General)',
     hubLandmark: 'Opposite Bus Stand',
-    orderStatus: 'Cancelled',
+    orderStatus: 'Delivered Unsuccessfully',
     paymentType: 'COD',
     paymentStatus: 'UNPAID',
     totalAmount: 699.00,
-    offlineCreatedAt: new Date(Date.now() - 7 * 86400000).toISOString(),
-    syncedAt: new Date(Date.now() - 7 * 86400000).toISOString(),
-    deliveryDate: new Date(Date.now() - 4 * 86400000).toISOString(),
+    offlineCreatedAt: new Date(Date.now() - 5 * 86400000).toISOString(),
+    syncedAt: new Date(Date.now() - 5 * 86400000).toISOString(),
+    deliveryDate: new Date(Date.now() - 2 * 86400000).toISOString(),
     items: [
       {
         productId: 2,
-        productTitle: '{"en": "Handwoven Sabai Grass Basket", "hi": "हाथ से बुनी सबाई घास की टोकरी", "kn": "ಕೈಯಿಂದ ನೇಯ್ದ ಸಬಾಯಿ ಹುಲ್ಲಿನ ಬುಟ್ಟಿ"}',
+        productTitle: '{"en": "Handwoven Sabai Grass Basket", "hi": "हाथ से बुनी सबाई घास की टोकरी", "kn": "ಕೈयಿಂದ ನೇಯ್ದ ಸಬಾಯಿ ಹುಲ್ಲಿನ ಬುಟ್ಟಿ"}',
         quantity: 1,
         unitPrice: 699.00
+      }
+    ]
+  },
+  {
+    id: 4,
+    orderNumber: 'RR-889104',
+    idempotencyKey: 'a4444444-4444-4444-4444-444444444444',
+    buyerPhone: '9876543210',
+    buyerName: 'Ananya Sharma',
+    hubName: 'Ramgarh Central Kendra (Kalyan Store)',
+    hubLandmark: 'Near Panchayat Bhawan',
+    orderStatus: 'DISPATCHED',
+    paymentType: 'UPI',
+    paymentStatus: 'PAID',
+    totalAmount: 1299.00,
+    offlineCreatedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+    syncedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+    deliveryDate: new Date(Date.now() + 1 * 86400000).toISOString(),
+    items: [
+      {
+        productId: 5,
+        productTitle: '{"en": "Handwoven Organic Cotton Stole", "hi": "हाथ से बुना ऑर्गेनिक कॉटन स्टोल", "kn": "ಕೈಯಿಂದ ನೇಯ್ದ ಸಾವಯವ ಹತ್ತಿ ಶಾಲು"}',
+        quantity: 1,
+        unitPrice: 1299.00
+      }
+    ]
+  },
+  {
+    id: 5,
+    orderNumber: 'RR-889105',
+    idempotencyKey: 'a5555555-5555-5555-5555-555555555555',
+    buyerPhone: '9876543210',
+    buyerName: 'Ananya Sharma',
+    hubName: 'Chandanpur Rural Hub (Gupta General)',
+    hubLandmark: 'Opposite Bus Stand',
+    orderStatus: 'Cancelled',
+    paymentType: 'CARD',
+    paymentStatus: 'REFUNDED',
+    totalAmount: 450.00,
+    offlineCreatedAt: new Date(Date.now() - 1 * 86400000).toISOString(),
+    syncedAt: new Date(Date.now() - 1 * 86400000).toISOString(),
+    deliveryDate: new Date(Date.now() + 2 * 86400000).toISOString(),
+    items: [
+      {
+        productId: 3,
+        productTitle: '{"en": "Beaded Tribal Drop Earrings", "hi": "मनके वाले जनजातीय झुमके", "kn": "ಮಣಿಗಳುಳ್ಳ ಗಿರಿಜನ ಕಿವಿಯೋಲೆಗಳು"}',
+        quantity: 1,
+        unitPrice: 450.00
       }
     ]
   }
@@ -133,6 +203,7 @@ export const MyOrders: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [reviewModalState, setReviewModalState] = useState<{ productId: number; productTitle: string; orderId: number } | null>(null);
+  const [detailsModalData, setDetailsModalData] = useState<OrderDetailsData | null>(null);
   const [serviceModalState, setServiceModalState] = useState<{
     orderId: number;
     orderNumber: string;
@@ -149,23 +220,67 @@ export const MyOrders: React.FC = () => {
 
   const fetchUserOrders = async () => {
     setLoading(true);
+    let combinedOrders: OrderEntry[] = [];
+
+    // 1. Fetch remote orders from API
     try {
       const res = await fetch('/api/v1/orders/my-orders', {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setOrders(data);
-          setLoading(false);
-          return;
+        if (Array.isArray(data)) {
+          combinedOrders = data;
         }
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.warn('API order fetch warning:', err);
     }
 
-    setOrders(FALLBACK_DEMO_ORDERS);
+    // 2. Fetch local pending orders from IndexedDB to ensure zero-latency display
+    try {
+      const pendingList = await db.pendingOrders.toArray();
+      const currentUserPhone = user?.phoneNumber || '9876543210';
+      const userPending = pendingList.filter((po) => !po.buyerPhone || po.buyerPhone === currentUserPhone);
+
+      userPending.forEach((po) => {
+        const exists = combinedOrders.some(
+          (o) => o.idempotencyKey && po.idempotencyKey && o.idempotencyKey === po.idempotencyKey
+        );
+        if (!exists) {
+          combinedOrders.unshift({
+            id: po.id || Math.floor(Math.random() * 100000),
+            orderNumber: po.orderNumber || `RR-${po.idempotencyKey.slice(0, 6).toUpperCase()}`,
+            idempotencyKey: po.idempotencyKey,
+            buyerPhone: po.buyerPhone,
+            buyerName: user?.fullName || 'Ananya Sharma',
+            hubName: po.hubName || 'Ramgarh Central Kendra (Kalyan Store)',
+            hubLandmark: 'Near Panchayat Bhawan',
+            orderStatus: (po.orderStatus as OrderStatusType) || 'ORDER_PLACED',
+            paymentType: po.paymentType || 'COD',
+            paymentStatus: po.syncStatus === 'QUEUED' ? 'PENDING_SYNC' : 'PAID',
+            totalAmount: po.totalAmount,
+            offlineCreatedAt: po.offlineCreatedAt || new Date().toISOString(),
+            syncedAt: po.offlineCreatedAt || new Date().toISOString(),
+            deliveryDate: po.deliveryDate || new Date(Date.now() + 3 * 86400000).toISOString(),
+            items: po.items.map((it) => ({
+              productId: it.productId,
+              productTitle: typeof it.productTitle === 'string' ? it.productTitle : JSON.stringify(it.productTitle),
+              quantity: it.quantity,
+              unitPrice: it.unitPrice
+            }))
+          });
+        }
+      });
+    } catch (err) {
+      console.warn('IndexedDB pending orders fetch warning:', err);
+    }
+
+    if (combinedOrders.length === 0) {
+      combinedOrders = FALLBACK_DEMO_ORDERS;
+    }
+
+    setOrders(combinedOrders);
     setLoading(false);
   };
 
@@ -192,12 +307,49 @@ export const MyOrders: React.FC = () => {
 
   const filteredOrders = orders.filter((o) => {
     if (filterStatus === 'ALL') return true;
+    if (filterStatus === 'ACTIVE') {
+      return o.orderStatus === 'ORDER_PLACED' || o.orderStatus === 'Order Placed' || o.orderStatus === 'DISPATCHED' || o.orderStatus === 'In Transit' || o.orderStatus === 'READY_FOR_PICKUP';
+    }
     return o.orderStatus === filterStatus;
   });
 
-  const getStatusBadge = (status: OrderStatusType) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'ORDER_PLACED':
+      case 'Order Placed':
+      case 'CONFIRMED':
+        return (
+          <span className="order-status-pill" style={{ background: '#E0E7FF', color: '#3730A3', border: '1px solid #C7D2FE', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <Clock size={15} />
+            <span>Order Placed</span>
+          </span>
+        );
+      case 'DISPATCHED':
+      case 'Dispatched':
+        return (
+          <span className="order-status-pill" style={{ background: '#FEF3C7', color: '#B45309', border: '1px solid #FCD34D', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <Truck size={15} />
+            <span>Dispatched</span>
+          </span>
+        );
+      case 'IN_TRANSIT':
+      case 'In Transit':
+        return (
+          <span className="order-status-pill" style={{ background: '#DBEAFE', color: '#1E40AF', border: '1px solid #93C5FD', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <Truck size={15} />
+            <span>In Transit</span>
+          </span>
+        );
+      case 'READY_FOR_PICKUP':
+      case 'Ready for Pickup':
+        return (
+          <span className="order-status-pill" style={{ background: '#ECFDF5', color: '#047857', border: '1px solid #A7F3D0', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <Store size={15} />
+            <span>Ready for Pickup</span>
+          </span>
+        );
       case 'Delivered Successfully':
+      case 'DELIVERED':
         return (
           <span className="order-status-pill status-success">
             <CheckCircle2 size={15} />
@@ -209,6 +361,14 @@ export const MyOrders: React.FC = () => {
           <span className="order-status-pill status-failed">
             <AlertTriangle size={15} />
             <span>{t('deliveredUnsuccessfulBadge')}</span>
+          </span>
+        );
+      case 'Cancelled':
+      case 'CANCELLED':
+        return (
+          <span className="order-status-pill" style={{ background: '#FEE2E2', color: '#991B1B', border: '1px solid #FCA5A5', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <XCircle size={15} />
+            <span>Cancelled</span>
           </span>
         );
       case 'Returned':
@@ -256,6 +416,70 @@ export const MyOrders: React.FC = () => {
     }
   };
 
+  const renderTrackingStepperProgress = (order: OrderEntry) => {
+    const isCancelled = order.orderStatus === 'Cancelled' || order.orderStatus === 'CANCELLED';
+    const isDelivered = order.orderStatus === 'Delivered Successfully' || order.orderStatus === 'DELIVERED';
+
+    let activeStage = 1;
+    if (isDelivered) {
+      activeStage = 5;
+    } else if (isCancelled) {
+      activeStage = 0;
+    } else {
+      const elapsedMinutes = (Date.now() - new Date(order.offlineCreatedAt).getTime()) / (1000 * 60);
+      if (elapsedMinutes > 60) activeStage = 4;
+      else if (elapsedMinutes > 10) activeStage = 3;
+      else if (elapsedMinutes > 2) activeStage = 2;
+      else activeStage = 1;
+    }
+
+    const steps = [
+      { label: 'Order Placed', desc: 'Received' },
+      { label: 'Dispatched', desc: 'Kendra Origin' },
+      { label: 'In Transit', desc: 'Logistics' },
+      { label: 'At Village Hub', desc: 'Ready for Pickup' },
+      { label: 'Delivered', desc: 'Handover Done' }
+    ];
+
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px', textAlign: 'center', marginTop: '10px' }}>
+        {steps.map((st, idx) => {
+          const stepNum = idx + 1;
+          const isDone = !isCancelled && stepNum <= activeStage;
+          const isCurrent = !isCancelled && stepNum === activeStage;
+
+          return (
+            <div key={idx} style={{ position: 'relative' }}>
+              <div
+                style={{
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '50%',
+                  background: isCancelled ? '#EF4444' : isDone ? 'var(--forest)' : '#CBD5E1',
+                  color: '#FFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 6px',
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  border: isCurrent ? '3px solid #86EFAC' : 'none',
+                  boxShadow: isCurrent ? '0 0 0 2px var(--forest)' : 'none'
+                }}
+              >
+                {isDone ? '✓' : stepNum}
+              </div>
+              <div style={{ fontSize: '0.75rem', fontWeight: isCurrent ? 800 : 600, color: isCurrent ? 'var(--forest)' : 'var(--ink)' }}>
+                {st.label}
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--ink-soft)' }}>{st.desc}</div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div>
       <div className="container" style={{ minHeight: '70vh', paddingBottom: '56px' }}>
@@ -273,7 +497,7 @@ export const MyOrders: React.FC = () => {
           </p>
         </div>
 
-        {/* Status Management Filter Tabs */}
+        {/* Status Filter Tabs */}
         <div className="orders-filter-tabs">
           <button
             type="button"
@@ -286,20 +510,20 @@ export const MyOrders: React.FC = () => {
 
           <button
             type="button"
-            className={`orders-tab ${filterStatus === 'Delivered Successfully' ? 'active' : ''}`}
-            onClick={() => setFilterStatus('Delivered Successfully')}
+            className={`orders-tab ${filterStatus === 'ACTIVE' ? 'active' : ''}`}
+            onClick={() => setFilterStatus('ACTIVE')}
           >
-            <CheckCircle2 size={16} style={{ color: '#22c55e' }} />
-            <span>{t('deliveredSuccessFilter').replace('{{count}}', String(orders.filter(o => o.orderStatus === 'Delivered Successfully').length))}</span>
+            <Truck size={16} style={{ color: '#3b82f6' }} />
+            <span>Active Orders ({orders.filter(o => o.orderStatus === 'ORDER_PLACED' || o.orderStatus === 'Order Placed' || o.orderStatus === 'DISPATCHED' || o.orderStatus === 'In Transit' || o.orderStatus === 'READY_FOR_PICKUP').length})</span>
           </button>
 
           <button
             type="button"
-            className={`orders-tab ${filterStatus === 'Delivered Unsuccessfully' ? 'active' : ''}`}
-            onClick={() => setFilterStatus('Delivered Unsuccessfully')}
+            className={`orders-tab ${filterStatus === 'Delivered Successfully' ? 'active' : ''}`}
+            onClick={() => setFilterStatus('Delivered Successfully')}
           >
-            <AlertTriangle size={16} style={{ color: '#ef4444' }} />
-            <span>{t('deliveredUnsuccessFilter').replace('{{count}}', String(orders.filter(o => o.orderStatus === 'Delivered Unsuccessfully').length))}</span>
+            <CheckCircle2 size={16} style={{ color: '#22c55e' }} />
+            <span>{t('deliveredSuccessFilter').replace('{{count}}', String(orders.filter(o => o.orderStatus === 'Delivered Successfully' || o.orderStatus === 'DELIVERED').length))}</span>
           </button>
 
           <button
@@ -308,23 +532,14 @@ export const MyOrders: React.FC = () => {
             onClick={() => setFilterStatus('Cancelled')}
           >
             <XCircle size={16} style={{ color: '#f59e0b' }} />
-            <span>{t('cancelledFilter').replace('{{count}}', String(orders.filter(o => o.orderStatus === 'Cancelled').length))}</span>
-          </button>
-
-          <button
-            type="button"
-            className={`orders-tab ${filterStatus === 'Returned' ? 'active' : ''}`}
-            onClick={() => setFilterStatus('Returned')}
-          >
-            <RotateCcw size={16} style={{ color: '#8b5cf6' }} />
-            <span>Returned ({orders.filter(o => o.orderStatus === 'Returned').length})</span>
+            <span>{t('cancelledFilter').replace('{{count}}', String(orders.filter(o => o.orderStatus === 'Cancelled' || o.orderStatus === 'CANCELLED').length))}</span>
           </button>
         </div>
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <RefreshCw size={32} className="spin-icon" style={{ color: 'var(--forest)' }} />
-            <p style={{ marginTop: '12px', color: 'var(--ink-soft)' }}>Loading your order history...</p>
+            <p style={{ marginTop: '12px', color: 'var(--ink-soft)' }}>Loading your orders...</p>
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="empty-cart" style={{ textAlign: 'center', padding: '48px 24px' }}>
@@ -341,7 +556,7 @@ export const MyOrders: React.FC = () => {
             {filteredOrders.map((order) => (
               <div key={order.id} className="order-history-card">
                 
-                {/* Order Top Bar Header */}
+                {/* Order Header */}
                 <div className="order-card-header">
                   <div className="order-header-main">
                     <div className="order-num-tag">
@@ -355,10 +570,55 @@ export const MyOrders: React.FC = () => {
                   {getStatusBadge(order.orderStatus)}
                 </div>
 
+                {/* Real-Time Logistics Tracking Banner */}
+                <div style={{ background: 'var(--cream)', padding: '14px 18px', borderRadius: '12px', margin: '16px 20px 0', border: '1px solid var(--line)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--forest)' }}>
+                      <Truck size={16} />
+                      <span>Real-Time Tracking & Delivery Details</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--ink-soft)', fontWeight: 600 }}>Expected Delivery:</span>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--forest-dark)', background: '#DCFCE7', padding: '3px 10px', borderRadius: '6px', border: '1px solid #86EFAC' }}>
+                        📅 {formatDate(order.deliveryDate)}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-outline btn-sm"
+                        style={{ fontSize: '0.78rem', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#fff' }}
+                        onClick={() => setDetailsModalData({
+                          id: order.id,
+                          orderNumber: order.orderNumber,
+                          idempotencyKey: order.idempotencyKey,
+                          buyerName: order.buyerName,
+                          buyerPhone: order.buyerPhone,
+                          hubName: order.hubName,
+                          hubLandmark: order.hubLandmark,
+                          orderStatus: order.orderStatus,
+                          paymentType: order.paymentType,
+                          paymentStatus: order.paymentStatus,
+                          totalAmount: order.totalAmount,
+                          offlineCreatedAt: order.offlineCreatedAt,
+                          syncedAt: order.syncedAt,
+                          items: order.items.map(it => ({
+                            productId: it.productId,
+                            title: getLocalizedTitle(it.productTitle),
+                            quantity: it.quantity,
+                            unitPrice: Number(it.unitPrice)
+                          }))
+                        })}
+                      >
+                        <Eye size={13} /> Full Logistics View
+                      </button>
+                    </div>
+                  </div>
+                  {renderTrackingStepperProgress(order)}
+                </div>
+
                 {/* Main Order Content */}
                 <div className="order-card-body">
                   
-                  {/* Left Column: Product Details List */}
+                  {/* Left Column: Products List */}
                   <div className="order-products-section">
                     <h4 className="section-subtitle">{t('productDetailsLabel')}</h4>
                     <div className="order-items-list">
@@ -374,7 +634,7 @@ export const MyOrders: React.FC = () => {
                               <div className="product-qty-meta">
                                 {t('qtyLabel').replace('{{qty}}', String(item.quantity)).replace('{{price}}', itemPrice.toLocaleString('en-IN'))}
                               </div>
-                              {order.orderStatus === 'Delivered Successfully' && (
+                              {(order.orderStatus === 'Delivered Successfully' || order.orderStatus === 'DELIVERED') && (
                                 <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
                                   <button
                                     type="button"
@@ -488,7 +748,8 @@ export const MyOrders: React.FC = () => {
                                   </button>
                                 </div>
                               )}
-                              {order.orderStatus !== 'Delivered Successfully' && order.orderStatus !== 'Cancelled' && (
+
+                              {order.orderStatus !== 'Delivered Successfully' && order.orderStatus !== 'DELIVERED' && order.orderStatus !== 'Cancelled' && order.orderStatus !== 'CANCELLED' && (
                                 <button
                                   type="button"
                                   className="btn btn-outline btn-sm"
@@ -524,7 +785,7 @@ export const MyOrders: React.FC = () => {
                         <Calendar size={15} />
                         <span>{t('deliveryDateLabel')}</span>
                       </div>
-                      <div className="meta-value-bold">
+                      <div className="meta-value-bold" style={{ color: 'var(--forest-dark)' }}>
                         {formatDate(order.deliveryDate)}
                       </div>
                     </div>
@@ -548,7 +809,7 @@ export const MyOrders: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Interactive Status Management Controls */}
+                    {/* Interactive Status Control */}
                     <div className="status-management-box">
                       <label className="status-control-label">{t('statusManagementLabel')}</label>
                       <select
@@ -557,6 +818,9 @@ export const MyOrders: React.FC = () => {
                         disabled={updatingId === order.id}
                         onChange={(e) => handleUpdateStatus(order.id, e.target.value as OrderStatusType)}
                       >
+                        <option value="ORDER_PLACED">🔵 Order Placed</option>
+                        <option value="DISPATCHED">🚚 Dispatched</option>
+                        <option value="IN_TRANSIT">📦 In Transit</option>
                         <option value="Delivered Successfully">🟢 {t('deliveredSuccessFilter').replace(' ({{count}})', '')}</option>
                         <option value="Delivered Unsuccessfully">🔴 {t('deliveredUnsuccessfulBadge')}</option>
                         <option value="Cancelled">🟡 {t('cancelledBadge')}</option>
@@ -573,6 +837,19 @@ export const MyOrders: React.FC = () => {
           </div>
         )}
       </div>
+
+      {detailsModalData && (
+        <OrderDetailsModal
+          order={detailsModalData}
+          onClose={() => setDetailsModalData(null)}
+          onCancelOrder={async (orderId, reason) => {
+            setOrders((prev) =>
+              prev.map((o) => (o.id === Number(orderId) || o.orderNumber === String(orderId) ? { ...o, orderStatus: 'Cancelled' } : o))
+            );
+            fetchUserOrders();
+          }}
+        />
+      )}
 
       {reviewModalState && (
         <WriteReviewModal

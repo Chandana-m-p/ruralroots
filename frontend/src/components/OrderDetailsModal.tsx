@@ -49,18 +49,28 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
 
   const getStatusBadge = (status: string) => {
     switch (status?.toUpperCase()) {
+      case 'ORDER_PLACED':
+      case 'ORDER PLACED':
+      case 'CONFIRMED':
+        return { label: 'Order Placed & Confirmed', bg: '#E0E7FF', color: '#3730A3', icon: <Clock size={16} /> };
+      case 'DISPATCHED':
+        return { label: 'Dispatched from Artisan Hub', bg: '#FEF3C7', color: '#B45309', icon: <Truck size={16} /> };
+      case 'IN_TRANSIT':
+      case 'IN TRANSIT':
+        return { label: 'In Transit to Village Kendra', bg: '#DBEAFE', color: '#1E40AF', icon: <Truck size={16} /> };
+      case 'READY_FOR_PICKUP':
+      case 'READY FOR PICKUP':
+        return { label: 'Ready for Pickup at Hub', bg: '#ECFDF5', color: '#047857', icon: <Package size={16} /> };
       case 'DELIVERED':
+      case 'DELIVERED SUCCESSFULLY':
       case 'COMPLETED':
         return { label: 'Delivered & Cash Collected', bg: '#D1FAE5', color: '#065F46', icon: <CheckCircle2 size={16} /> };
       case 'CANCELLED':
         return { label: 'Order Cancelled', bg: '#FEE2E2', color: '#991B1B', icon: <XCircle size={16} /> };
-      case 'DISPATCHED':
-      case 'IN_TRANSIT':
-        return { label: 'In Transit to Hub', bg: '#DBEAFE', color: '#1E40AF', icon: <Truck size={16} /> };
       case 'PENDING_SYNC':
         return { label: 'Pending Offline Sync', bg: '#FEF3C7', color: '#92400E', icon: <Clock size={16} /> };
       default:
-        return { label: 'Order Confirmed', bg: '#E0E7FF', color: '#3730A3', icon: <CheckCircle2 size={16} /> };
+        return { label: order.orderStatus || 'Order Confirmed', bg: '#E0E7FF', color: '#3730A3', icon: <CheckCircle2 size={16} /> };
     }
   };
 
@@ -189,30 +199,35 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
             <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--forest)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Clock size={16} /> Delivery Progress Timeline
             </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', textAlign: 'center', position: 'relative' }}>
-              <div style={{ position: 'relative' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px', textAlign: 'center', position: 'relative' }}>
+              <div>
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--forest)', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontWeight: 700, fontSize: '0.8rem' }}>1</div>
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink)' }}>Order Placed</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--ink-soft)' }}>Offline/Synced</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--ink-soft)' }}>Confirmed</div>
               </div>
 
               <div>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: order.orderStatus === 'CANCELLED' ? '#EF4444' : 'var(--forest)', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontWeight: 700, fontSize: '0.8rem' }}>2</div>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: order.orderStatus?.toUpperCase().includes('CANCEL') ? '#EF4444' : order.orderStatus?.toUpperCase() !== 'ORDER_PLACED' ? 'var(--forest)' : '#CBD5E1', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontWeight: 700, fontSize: '0.8rem' }}>2</div>
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink)' }}>Dispatched</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--ink-soft)' }}>Consignment</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--ink-soft)' }}>Kendra Origin</div>
               </div>
 
               <div>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: order.orderStatus === 'DELIVERED' ? 'var(--forest)' : '#CBD5E1', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontWeight: 700, fontSize: '0.8rem' }}>3</div>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: ['IN_TRANSIT', 'READY_FOR_PICKUP', 'DELIVERED', 'DELIVERED SUCCESSFULLY'].some(s => order.orderStatus?.toUpperCase().includes(s)) ? 'var(--forest)' : '#CBD5E1', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontWeight: 700, fontSize: '0.8rem' }}>3</div>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink)' }}>In Transit</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--ink-soft)' }}>Logistics Hub</div>
+              </div>
+
+              <div>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: ['READY_FOR_PICKUP', 'DELIVERED', 'DELIVERED SUCCESSFULLY'].some(s => order.orderStatus?.toUpperCase().includes(s)) ? 'var(--forest)' : '#CBD5E1', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontWeight: 700, fontSize: '0.8rem' }}>4</div>
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink)' }}>At Village Hub</div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--ink-soft)' }}>Ready for Pickup</div>
               </div>
 
               <div>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: order.orderStatus === 'DELIVERED' ? '#16A34A' : '#CBD5E1', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontWeight: 700, fontSize: '0.8rem' }}>4</div>
-                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink)' }}>Cash Handover</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--ink-soft)' }}>COD Completed</div>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: order.orderStatus?.toUpperCase().includes('DELIVER') ? '#16A34A' : '#CBD5E1', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontWeight: 700, fontSize: '0.8rem' }}>5</div>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink)' }}>Delivered</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--ink-soft)' }}>Handover Done</div>
               </div>
             </div>
           </div>
