@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://ruralroots-backend.onrender.com/api/:path*"
+      "destination": "https://ruralroots-1.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",
