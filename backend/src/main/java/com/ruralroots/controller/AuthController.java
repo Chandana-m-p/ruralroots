@@ -2,6 +2,7 @@ package com.ruralroots.controller;
 
 import com.ruralroots.dto.AuthRequestDTO;
 import com.ruralroots.dto.AuthResponseDTO;
+import com.ruralroots.dto.LoginRequestDTO;
 import com.ruralroots.dto.OtpVerifyDTO;
 import com.ruralroots.service.AuthService;
 import jakarta.validation.Valid;
@@ -17,6 +18,12 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
+        AuthResponseDTO response = authService.loginWithCredentials(request);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/request-otp")
     public ResponseEntity<Map<String, String>> requestOtp(@Valid @RequestBody AuthRequestDTO request) {

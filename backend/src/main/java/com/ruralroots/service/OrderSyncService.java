@@ -52,7 +52,12 @@ public class OrderSyncService {
         VillageHub hub = hubRepository.findById(dto.getHubId())
                 .orElseThrow(() -> new IllegalArgumentException("Village Hub not found: " + dto.getHubId()));
 
-        String orderNumber = "RR-" + (100000 + (long)(Math.random() * 899999));
+        String orderNumber;
+        int attempts = 0;
+        do {
+            orderNumber = "RR-" + (System.currentTimeMillis() % 1000000) + (10 + (int)(Math.random() * 89));
+            attempts++;
+        } while (orderRepository.findByOrderNumber(orderNumber).isPresent() && attempts < 10);
 
         Order order = Order.builder()
                 .orderNumber(orderNumber)
@@ -119,6 +124,10 @@ public class OrderSyncService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
 
+        if ("CANCELLED".equals(order.getOrderStatus())) {
+            throw new IllegalStateException("Cannot deliver an order that has been cancelled.");
+        }
+
         order.setOrderStatus("DELIVERED");
         order.setPaymentStatus("PAID");
         Order updated = orderRepository.save(order);
@@ -132,6 +141,13 @@ public class OrderSyncService {
     public OrderResponseDTO cancelOrder(Long orderId, String reason, String buyerPhoneNumber) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
+
+        User caller = userRepository.findByPhoneNumber(buyerPhoneNumber)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + buyerPhoneNumber));
+
+        if (!order.getBuyer().getId().equals(caller.getId()) && caller.getRole() != Role.ROLE_ADMIN) {
+            throw new IllegalStateException("You are not authorized to cancel this order.");
+        }
 
         if ("CANCELLED".equals(order.getOrderStatus())) {
             throw new IllegalStateException("Order is already cancelled.");

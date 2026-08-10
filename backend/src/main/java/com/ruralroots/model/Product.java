@@ -14,6 +14,9 @@ public class Product {
     @Column(nullable = false, unique = true, length = 50)
     private String sku;
 
+    @Column(name = "category", length = 100)
+    private String category = "pottery";
+
     @Column(name = "title_i18n", nullable = false, columnDefinition = "TEXT")
     private String titleI18n;
 
@@ -26,10 +29,10 @@ public class Product {
     @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity;
 
-    @Column(name = "thumbnail_url", nullable = false, length = 255)
+    @Column(name = "thumbnail_url", columnDefinition = "TEXT")
     private String thumbnailUrl;
 
-    @Column(name = "images_json", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "images_json", columnDefinition = "TEXT")
     private String imagesJson;
 
     @Column(name = "is_active")
@@ -41,9 +44,10 @@ public class Product {
 
     public Product() {}
 
-    public Product(Long id, String sku, String titleI18n, String descriptionI18n, BigDecimal basePrice, Integer stockQuantity, String thumbnailUrl, String imagesJson, Boolean isActive, Long version) {
+    public Product(Long id, String sku, String category, String titleI18n, String descriptionI18n, BigDecimal basePrice, Integer stockQuantity, String thumbnailUrl, String imagesJson, Boolean isActive, Long version) {
         this.id = id;
         this.sku = sku;
+        this.category = category != null ? category : "pottery";
         this.titleI18n = titleI18n;
         this.descriptionI18n = descriptionI18n;
         this.basePrice = basePrice;
@@ -61,6 +65,7 @@ public class Product {
     public static class ProductBuilder {
         private Long id;
         private String sku;
+        private String category = "pottery";
         private String titleI18n;
         private String descriptionI18n;
         private BigDecimal basePrice;
@@ -72,6 +77,7 @@ public class Product {
 
         public ProductBuilder id(Long id) { this.id = id; return this; }
         public ProductBuilder sku(String sku) { this.sku = sku; return this; }
+        public ProductBuilder category(String category) { this.category = category; return this; }
         public ProductBuilder titleI18n(String titleI18n) { this.titleI18n = titleI18n; return this; }
         public ProductBuilder descriptionI18n(String descriptionI18n) { this.descriptionI18n = descriptionI18n; return this; }
         public ProductBuilder basePrice(BigDecimal basePrice) { this.basePrice = basePrice; return this; }
@@ -82,7 +88,7 @@ public class Product {
         public ProductBuilder version(Long version) { this.version = version; return this; }
 
         public Product build() {
-            return new Product(id, sku, titleI18n, descriptionI18n, basePrice, stockQuantity, thumbnailUrl, imagesJson, isActive, version);
+            return new Product(id, sku, category, titleI18n, descriptionI18n, basePrice, stockQuantity, thumbnailUrl, imagesJson, isActive, version);
         }
     }
 
@@ -90,6 +96,8 @@ public class Product {
     public void setId(Long id) { this.id = id; }
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
     public String getTitleI18n() { return titleI18n; }
     public void setTitleI18n(String titleI18n) { this.titleI18n = titleI18n; }
     public String getDescriptionI18n() { return descriptionI18n; }
